@@ -1,7 +1,4 @@
-import React from 'react'
-
+import { redirect } from "next/navigation";
 export default function page() {
-  return (
-    <div>Audit Tracker</div>
-  )
+ return redirect("/auth/login");
 }
