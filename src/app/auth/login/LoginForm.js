@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
 import { useState } from "react";
 import useSWRMutation from "swr/mutation";
@@ -38,8 +39,17 @@ export default function LoginForm() {
       // Handle form submission logic here
       const formData = { email, password };
       const result = await trigger(formData);
-      console.log('result:', result)
+      console.log("result:", result);
       if (result) {
+        const user = {
+          _id: result._id,
+          name: result.name,
+          email: result.email,
+          role: result.role,
+        };
+        console.log(user)
+        useAuthStore.getState().login(user, result.token);
+        
         window.location.href = "/dashboard";
       }
     } catch (error) {
