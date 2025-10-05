@@ -1,4 +1,8 @@
-import { redirect } from "next/navigation";
+import React from 'react'
+
 export default function page() {
- return redirect("/auth/login");
+  return (
+    <div>welcome</div>
+  )
 }
+
