@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWRMutation from "swr/mutation";
 
 async function loginRequest(url, { arg }) {
+   
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -24,6 +26,10 @@ async function loginRequest(url, { arg }) {
 }
 
 export default function LoginForm() {
+
+  const router = useRouter();
+  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -50,7 +56,7 @@ export default function LoginForm() {
         console.log(user)
         useAuthStore.getState().login(user, result.token);
         
-        window.location.href = "/dashboard";
+        router.push(`/dashboard/${user.role}`);
       }
     } catch (error) {
       console.error("Login failed:", error.message);
