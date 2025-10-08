@@ -5,6 +5,7 @@ export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
   const currentPath = request.nextUrl.pathname;
 
+  // ❌ হোমপেজ ("/") কে public route থেকে বাদ দিন!
   const publicRoutes = ["/auth/login"];
   const isPublicRoute = publicRoutes.some(
     (route) => currentPath === route || currentPath.startsWith(route + "/")
@@ -19,23 +20,25 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // Public route logic
+  // Public routes (শুধু /auth/login)
   if (isPublicRoute) {
     if (token) {
       try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
         const { payload } = await jwtVerify(token, secret);
+        // লগইন করা থাকলে /auth/login এ থাকা উচিত না → ড্যাশবোর্ডে পাঠান
         return NextResponse.redirect(
           new URL(`/dashboard/${payload.role}`, request.url)
         );
       } catch {
+        // Invalid token → allow access to login page
         return NextResponse.next();
       }
     }
     return NextResponse.next();
   }
 
-  // Protected routes
+  // 🔒 সবকিছুই protected — যেমন: /, /dashboard, ইত্যাদি
   if (!token) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
@@ -50,6 +53,12 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
+    // ✅ যদি কেউ "/" এ আসে → তাকে তার ড্যাশবোর্ডে পাঠান
+    if (currentPath === "/") {
+      return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
+    }
+
+    // ড্যাশবোর্ড রোল ভ্যালিডেশন
     if (
       currentPath.startsWith("/dashboard") &&
       !currentPath.startsWith(`/dashboard/${role}`)
@@ -66,8 +75,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*", // protect all dashboard routes
-    "/auth/login",
-    "/", // home
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|gif)$).*)",
   ],
 };
