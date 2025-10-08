@@ -8,7 +8,7 @@ const UserManagementPage = async () => {
   const initialUsers = await getAllUsers(token);
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto ">
       <h1 className="text-3xl font-bold mb-2">User Management</h1>
       <p className="text-gray-600 mb-6">Manage and monitor all user accounts</p>
       <UsersFilters />

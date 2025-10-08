@@ -1,7 +1,7 @@
 // src/components/admin/UsersFilters.jsx
 export default function UsersFilters({ searchValue, onSearchChange, roleValue, onRoleChange, statusValue, onStatusChange }) {
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
+    <div className="md:flex flex-wrap gap-4 mb-6">
       {/* Search */}
       <div className="flex-grow">
         <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
