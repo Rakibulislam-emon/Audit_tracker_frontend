@@ -1,4 +1,23 @@
 // Fetch all users directly from backend
+// create user
+
+ export const createUser = async (token, data) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/register`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : undefined,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to create user");
+  return response.json();
+};
+
+
 export const getAllUsers = async (token) => {
   try {
     const response = await fetch(
@@ -33,7 +52,7 @@ export const updateUser = async (token, userId, data) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userId}`,
     {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : undefined,

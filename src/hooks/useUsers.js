@@ -1,12 +1,25 @@
 "use client";
 
 import {
+  createUser,
   deleteUser,
   getAllUsers,
   patchUser,
   updateUser,
 } from "@/services/userService.js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+// create user 
+
+ export const useCreateUser = (token) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => createUser(token, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+    },
+  });
+};
 
 export const useUsers = (token, options = {}) => {
   return useQuery({
@@ -28,15 +41,15 @@ export const useUpdateUser = (token) => {
   });
 };
 
-export const usePatchUser = (token) => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ userId, data }) => patchUser(token, userId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["users"]);
-    },
-  });
-};
+// export const usePatchUser = (token) => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({ userId, data }) => patchUser(token, userId, data),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(["users"]);
+//     },
+//   });
+// };
 
 export const useDeleteUser = (token) => {
   const queryClient = useQueryClient();
