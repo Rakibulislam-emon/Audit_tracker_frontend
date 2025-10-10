@@ -1,7 +1,7 @@
 // Fetch all users directly from backend
 // create user
 
- export const createUser = async (token, data) => {
+export const createUser = async (token, data) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/register`,
     {
@@ -17,11 +17,23 @@
   return response.json();
 };
 
-
-export const getAllUsers = async (token) => {
+export const getAllUsers = async (token, filter = {}) => {
+  const { search = "", role = "", status = "" } = filter;
+  console.log('filter:', filter)
+  const params = new URLSearchParams();
+  console.log('params:', params)
+  if (search) {
+    params.append("search", search);
+  }
+  if (role) {
+    params.append("role", role);
+  }
+  if (status) {
+    params.append("status", status);
+  }
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/?${params.toString()}`,
       {
         method: "GET",
         headers: {

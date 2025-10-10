@@ -27,7 +27,7 @@ export default function UserTable({ users: initialUsers, token }) {
         </button>
       </div>
     );
-
+console.log(users)
   return (
     <div>
       <AddUsers users={users} token={token} />

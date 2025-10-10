@@ -74,6 +74,9 @@ export const useAuthStore = create(
       setToken: (token) => set({ token }),
       setLoading: (isLoading) => set({ isLoading }),
 
+// get user role
+      getUserRole: () => get().user &&  get().user.role,
+
       login: (userData, token) => {
         set({ user: userData, token, isLoading: false });
       },
