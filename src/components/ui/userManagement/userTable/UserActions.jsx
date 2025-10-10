@@ -19,21 +19,24 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../button";
 import EditUserModal from "./EditUserModal";
+import { useRouter } from "next/navigation";
 
 export default function UserActions({ user, token }) {
+  const router = useRouter();
   // get user f4rom auth
+  const [open, setOpen] = useState(false);
+  const { mutate: deleteUser, isLoading: deleting } = useDeleteUser(token);
   const { user: authUser } = useAuthStore();
 
   if (authUser._id === user._id) return null;
   if (authUser.role === user.role) return null;
-  const [open, setOpen] = useState(false);
-  const { mutate: deleteUser, isLoading: deleting } = useDeleteUser(token);
 
   const handleDelete = () => {
     deleteUser(user._id, {
       onSuccess: () => {
         toast.success("User deleted successfully");
         setOpen(false);
+        router.refresh();
       },
       onError: () => toast.error("Failed to delete user"),
     });

@@ -1,101 +1,128 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "../button";
+import { useAuthStore } from "@/stores/useAuthStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function UsersFilters({ currentFilters }) {
+  const [search, setSearch] = useState(currentFilters.search || "");
+  const [selectedRole, setSelectedRole] = useState(currentFilters.role || "all");
+  const [selectedStatus, setSelectedStatus] = useState(currentFilters.status || "all");
   const router = useRouter();
-  const role = "admin"
-  const timeoutRef = useRef(null);
-  const [localSearch, setLocalSearch] = useState(currentFilters.search || "");
+  const { user } = useAuthStore();
+  const role = user.role;
 
-  // Debounced search function
-  const updateSearchFilter = useCallback((value) => {
-    setLocalSearch(value);
-    
-    // Clear previous timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    
-    // Set new timeout - 500ms delay after typing stops
-    timeoutRef.current = setTimeout(() => {
-      const newFilters = { ...currentFilters, search: value };
+  // ✅ Updated URL update function
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const filters = {};
       
-      // Remove empty filters
-      Object.keys(newFilters).forEach(key => {
-        if (!newFilters[key]) delete newFilters[key];
-      });
+      // ✅ ONLY add non-empty values and exclude "all" values
+      if (search) filters.search = search;
+      if (selectedRole && selectedRole !== "all") filters.role = selectedRole;
+      if (selectedStatus && selectedStatus !== "all") filters.status = selectedStatus;
       
-      const params = new URLSearchParams(newFilters);
-      router.push(`/dashboard/${role}/users?${params.toString()}`);
-    }, 500); // Wait 500ms after user stops typing
-  }, [currentFilters, router]);
-
-  // Immediate update for other filters (role, status)
-  const updateFilter = (key, value) => {
-    const newFilters = { ...currentFilters, [key]: value };
+      const params = new URLSearchParams(filters);
+      
+      // ✅ Build URL - if no filters, remove all params
+      const queryString = params.toString();
+      const newUrl = queryString 
+        ? `/dashboard/${role}/users?${queryString}`
+        : `/dashboard/${role}/users`; // ✅ Clean URL when no filters
+      
+      router.push(newUrl);
+    }, search ? 500 : 0); // ✅ Immediate update when clearing
     
-    Object.keys(newFilters).forEach(key => {
-      if (!newFilters[key]) delete newFilters[key];
-    });
-    
-    const params = new URLSearchParams(newFilters);
-    router.push(`/dashboard/admin/users?${params.toString()}`);
-  };
+    return () => clearTimeout(timeoutId);
+  }, [search, selectedRole, selectedStatus, router, role]);
 
   return (
     <div className="md:flex flex-wrap gap-4 mb-6">
-      {/* Search Input - With Debouncing */}
+      {/* Search Input - Converted to shadcn Input */}
       <div className="flex-grow">
-        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+        <Label htmlFor="search" className="text-sm font-medium text-gray-700 mb-1">
           Search
-        </label>
-        <input
+        </Label>
+        <Input
           id="search"
-          value={localSearch}
-          onChange={(e) => updateSearchFilter(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or email..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
-        <p className="text-xs text-gray-500 mt-1">Search will update after you stop typing</p>
+        <p className="text-xs text-gray-500 mt-1">
+          {search ? "Search will update when you pause typing" : "Type to search users"}
+        </p>
       </div>
 
-      {/* Role Filter - Immediate Update */}
+      {/* Role Filter - Converted to shadcn Select */}
       <div>
-        <label htmlFor="roleFilter" className="block text-sm font-medium text-gray-700 mb-1">
+        <Label htmlFor="roleFilter" className="text-sm font-medium text-gray-700 mb-1">
           Role
-        </label>
-        <select
-          id="roleFilter"
-          value={currentFilters.role || ""}
-          onChange={(e) => updateFilter("role", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        </Label>
+        <Select
+          value={selectedRole}
+          onValueChange={setSelectedRole}
         >
-          <option value="">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="audit_manager">Audit Manager</option>
-          <option value="auditor">Auditor</option>
-          <option value="compliance_officer">Compliance Officer</option>
-          <option value="sysadmin">SysAdmin</option>
-        </select>
+          <SelectTrigger id="roleFilter" className="w-full">
+            <SelectValue placeholder="All Roles" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="audit_manager">Audit Manager</SelectItem>
+            <SelectItem value="auditor">Auditor</SelectItem>
+            <SelectItem value="compliance_officer">Compliance Officer</SelectItem>
+            <SelectItem value="sysadmin">SysAdmin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Status Filter - Immediate Update */}
+      {/* Status Filter - Converted to shadcn Select */}
       <div>
-        <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">
+        <Label htmlFor="statusFilter" className="text-sm font-medium text-gray-700 mb-1">
           Status
-        </label>
-        <select
-          id="statusFilter"
-          value={currentFilters.status || ""}
-          onChange={(e) => updateFilter("status", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        </Label>
+        <Select
+          value={selectedStatus}
+          onValueChange={setSelectedStatus}
         >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+          <SelectTrigger id="statusFilter" className="w-full">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* ✅ Clear Filters Button */}
+      {(search || selectedRole !== "all" || selectedStatus !== "all") && (
+        <div className="flex items-center md:my-0 my-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSearch("");
+              setSelectedRole("all");
+              setSelectedStatus("all");
+            }}
+            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            Clear Filters
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

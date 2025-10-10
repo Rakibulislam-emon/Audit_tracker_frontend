@@ -19,9 +19,9 @@ export const createUser = async (token, data) => {
 
 export const getAllUsers = async (token, filter = {}) => {
   const { search = "", role = "", status = "" } = filter;
-  console.log('filter:', filter)
+
   const params = new URLSearchParams();
-  console.log('params:', params)
+  
   if (search) {
     params.append("search", search);
   }

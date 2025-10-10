@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -28,12 +29,14 @@ import {
 
 import { useUpdateUser } from "@/hooks/useUsers";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../../button";
 
 export default function EditUserModal({ user, token }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { mutate: updateUser, isLoading } = useUpdateUser(token);
 
@@ -47,7 +50,6 @@ export default function EditUserModal({ user, token }) {
   });
 
   const onSubmit = (data) => {
-    console.log("data:", data);
     if (!user._id) {
       toast.error("User ID is missing");
       return;
@@ -59,6 +61,7 @@ export default function EditUserModal({ user, token }) {
         onSuccess: () => {
           toast.success("User updated successfully");
           setOpen(false);
+          router.refresh();
         },
         onError: () => toast.error("Failed to update user"),
       }
@@ -79,6 +82,9 @@ export default function EditUserModal({ user, token }) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
+          <DialogDescription>
+            Edit this user's information and save your changes.{" "}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

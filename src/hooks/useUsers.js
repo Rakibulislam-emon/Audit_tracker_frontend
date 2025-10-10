@@ -21,13 +21,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
   });
 };
 
-export const useUsers = (token, options = {}) => {
+export const useUsers = (token, filters = {}, options = {}) => {
   return useQuery({
-    queryKey: ["users"],
-    queryFn: () => getAllUsers(token),
+    queryKey: ["users", filters], // Include filters in query key
+    queryFn: () => getAllUsers(token, filters),
     enabled: !!token,
     initialData: options.initialData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
