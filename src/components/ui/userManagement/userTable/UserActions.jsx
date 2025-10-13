@@ -37,6 +37,7 @@ export default function UserActions({ user, token }) {
         toast.success("User deleted successfully");
         setOpen(false);
         router.refresh();
+        router.push(`/dashboard/${authUser.role}/users`);
       },
       onError: () => toast.error("Failed to delete user"),
     });

@@ -62,6 +62,7 @@ export default function EditUserModal({ user, token }) {
           toast.success("User updated successfully");
           setOpen(false);
           router.refresh();
+          router.push(`/dashboard/${authUser.role}/users`);
         },
         onError: () => toast.error("Failed to update user"),
       }

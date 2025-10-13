@@ -2,6 +2,7 @@
 
 import { useCreateUser } from "@/hooks/useUsers";
 import { UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../button";
 import Modal from "../modal";
@@ -10,11 +11,12 @@ import AddUserForm from "./AddUserFrom";
 export default function AddUsers({ users, token }) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutate: createUser, isPending, error } = useCreateUser(token);
-
+  const router = useRouter();
   const handleAddUser = (formData) => {
     createUser(formData, {
       onSuccess: () => setIsOpen(false),
     });
+    router.refresh();
   };
 
   return (

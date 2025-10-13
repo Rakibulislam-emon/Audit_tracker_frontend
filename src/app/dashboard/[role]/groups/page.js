@@ -1,7 +1,8 @@
-import React from 'react'
+import GroupManagement from "@/components/groupManagement/GroupManagement";
 
-export default function GroupManagementPage() {
-  return (
-    <div>GroupManagementPage  here will be group management things</div>
-  )
+
+
+export default async function GroupsPage() {
+  // This is now a server component - no "use client"
+  return <GroupManagement />;
 }

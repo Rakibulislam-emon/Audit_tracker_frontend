@@ -76,23 +76,6 @@ export const updateUser = async (token, userId, data) => {
   return response.json();
 };
 
-// Patch user
-export const patchUser = async (token, userId, data) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userId}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : undefined,
-      },
-      body: JSON.stringify(data),
-    }
-  );
-  if (!response.ok) throw new Error("Failed to patch user");
-  return response.json();
-};
-
 // Delete user
 export const deleteUser = async (token, userId) => {
   const response = await fetch(
