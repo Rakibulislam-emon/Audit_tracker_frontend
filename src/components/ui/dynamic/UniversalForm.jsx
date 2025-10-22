@@ -1,231 +1,308 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { universalConfig } from "@/config/dynamicConfig";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { universalConfig } from "@/config/dynamicConfig";
+import { AlertCircle, Plus, Save } from "lucide-react";
+import { useForm } from "react-hook-form";
 
-
-/**
- * UNIVERSAL FORM COMPONENT
- * 
- * Automatically generates forms from module configuration
- * 
- * @param {string} module - Module name: "users", "groups", "companies"
- * @param {function} onSubmit - Form submission handler
- * @param {boolean} isSubmitting - Loading state
- * @param {object} initialData - Pre-fill data for edit mode
- * @param {string} mode - "create" or "edit"
- * 
- * USAGE:
- * <UniversalForm module="users" onSubmit={handleSubmit} mode="create" />
- * <UniversalForm module="users" onSubmit={handleUpdate} initialData={user} mode="edit" />
- */
 export default function UniversalForm({
   module,
   onSubmit,
   isSubmitting = false,
   initialData = {},
-  mode = "create"
+  mode = "create",
 }) {
-  // 1. GET MODULE CONFIGURATION
   const config = universalConfig[module];
 
-  // 2. INITIALIZE REACT HOOK FORM
   const {
     register,
     handleSubmit,
-    formState: { errors },
     watch,
-    setValue,
-    control
+    formState: { errors, isDirty },
   } = useForm({
     defaultValues: initialData,
   });
 
-  // 3. SAFETY CHECK
   if (!config) {
     return (
-      <div className="p-4 text-red-600 border border-red-200 rounded-lg">
-        Error: Configuration not found for module "{module}"
+      <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-lg flex items-start gap-3">
+        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="font-semibold">Configuration Error</p>
+          <p className="text-sm mt-1">
+            No configuration found for module "{module}"
+          </p>
+        </div>
       </div>
     );
   }
 
-  /**
-   * FIELD RENDERER FUNCTION
-   * 
-   * Renders appropriate input based on field type from configuration
-   * 
-   * @param {string} fieldKey - Field name: "name", "email", "role"
-   * @param {object} fieldConfig - Field configuration from dynamicConfig
-   */
   const renderField = (fieldKey, fieldConfig) => {
-    // Skip createOnly fields in edit mode
-    if (mode === "edit" && fieldConfig.createOnly) {
-      return null;
-    }
+    console.log("fieldConfig:", fieldConfig);
+    // Skip fields based on mode
+    if (mode === "edit" && fieldConfig.createOnly) return null;
+    if (mode === "create" && fieldConfig.editOnly) return null;
+    if (fieldConfig.formField === false) return null;
 
-    // Common props for all inputs
-    const commonProps = {
-      disabled: isSubmitting,
-      ...register(fieldKey, {
-        required: fieldConfig.required ? `${fieldConfig.label} is required` : false,
-        // You can add more validation rules here based on field type
-      }),
-    };
+    const hasError = errors[fieldKey];
+    const errorClass = hasError ? "border-red-500 focus:ring-red-500" : "";
 
-    // Switch based on field type from configuration
+    // Watch current value for dynamic styling
+    const currentValue = watch(fieldKey);
+
     switch (fieldConfig.type) {
-      // TEXT INPUTS
-      case 'text':
-      case 'email':
-      case 'password':
+      case "text":
+      case "email":
+      case "password":
         return (
           <Input
             type={fieldConfig.type}
             placeholder={fieldConfig.placeholder}
-            className={errors[fieldKey] ? "border-red-500" : ""}
-            {...commonProps}
-          />
-        );
-
-      // SELECT DROPDOWN
-      case 'select':
-        return (
-          <Select
-            value={watch(fieldKey) || ""}
-            onValueChange={(value) => setValue(fieldKey, value)}
             disabled={isSubmitting}
-          >
-            <SelectTrigger className={errors[fieldKey] ? "border-red-500" : ""}>
-              <SelectValue placeholder={`Select ${fieldConfig.label}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {fieldConfig.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {/* Auto-format: "audit_manager" → "Audit Manager" */}
-                  {option.split('_').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-
-      // TEXTAREA FOR LONG TEXT
-      case 'textarea':
-        return (
-          <Textarea
-            placeholder={fieldConfig.placeholder}
-            className={errors[fieldKey] ? "border-red-500" : ""}
-            rows={4}
-            {...commonProps}
+            className={`${errorClass} transition-colors`}
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+              pattern:
+                fieldConfig.type === "email"
+                  ? {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    }
+                  : undefined,
+            })}
           />
         );
 
-      // SWITCH/TOGGLE (Checkbox for now)
-      case 'switch':
+      case "select":
+        const options = fieldConfig.options || [];
+        console.log("options:", options);
+
         return (
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id={fieldKey}
-              checked={watch(fieldKey) || false}
-              onCheckedChange={(checked) => setValue(fieldKey, checked)}
+          <div className="relative">
+            <select
               disabled={isSubmitting}
-            />
-            <Label htmlFor={fieldKey} className="text-sm font-normal">
-              {fieldConfig.label}
-            </Label>
+              className={`
+                flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm 
+                ring-offset-background
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                disabled:cursor-not-allowed disabled:opacity-50 appearance-none
+                transition-colors
+                ${errorClass || "border-gray-300"}
+                ${
+                  !currentValue || currentValue === ""
+                    ? "text-gray-400"
+                    : "text-gray-900"
+                }
+              `}
+              {...register(fieldKey, {
+                required: fieldConfig.required
+                  ? `${fieldConfig.label} is required`
+                  : false,
+                validate: (value) => {
+                  if (fieldConfig.required && (!value || value === "")) {
+                    return `${fieldConfig.label} is required`;
+                  }
+                  return true;
+                },
+              })}
+            >
+              <option value="" className="text-gray-400">
+                {fieldConfig.placeholder || `Select ${fieldConfig.label}`}
+              </option>
+              {options.map((option, index) => (
+                <option key={index} value={option} className="text-gray-900">
+                  {fieldKey === "isActive"
+                    ? option === "active" || option === true
+                      ? "Active"
+                      : "Inactive"
+                    : typeof option === "string" && option.includes("_")
+                    ? option
+                        .split("_")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
+                    : option.charAt(0).toUpperCase() + option.slice(1)}
+                </option>
+              ))}
+            </select>
+            {/* Custom dropdown arrow */}
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 15 15"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 opacity-50"
+              >
+                <path
+                  d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z"
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </div>
           </div>
         );
 
-      // DATE FIELD
-      case 'date':
+      case "textarea":
+        return (
+          <Textarea
+            placeholder={fieldConfig.placeholder}
+            disabled={isSubmitting}
+            className={`${errorClass} transition-colors resize-none`}
+            rows={4}
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+            })}
+          />
+        );
+
+      case "date":
         return (
           <Input
             type="date"
             disabled={fieldConfig.readOnly || isSubmitting}
-            {...commonProps}
+            className={`${errorClass} transition-colors`}
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+            })}
           />
         );
 
-      // FALLBACK FOR UNKNOWN TYPES
       default:
         return (
           <Input
             type="text"
             placeholder={fieldConfig.placeholder}
-            className={errors[fieldKey] ? "border-red-500" : ""}
-            {...commonProps}
+            disabled={isSubmitting}
+            className={`${errorClass} transition-colors`}
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+            })}
           />
         );
     }
   };
 
+  // Get visible fields for layout
+  const visibleFields = Object.entries(config.fields).filter(
+    ([fieldKey, fieldConfig]) => {
+      if (mode === "edit" && fieldConfig.createOnly) return false;
+      if (mode === "create" && fieldConfig.editOnly) return false;
+      if (fieldConfig.formField === false) return false;
+      return true;
+    }
+  );
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* DYNAMIC FIELDS - Generated from configuration */}
-      {Object.entries(config.fields).map(([fieldKey, fieldConfig]) => {
-        // Skip fields that shouldn't be rendered in current mode
-        if (mode === "edit" && fieldConfig.createOnly) return null;
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(onSubmit)(e);
+      }}
+      className="space-y-5"
+    >
+      {/* Form Fields - Grid Layout for better space usage */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {visibleFields.map(([fieldKey, fieldConfig]) => {
+          const isFullWidth =
+            fieldConfig.type === "textarea" || fieldConfig.fullWidth;
 
-        return (
-          <div key={fieldKey} className="space-y-2">
-            {/* FIELD LABEL */}
-            <Label htmlFor={fieldKey} className="text-sm font-medium">
-              {fieldConfig.label}
-              {fieldConfig.required && (
-                <span className="text-red-500 ml-1">*</span>
+          return (
+            <div
+              key={fieldKey}
+              className={`space-y-2 ${isFullWidth ? "md:col-span-2" : ""}`}
+            >
+              {/* Label */}
+              <Label
+                htmlFor={fieldKey}
+                className="text-sm font-medium text-gray-700 flex items-center gap-1"
+              >
+                {fieldConfig.label}
+                {fieldConfig.required && (
+                  <span className="text-red-500" title="Required">
+                    *
+                  </span>
+                )}
+              </Label>
+
+              {/* Field */}
+              {renderField(fieldKey, fieldConfig)}
+
+              {/* Error Message */}
+              {errors[fieldKey] && (
+                <div className="flex items-start gap-1.5 text-red-600 text-sm mt-1">
+                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <p>{errors[fieldKey].message}</p>
+                </div>
               )}
-            </Label>
 
-            {/* RENDERED INPUT FIELD */}
-            {renderField(fieldKey, fieldConfig)}
+              {/* Description/Helper Text */}
+              {fieldConfig.description && !errors[fieldKey] && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {fieldConfig.description}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-            {/* VALIDATION ERROR MESSAGE */}
-            {errors[fieldKey] && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors[fieldKey].message}
-              </p>
-            )}
+      {/* Divider */}
+      <div className="border-t border-gray-200 pt-5" />
 
-            {/* FIELD DESCRIPTION/HELP TEXT */}
-            {fieldConfig.description && (
-              <p className="text-sm text-gray-500 mt-1">
-                {fieldConfig.description}
-              </p>
-            )}
-          </div>
-        );
-      })}
+      {/* Action Buttons */}
+      <div className="flex gap-3 justify-end">
+        <Button
+          type="submit"
+          disabled={isSubmitting || (mode === "edit" && !isDirty)}
+          className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+              <span>{mode === "create" ? "Creating..." : "Updating..."}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              {mode === "create" ? (
+                <>
+                  <Plus className="h-4 w-4" />
+                  <span>Create {config.title}</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Save Changes</span>
+                </>
+              )}
+            </div>
+          )}
+        </Button>
+      </div>
 
-      {/* SUBMIT BUTTON */}
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition-colors"
-      >
-        {isSubmitting ? (
-          <>
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-            {mode === "create" ? "Creating..." : "Updating..."}
-          </>
-        ) : (
-          `${mode === "create" ? "Create" : "Update"} ${config.title}`
-        )}
-      </Button>
+      {/* Form Status Indicator */}
+      {mode === "edit" && !isDirty && !isSubmitting && (
+        <div className="text-center">
+          <p className="text-xs text-gray-500">
+            No changes detected. Make changes to enable save.
+          </p>
+        </div>
+      )}
     </form>
   );
 }

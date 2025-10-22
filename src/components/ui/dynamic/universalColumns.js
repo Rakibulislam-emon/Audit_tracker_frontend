@@ -2,13 +2,13 @@ import { universalConfig } from "@/config/dynamicConfig";
 
 /**
  * UNIVERSAL COLUMNS GENERATOR
- * 
+ *
  * Automatically generates TanStack Table columns from module configuration
- * 
+ *
  * @param {string} module - Module name: "users", "groups", "companies"
  * @param {function} actionsComponent - Custom actions component (edit/delete buttons)
  * @returns {array} - Array of column definitions for TanStack Table
- * 
+ *
  * USAGE:
  * const columns = generateUniversalColumns("users", UserActions);
  * const table = useReactTable({ columns, data });
@@ -27,10 +27,8 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
 
   // 3. LOOP THROUGH ALL FIELDS IN CONFIGURATION
   Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
-    
     // 4. ONLY INCLUDE FIELDS MARKED FOR TABLE DISPLAY
     if (fieldConfig.tableColumn) {
-      
       // 5. CREATE COLUMN DEFINITION
       const column = {
         accessorKey: fieldKey, // Data key: "name", "email", "role"
@@ -39,59 +37,66 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
         // 6. CELL RENDERER - Transforms data for display based on field type
         cell: (info) => {
           const value = info.getValue(); // Get actual value from data
-          
+
           // Handle different field types with special rendering
           switch (fieldConfig.type) {
-            
             // SWITCH FIELDS (like isActive) - Show badge
-            case 'switch':
-              return (
-                <div className="flex justify-center">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      value
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {value ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-              );
+            case "select":
+              // Special handling for status field
 
-            // SELECT FIELDS (like role) - Show colored badge
-            case 'select':
+              if (fieldKey === "isActive") {
+                // Handle both boolean and string values
+                const isActive = value === true || value === "active";
+
+                return (
+                  <div className="flex justify-center">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                );
+              }
+
+              // Existing role handling
               const roleColors = {
-                admin: 'bg-purple-100 text-purple-800',
-                audit_manager: 'bg-blue-100 text-blue-800',
-                auditor: 'bg-green-100 text-green-800',
-                compliance_officer: 'bg-orange-100 text-orange-800',
-                sysadmin: 'bg-red-100 text-red-800',
+                admin: "bg-purple-100 text-purple-800",
+                audit_manager: "bg-blue-100 text-blue-800",
+                auditor: "bg-green-100 text-green-800",
+                compliance_officer: "bg-orange-100 text-orange-800",
+                sysadmin: "bg-red-100 text-red-800",
               };
-              
+
               return (
                 <div className="flex justify-center">
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      roleColors[value] || 'bg-gray-100 text-gray-800'
+                      roleColors[value] || "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {/* Format: "audit_manager" → "Audit Manager" */}
                     {value
-                      ? value.split('_').map(word => 
-                          word.charAt(0).toUpperCase() + word.slice(1)
-                        ).join(' ')
-                      : 'N/A'
-                    }
+                      ? value
+                          .split("_")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
+                      : "N/A"}
                   </span>
                 </div>
               );
 
             // TEXTAREA FIELDS - Truncate long text
-            case 'textarea':
+            case "textarea":
               return value ? (
-                <div 
-                  className="max-w-xs truncate" 
+                <div
+                  className="max-w-xs truncate"
                   title={value} // Show full text on hover
                 >
                   {value.length > 50 ? `${value.substring(0, 50)}...` : value}
@@ -101,7 +106,7 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
               );
 
             // DATE FIELDS - Format properly
-            case 'date':
+            case "date":
               return value ? (
                 <div className="text-center">
                   {new Date(value).toLocaleDateString()}
@@ -111,9 +116,9 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
               );
 
             // EMAIL FIELDS - Make clickable
-            case 'email':
+            case "email":
               return value ? (
-                <a 
+                <a
                   href={`mailto:${value}`}
                   className="text-blue-600 hover:text-blue-800 hover:underline"
                 >
@@ -144,7 +149,7 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
       id: "actions",
       header: "Actions",
       // cell: (info) => actionsComponent(info), // Use provided actions component
-      cell: actionsComponent
+      cell: actionsComponent,
     });
   }
 
