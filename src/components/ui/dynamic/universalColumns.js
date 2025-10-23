@@ -37,50 +37,86 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
         // 6. CELL RENDERER - Transforms data for display based on field type
         cell: (info) => {
           const value = info.getValue(); // Get actual value from data
-
+          if (fieldConfig.relation && value) {
+            // Value is the populated object from backend: { _id: "123", name: "Group Name" }
+            if (typeof value === "object" && value !== null) {
+              return (
+                <div className="flex justify-center">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {getRelationDisplayValue(value, fieldConfig.relation)}
+                  </span>
+                </div>
+              );
+            }
+            return <span className="text-gray-400">N/A</span>;
+          }
           // Handle different field types with special rendering
           switch (fieldConfig.type) {
             // SWITCH FIELDS (like isActive) - Show badge
             case "select":
-              // Special handling for status field
+              // ✅ DYNAMIC COLOR SYSTEM FOR ALL MODULES
+              const getColorClass = (value, fieldKey, module) => {
+                // Users module colors
+                if (module === "users") {
+                  if (fieldKey === "isActive") {
+                    const isActive = value === true || value === "active";
+                    return isActive
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800";
+                  }
 
-              if (fieldKey === "isActive") {
-                // Handle both boolean and string values
-                const isActive = value === true || value === "active";
+                  if (fieldKey === "role") {
+                    const roleColors = {
+                      admin: "bg-purple-100 text-purple-800",
+                      audit_manager: "bg-blue-100 text-blue-800",
+                      auditor: "bg-green-100 text-green-800",
+                      compliance_officer: "bg-orange-100 text-orange-800",
+                      sysadmin: "bg-red-100 text-red-800",
+                    };
+                    return roleColors[value] || "bg-gray-100 text-gray-800";
+                  }
+                }
 
-                return (
-                  <div className="flex justify-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-                );
-              }
+                // Groups module colors
+                if (module === "groups") {
+                  if (fieldKey === "status") {
+                    const statusColors = {
+                      active: "bg-green-100 text-green-800",
+                      inactive: "bg-red-100 text-red-800",
+                    };
+                    return statusColors[value] || "bg-gray-100 text-gray-800";
+                  }
+                }
 
-              // Existing role handling
-              const roleColors = {
-                admin: "bg-purple-100 text-purple-800",
-                audit_manager: "bg-blue-100 text-blue-800",
-                auditor: "bg-green-100 text-green-800",
-                compliance_officer: "bg-orange-100 text-orange-800",
-                sysadmin: "bg-red-100 text-red-800",
+                // Default colors for other modules/fields
+                const defaultColors = {
+                  active: "bg-green-100 text-green-800",
+                  inactive: "bg-red-100 text-red-800",
+                  pending: "bg-yellow-100 text-yellow-800",
+                  completed: "bg-blue-100 text-blue-800",
+                };
+
+                return defaultColors[value] || "bg-gray-100 text-gray-800";
               };
+
+              // Handle both boolean and string values for isActive
+              let displayValue = value;
+              if (fieldKey === "isActive") {
+                displayValue =
+                  value === true || value === "active" ? "active" : "inactive";
+              }
 
               return (
                 <div className="flex justify-center">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      roleColors[value] || "bg-gray-100 text-gray-800"
-                    }`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getColorClass(
+                      displayValue,
+                      fieldKey,
+                      module
+                    )}`}
                   >
-                    {value
-                      ? value
+                    {displayValue
+                      ? displayValue
                           .split("_")
                           .map(
                             (word) =>
@@ -148,11 +184,24 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
     columns.push({
       id: "actions",
       header: "Actions",
-      // cell: (info) => actionsComponent(info), // Use provided actions component
       cell: actionsComponent,
     });
   }
 
   console.log(`✅ Generated ${columns.length} columns for ${module}`);
   return columns;
+};
+// ✅ Helper function for relation display
+const getRelationDisplayValue = (item, relationModule) => {
+  switch (relationModule) {
+    case "users":
+      return item.name || item.email;
+    case "companies":
+      return item.name;
+    case "groups":
+      return item.name;
+      
+    default:
+      return item.name || item.title || "Unknown";
+  }
 };

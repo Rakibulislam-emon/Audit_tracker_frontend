@@ -72,130 +72,108 @@ export default function UniversalFilters({ module }) {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row gap-4 items-end">
-        {/* Search Input */}
-        {filterConfig.search && (
-          <div className="w-full sm:w-2/5">
-            <Label
-              htmlFor="search"
-              className="text-sm font-medium text-gray-700 mb-1 block"
-            >
-              {filterConfig.search.label || "Search"}
-            </Label>
-            <div className="relative lg:w-80 lg:mr-32">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                id="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
-                placeholder={
-                  filterConfig.search.placeholder || `Search ${module}...`
-                }
-                className="w-full pl-10 pr-10 md:mr-40"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Role Filter */}
-        {filterConfig.role && (
-          <div className="w-full">
-            <Label
-              htmlFor="roleFilter"
-              className="text-sm font-medium text-gray-700 mb-1 block"
-            >
-              Role
-            </Label>
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger id="roleFilter" className="w-full">
-                <SelectValue
-                  placeholder={filterConfig.role.placeholder || "All Roles"}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                {filterConfig.role.options?.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option
-                      .split("_")
-                      .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                      )
-                      .join(" ")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        {/* Status Filter */}
-        {filterConfig.status && (
-          <div className="w-full">
-            <Label
-              htmlFor="statusFilter"
-              className="text-sm font-medium text-gray-700 mb-1 block"
-            >
-              Status
-            </Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger id="statusFilter" className="w-full">
-                <SelectValue
-                  placeholder={
-                    filterConfig.status.placeholder || "All Statuses"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                {filterConfig.status.options?.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option.charAt(0).toUpperCase() + option.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
-        {/* Clear Button */}
-        <div className="w-full sm:w-1/5">
-          <Button
-            variant={hasActiveFilters ? "outline" : "ghost"}
-            onClick={clearAllFilters}
-            className="w-full h-10"
-            size="sm"
-            disabled={!hasActiveFilters}
+     <div className="flex flex-col sm:flex-row gap-4 items-end w-full">
+  {/* Search Input */}
+  {filterConfig.search && (
+    <div className="w-full sm:w-2/5 min-w-[200px]">
+      <Label htmlFor="search" className="text-sm font-medium text-gray-700 mb-1 block">
+        {filterConfig.search.label || "Search"}
+      </Label>
+      <div className="relative w-full">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          id="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+          placeholder={filterConfig.search.placeholder || `Search ${module}...`}
+          className="w-full pl-10 pr-10"
+        />
+        {search && (
+          <button
             type="button"
+            onClick={clearSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
-            {hasActiveFilters ? (
-              <>
-                <X className="h-4 w-4 mr-2" />
-                Clear
-              </>
-            ) : (
-              <>
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </>
-            )}
-          </Button>
-        </div>
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
+    </div>
+  )}
+
+  {/* Role Filter */}
+  {filterConfig.role && (
+    <div className="flex-1 min-w-[150px]">
+      <Label htmlFor="roleFilter" className="text-sm font-medium text-gray-700 mb-1 block">
+        Role
+      </Label>
+      <Select value={role} onValueChange={setRole}>
+        <SelectTrigger id="roleFilter" className="w-full">
+          <SelectValue placeholder={filterConfig.role.placeholder || "All Roles"} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Roles</SelectItem>
+          {filterConfig.role.options?.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option
+                .split("_")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )}
+
+  {/* Status Filter */}
+  {filterConfig.status && (
+    <div className="flex-1 min-w-[150px]">
+      <Label htmlFor="statusFilter" className="text-sm font-medium text-gray-700 mb-1 block">
+        Status
+      </Label>
+      <Select value={status} onValueChange={setStatus}>
+        <SelectTrigger id="statusFilter" className="w-full">
+          <SelectValue placeholder={filterConfig.status.placeholder || "All Statuses"} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Statuses</SelectItem>
+          {filterConfig.status.options?.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option.charAt(0).toUpperCase() + option.slice(1)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )}
+
+  {/* Clear Button */}
+  <div className="sm:w-1/5 w-full">
+    <Button
+      variant={hasActiveFilters ? "outline" : "ghost"}
+      onClick={clearAllFilters}
+      className="w-full h-10"
+      size="sm"
+      disabled={!hasActiveFilters}
+      type="button"
+    >
+      {hasActiveFilters ? (
+        <>
+          <X className="h-4 w-4 mr-2" />
+          Clear
+        </>
+      ) : (
+        <>
+          <Filter className="h-4 w-4 mr-2" />
+          Filters
+        </>
+      )}
+    </Button>
+  </div>
+</div>
+
     </div>
   );
 }

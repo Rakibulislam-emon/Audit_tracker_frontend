@@ -32,7 +32,7 @@ export const universalConfig = {
         required: true,
         tableColumn: false,
         filterable: false,
-        createOnly: true, 
+        createOnly: true,
       },
       role: {
         type: "select",
@@ -97,6 +97,187 @@ export const universalConfig = {
         placeholder: "All Statuses",
         apiParam: "status", // Maps to ?status= in URL
         // Note: Backend converts "active"→isActive:true, "inactive"→isActive:false
+      },
+    },
+
+    // PERMISSIONS
+    permissions: {
+      create: ["admin", "sysadmin"],
+      edit: ["admin", "sysadmin"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager"],
+    },
+  },
+  groups: {
+    // API Configuration
+    endpoint: "groups",
+
+    // UI Configuration
+    title: "Group Management",
+    description: "Manage and organize user groups",
+
+    // FIELD DEFINITIONS - Database fields অনুযায়ী
+    fields: {
+      name: {
+        type: "text",
+        label: "Group Name",
+        placeholder: "Enter group name",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      description: {
+        type: "textarea",
+        label: "Description",
+        placeholder: "Enter group description",
+        required: true, // আপনার controller এ required
+        tableColumn: true,
+        filterable: false,
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        readOnly: true,
+        filterable: false,
+        formField: false,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        readOnly: true,
+        filterable: false,
+        formField: false,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        label: "Search Groups",
+        type: "search",
+        fields: ["name", "description"],
+        placeholder: "Search groups...",
+        apiParam: "search",
+      },
+      status: {
+        type: "select",
+        options: ["active", "inactive"],
+        placeholder: "All Statuses",
+        apiParam: "status",
+      },
+    },
+
+    // PERMISSIONS
+    permissions: {
+      create: ["admin", "sysadmin"],
+      edit: ["admin", "sysadmin"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager"],
+    },
+  },
+
+ companies: {
+    // API Configuration
+    endpoint: "companies",
+
+    // UI Configuration
+    title: "Company Management",
+    description: "Manage and organize companies",
+
+    // FIELD DEFINITIONS - Database fields অনুযায়ী
+    fields: {
+      name: {
+        type: "text",
+        label: "Company Name",
+        placeholder: "Enter company name",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      group: {
+        type: "select",
+        label: "Group",
+        required: true,
+        relation: "groups", // ✅ Groups থেকে data load হবে
+        tableColumn: true,
+        filterable: true,
+      },
+      sector: {
+        type: "text",
+        label: "Sector",
+        placeholder: "Enter company sector",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+      },
+      address: {
+        type: "textarea",
+        label: "Address",
+        placeholder: "Enter company address",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        readOnly: true,
+        filterable: false,
+        formField: false,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        readOnly: true,
+        filterable: false,
+        formField: false,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        label: "Search Companies",
+        type: "search",
+        fields: ["name", "sector", "address"],
+        placeholder: "Search companies...",
+        apiParam: "search",
+      },
+      group: {
+        type: "select",
+        relation: "groups", // ✅ Groups থেকে filter options load হবে
+        placeholder: "All Groups",
+        apiParam: "group",
+      },
+      status: {
+        type: "select",
+        options: ["active", "inactive"],
+        placeholder: "All Statuses",
+        apiParam: "status",
       },
     },
 
