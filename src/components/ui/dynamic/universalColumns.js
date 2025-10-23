@@ -205,6 +205,9 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
     companies: {
       company: "bg-orange-100 text-orange-800",
     },
+    site:{
+      site:"bg-orange-100 text-orange-800"
+    }
   };
 
   return colorMap[relationModule]?.[fieldKey] || "bg-gray-100 text-gray-800";

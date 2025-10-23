@@ -310,4 +310,120 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager"],
     },
   },
+
+
+
+  sites: {
+    // API Configuration
+    endpoint: "sites", // ব্যাকএন্ড রাউটের সাথে মিলবে
+
+    // UI Configuration
+    title: "Site Management",
+    description: "Manage company sites and locations",
+
+    // FIELD DEFINITIONS - Site.js মডেল অনুযায়ী
+    fields: {
+      name: {
+        type: "text",
+        label: "Site Name",
+        placeholder: "Enter site name (e.g., Head Office)",
+        required: true,
+        tableColumn: true,
+        filterable: true, // সার্চের জন্য
+      },
+      location: {
+        type: "textarea", // লোকেশন লম্বা হতে পারে
+        label: "Location / Address",
+        placeholder: "Enter full address or location details",
+        required: false, // মডেল অনুযায়ী required নয়
+        tableColumn: true,
+        filterable: true, // সার্চের জন্য
+        fullWidth: true, // ফর্মে পুরো জায়গা নিতে পারে
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        required: true, // মডেল অনুযায়ী required
+        relation: "companies", // ✅ Companies মডিউল থেকে ডেটা আসবে
+        tableColumn: true,
+        filterable: true, // ফিল্টারিং এর জন্য
+        // dataAccessor: "company.name", // ✅ টেবিলে কোম্পানির নাম দেখানোর জন্য
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true, // commonFields থেকে আসছে, required ধরাই ভালো
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true, // ফিল্টারিং এর জন্য
+        // editOnly: true, // প্রয়োজন অনুযায়ী যোগ করুন
+      },
+      // commonFields থেকে আসা বাকি ফিল্ডগুলো
+      createdBy: {
+        type: "relation", // অথবা 'text', টাইপ এখানে মুখ্য নয়
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "createdBy.name", // ✅ টেবিলে ইউজারের নাম দেখানোর জন্য
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "updatedBy.name", // ✅ টেবিলে ইউজারের নাম দেখানোর জন্য
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Sites",
+        placeholder: "Search by name or location...",
+        apiParam: "search", // ব্যাকএন্ড Controller-এর req.query.search
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        placeholder: "All Companies",
+        apiParam: "company", // ব্যাকএন্ড Controller-এর req.query.company
+        relation: "companies", // ✅ Companies মডিউল থেকে অপশন লোড হবে
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // ব্যাকএন্ড Controller-এর req.query.status
+        options: ["active", "inactive"],
+      },
+    },
+
+    // PERMISSIONS (আপনার প্রয়োজন অনুযায়ী অ্যাডজাস্ট করুন)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"], // কারা তৈরি করতে পারবে
+      edit: ["admin", "sysadmin", "audit_manager"],   // কারা এডিট করতে পারবে
+      delete: ["admin", "sysadmin"],                  // কারা ডিলিট করতে পারবে
+      view: ["admin", "sysadmin", "audit_manager", "auditor"], // কারা দেখতে পারবে
+    },
+  },
 };
