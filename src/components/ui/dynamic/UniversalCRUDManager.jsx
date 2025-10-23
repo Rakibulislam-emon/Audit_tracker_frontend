@@ -5,6 +5,7 @@ import UniversalFilters from "@/components/ui/dynamic/UniversalFilters";
 import UniversalForm from "@/components/ui/dynamic/UniversalForm";
 import UniversalTable from "@/components/ui/dynamic/UniversalTable";
 import Modal from "@/components/ui/modal";
+import { universalConfig } from "@/config/dynamicConfig";
 import {
   useCreateModule,
   useDeleteModule,
@@ -46,6 +47,8 @@ export default function UniversalCRUDManager({
   getRowCondition = null,
   isAvailable = true,
 }) {
+
+  
   const searchParams = useSearchParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,14 +56,18 @@ export default function UniversalCRUDManager({
   const [selectedItem, setSelectedItem] = useState(null);
 
   // Filters from URL
-  const filters = useMemo(
-    () => ({
-      search: searchParams.get("search") || "",
-      role: searchParams.get("role") || "",
-      status: searchParams.get("status") || "",
-    }),
-    [searchParams]
-  );
+ const filters = useMemo(() => {
+    const newFilters = {};
+    // ২. বর্তমান মডিউলের ফিল্টার কী-গুলো নিন (e.g., ['search', 'group', 'status'])
+    const filterKeys = Object.keys(universalConfig[module]?.filters || {});
+    
+    // ৩. প্রতিটি কী-এর জন্য URL থেকে ভ্যালু পড়ুন
+    filterKeys.forEach((key) => {
+      newFilters[key] = searchParams.get(key) || "";
+    });
+    
+    return newFilters;
+  }, [searchParams, module]);
 
   // Data fetch
   const {
@@ -70,7 +77,7 @@ export default function UniversalCRUDManager({
   } = useModuleData(module, token, filters);
 
   const items = response?.data || [];
-  console.log('items:', items)
+  console.log("items:", items);
 
   // Mutations
   const { mutate: createItem } = useCreateModule(module, token);
@@ -95,7 +102,7 @@ export default function UniversalCRUDManager({
       createItem(formData, {
         onSuccess: () => {
           closeModal();
-          refetch();
+          // refetch();
           toast.success(`${module} created successfully!`);
         },
         onError: (error) => {
@@ -108,7 +115,7 @@ export default function UniversalCRUDManager({
         {
           onSuccess: () => {
             closeModal();
-            refetch();
+            // refetch();
             toast.success(`${module} updated successfully!`);
           },
           onError: (error) => {
@@ -126,7 +133,7 @@ export default function UniversalCRUDManager({
     deleteItem(selectedItem._id, {
       onSuccess: () => {
         closeModal();
-        refetch();
+        // refetch();
         toast.success(`${module} deleted successfully!`);
       },
       onError: (error) => {
@@ -134,6 +141,10 @@ export default function UniversalCRUDManager({
       },
     });
   };
+
+
+
+  
 
   return (
     <div className="container mx-auto p-6">
@@ -149,7 +160,7 @@ export default function UniversalCRUDManager({
         {isAvailable && (
           <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
             <div className="flex-grow">
-              <UniversalFilters module={module} />
+              <UniversalFilters module={module} token={token} />
             </div>
             <Button onClick={() => openModal("create")} className="shrink-0">
               <Plus className="h-4 w-4 mr-2" />

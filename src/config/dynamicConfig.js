@@ -240,6 +240,27 @@ export const universalConfig = {
         filterable: true,
         editOnly: true,
       },
+       // ✅ NEW: createdBy field
+    createdBy: {
+      type: "relation",
+      label: "Created By",
+      relation: "users", // ✅ User module থেকে data
+      tableColumn: true,
+      filterable: false,
+      formField: false, // ✅ Form এ show করবে না
+      readOnly: true, // ✅ Edit করা যাবে না
+    },
+    
+    // ✅ NEW: updatedBy field  
+    updatedBy: {
+      type: "relation",
+      label: "Updated By",
+      relation: "users", // ✅ User module থেকে data
+      tableColumn: true, 
+      filterable: false,
+      formField: false, // ✅ Form এ show করবে না
+      readOnly: true, // ✅ Edit করা যাবে না
+    },
       createdAt: {
         type: "date",
         label: "Created At",
