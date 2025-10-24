@@ -558,7 +558,7 @@ export const universalConfig = {
       //   relation: "checkTypes", // Link to checkTypes module
       //   tableColumn: true,
       //   filterable: true,
-        // dataAccessor: "checkType.name",
+      // dataAccessor: "checkType.name",
       // },
       // --- End Missing CheckType ---
       status: {
@@ -641,126 +641,271 @@ export const universalConfig = {
     },
   },
 
-
   templates: {
-        // API Configuration
-        endpoint: "templates", // Matches backend route
+    // API Configuration
+    endpoint: "templates", // Matches backend route
 
-        // UI Configuration
-        title: "Template Management",
-        description: "Manage audit templates",
+    // UI Configuration
+    title: "Template Management",
+    description: "Manage audit templates",
 
-        // FIELD DEFINITIONS - Based on Template.js model
-        fields: {
-            title: {
-                type: "text",
-                label: "Template Title",
-                placeholder: "Enter a descriptive title",
-                required: true,
-                tableColumn: true,
-                filterable: true, // For search
-            },
-            description: {
-                type: "textarea",
-                label: "Description",
-                placeholder: "Enter details about the template",
-                required: false,
-                tableColumn: true,
-                filterable: true, // For search
-                fullWidth: true,
-            },
-            version: {
-                type: "text", // Could be number if needed
-                label: "Version",
-                placeholder: "e.g., 1.0",
-                required: false, // Has default in schema
-                tableColumn: true,
-                filterable: false, // Usually not filtered
-                // You might want to add validation (e.g., pattern for X.Y format)
-            },
-            company: {
-                type: "select",
-                label: "Company",
-                required: true,
-                relation: "companies", // Link to companies module
-                tableColumn: true,
-                filterable: true, // For filtering
-                dataAccessor: "company.name", // Show company name in table
-            },
-            status: {
-                type: "select",
-                label: "Status",
-                required: true,
-                options: ["active", "inactive"],
-                default: "active",
-                tableColumn: true,
-                filterable: true, // For filtering
-            },
-            // Common fields
-            createdBy: {
-                type: "relation",
-                label: "Created By",
-                relation: "users",
-                tableColumn: true,
-                formField: false,
-                readOnly: true,
-                // dataAccessor: "createdBy.name",
-            },
-            updatedBy: {
-                type: "relation",
-                label: "Updated By",
-                relation: "users",
-                tableColumn: true,
-                formField: false,
-                readOnly: true,
-                // dataAccessor: "updatedBy.name",
-            },
-            createdAt: {
-                type: "date",
-                label: "Created At",
-                tableColumn: true,
-                formField: false,
-                readOnly: true,
-            },
-            updatedAt: {
-                type: "date",
-                label: "Updated At",
-                tableColumn: true,
-                formField: false,
-                readOnly: true,
-            },
-        },
-
-        // FILTER CONFIGURATION
-        filters: {
-            search: {
-                type: "search",
-                label: "Search Templates",
-                placeholder: "Search by title or description...",
-                apiParam: "search", // Matches req.query.search
-            },
-            company: {
-                type: "select",
-                label: "Company",
-                placeholder: "All Companies",
-                apiParam: "company", // Matches req.query.company
-                relation: "companies", // Load options from companies
-            },
-            status: {
-                type: "select",
-                label: "Status",
-                placeholder: "All Statuses",
-                apiParam: "status", // Matches req.query.status
-                options: ["active", "inactive"],
-            },
-        },
-
-        // PERMISSIONS (Adjust as needed)
-        permissions: {
-            create: ["admin", "sysadmin", "audit_manager"],
-            edit: ["admin", "sysadmin", "audit_manager"],
-            delete: ["admin", "sysadmin"],
-            view: ["admin", "sysadmin", "audit_manager", "auditor"],
-        },
+    // FIELD DEFINITIONS - Based on Template.js model
+    fields: {
+      title: {
+        type: "text",
+        label: "Template Title",
+        placeholder: "Enter a descriptive title",
+        required: true,
+        tableColumn: true,
+        filterable: true, // For search
+      },
+      description: {
+        type: "textarea",
+        label: "Description",
+        placeholder: "Enter details about the template",
+        required: false,
+        tableColumn: true,
+        filterable: true, // For search
+        fullWidth: true,
+      },
+      version: {
+        type: "text", // Could be number if needed
+        label: "Version",
+        placeholder: "e.g., 1.0",
+        required: false, // Has default in schema
+        tableColumn: true,
+        filterable: false, // Usually not filtered
+        // You might want to add validation (e.g., pattern for X.Y format)
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        required: true,
+        relation: "companies", // Link to companies module
+        tableColumn: true,
+        filterable: true, // For filtering
+        dataAccessor: "company.name", // Show company name in table
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true, // For filtering
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
     },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Templates",
+        placeholder: "Search by title or description...",
+        apiParam: "search", // Matches req.query.search
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        placeholder: "All Companies",
+        apiParam: "company", // Matches req.query.company
+        relation: "companies", // Load options from companies
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+    },
+
+    // PERMISSIONS (Adjust as needed)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
+
+  questions: {
+    // API Configuration
+    endpoint: "questions", // Matches backend route
+
+    // UI Configuration
+    title: "Question Management",
+    description: "Manage audit questions within templates",
+
+    // FIELD DEFINITIONS - Based on Question.js model
+    fields: {
+      section: {
+        type: "text",
+        label: "Section",
+        placeholder: "Enter section name (optional)",
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering/searching if needed later
+      },
+      questionText: {
+        type: "textarea", // Questions can be long
+        label: "Question Text",
+        placeholder: "Enter the audit question",
+        required: true,
+        tableColumn: true,
+        filterable: true, // For search
+        fullWidth: true, // Use full width in form
+      },
+      responseType: {
+        type: "select",
+        label: "Response Type",
+        required: true,
+        options: ["yes/no", "text", "number", "rating", "dropdown"], // From schema enum
+        tableColumn: true,
+        filterable: true, // Allow filtering by type
+      },
+      severityDefault: {
+        type: "text", // Or select if you have predefined severities
+        label: "Default Severity",
+        placeholder: "e.g., High, Medium, Low (optional)",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      weight: {
+        type: "number",
+        label: "Weight",
+        placeholder: "Enter weight (0.1-10)",
+        required: true, // Has default in schema
+        tableColumn: true,
+        filterable: false,
+        // Add min/max validation if needed in frontend form
+      },
+      template: {
+        type: "select",
+        label: "Template",
+        required: true,
+        relation: "templates", // Link to templates module
+        tableColumn: true,
+        filterable: true, // Allow filtering by template
+        dataAccessor: "template.title", // Show template title in table
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true, // For filtering
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Questions",
+        placeholder: "Search by text or section...",
+        apiParam: "search", // Matches req.query.search
+      },
+      template: {
+        type: "select",
+        label: "Template",
+        placeholder: "All Templates",
+        apiParam: "template", // Matches req.query.template
+        relation: "templates", // Load options from templates
+      },
+      responseType: {
+        // Added filter for response type
+        type: "select",
+        label: "Response Type",
+        placeholder: "All Types",
+        apiParam: "responseType", // Matches req.query.responseType
+        options: ["yes/no", "text", "number", "rating", "dropdown"],
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+    },
+
+    // PERMISSIONS (Match these with your backend roles in authorizeRoles)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
 };

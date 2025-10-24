@@ -85,7 +85,39 @@ export default function UniversalForm({
             })}
           />
         );
-
+case "number": 
+        return (
+          <Input
+            type="number" 
+            placeholder={fieldConfig.placeholder}
+            disabled={isSubmitting}
+            className={`${errorClass} transition-colors`}
+            step={fieldConfig.step || "any"} // Allow decimals if needed, e.g., "0.1" for weight
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+              
+          
+              valueAsNumber: true, 
+              
+            
+              min: {
+                value: fieldConfig.min ?? 0.1, // Config থেকে min নিন, না থাকলে 0.1
+                message: `${fieldConfig.label} must be at least ${fieldConfig.min ?? 0.1}`,
+              },
+              max: {
+                value: fieldConfig.max ?? 10,
+                message: `${fieldConfig.label} must be no more than ${fieldConfig.max ?? 10}`,
+              },
+              
+              pattern: {
+                value: /^\d*\.?\d*$/, 
+                message: "Please enter a valid number",
+              }
+            })}
+          />
+        );
       case "select":
         // ✅ 4. This logic is now clean
         if (fieldConfig.relation) {

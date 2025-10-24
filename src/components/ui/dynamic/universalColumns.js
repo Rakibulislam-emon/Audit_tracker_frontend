@@ -101,6 +101,12 @@ export const generateUniversalColumns = (module) => {
                       inactive: `${inActive}`,
                     },
                   },
+                  questions: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
                 };
 
                 return (

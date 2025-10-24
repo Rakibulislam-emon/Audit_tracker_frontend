@@ -86,7 +86,7 @@ export default function UniversalFilters({ module, token }) {
     switch (filter.type) {
       case "search":
         return (
-          <div key={key} className="w-full sm:w-2/5 min-w-[200px]">
+          <div key={key} className="w-full bg- sm:w-2/5 min-w-[200px]">
             <Label
               htmlFor={key}
               className="text-sm font-medium text-gray-700 mb-1 block"
@@ -177,7 +177,7 @@ export default function UniversalFilters({ module, token }) {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row gap-4 items-end w-full">
+      <div className="flex flex-wrap md:flex-wrap lg:flex-row gap-4 items-end w-full">
         {/* ✅ ডাইনামিক লুপের মাধ্যমে সব ফিল্টার রেন্ডার করা */}
         {filterEntries.map(([key, filter]) => renderFilter(key, filter))}
 
