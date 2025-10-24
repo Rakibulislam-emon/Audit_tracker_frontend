@@ -5,6 +5,7 @@ import UniversalFilters from "@/components/ui/dynamic/UniversalFilters";
 import UniversalForm from "@/components/ui/dynamic/UniversalForm";
 import UniversalTable from "@/components/ui/dynamic/UniversalTable";
 import Modal from "@/components/ui/modal";
+import { universalConfig } from "@/config/dynamicConfig";
 import {
   useCreateModule,
   useDeleteModule,
@@ -18,20 +19,20 @@ import { toast } from "sonner";
 
 /**
  * UNIVERSAL CRUD MANAGER
- * 
+ *
  * Reusable component for ANY module (users, companies, groups, audits, etc.)
  * Handles: List, Create, Edit, Delete with modals
- * 
+ *
  * @param {string} module - Module name: "users", "companies", "groups"
  * @param {string} token - Auth token
  * @param {string} title - Page title (e.g., "User Management")
  * @param {string} addButtonText - Add button text (e.g., "Add User")
  * @param {function} getPriorityLevel - Priority indicator for table (optional)
  * @param {function} getRowCondition - Row condition for table (optional)
- * 
+ *
  * USAGE:
- * <UniversalCRUDManager 
- *   module="users" 
+ * <UniversalCRUDManager
+ *   module="users"
  *   token={token}
  *   title="User Management"
  *   addButtonText="Add User"
@@ -41,9 +42,11 @@ export default function UniversalCRUDManager({
   module,
   token,
   title,
+  desc,
   addButtonText = "Add Item",
   getPriorityLevel = null,
   getRowCondition = null,
+  isAvailable = true,
 }) {
   const searchParams = useSearchParams();
 
@@ -52,23 +55,24 @@ export default function UniversalCRUDManager({
   const [selectedItem, setSelectedItem] = useState(null);
 
   // Filters from URL
-  const filters = useMemo(
-    () => ({
-      search: searchParams.get("search") || "",
-      role: searchParams.get("role") || "",
-      status: searchParams.get("status") || "",
-    }),
-    [searchParams]
-  );
+  const filters = useMemo(() => {
+    const newFilters = {};
+    // ২. বর্তমান মডিউলের ফিল্টার কী-গুলো নিন (e.g., ['search', 'group', 'status'])
+    const filterKeys = Object.keys(universalConfig[module]?.filters || {});
+
+    // ৩. প্রতিটি কী-এর জন্য URL থেকে ভ্যালু পড়ুন
+    filterKeys.forEach((key) => {
+      newFilters[key] = searchParams.get(key) || "";
+    });
+
+    return newFilters;
+  }, [searchParams, module]);
 
   // Data fetch
-  const {
-    data: response,
-    isLoading,
-    refetch,
-  } = useModuleData(module, token, filters);
+  const { data: response, isLoading } = useModuleData(module, token, filters);
 
   const items = response?.data || [];
+ 
 
   // Mutations
   const { mutate: createItem } = useCreateModule(module, token);
@@ -93,7 +97,7 @@ export default function UniversalCRUDManager({
       createItem(formData, {
         onSuccess: () => {
           closeModal();
-          refetch();
+          // refetch();
           toast.success(`${module} created successfully!`);
         },
         onError: (error) => {
@@ -106,7 +110,7 @@ export default function UniversalCRUDManager({
         {
           onSuccess: () => {
             closeModal();
-            refetch();
+            // refetch();
             toast.success(`${module} updated successfully!`);
           },
           onError: (error) => {
@@ -124,7 +128,7 @@ export default function UniversalCRUDManager({
     deleteItem(selectedItem._id, {
       onSuccess: () => {
         closeModal();
-        refetch();
+        // refetch();
         toast.success(`${module} deleted successfully!`);
       },
       onError: (error) => {
@@ -139,20 +143,24 @@ export default function UniversalCRUDManager({
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
+          {desc && <p className="text-gray-600 mt-1">{desc}</p>}
+
           <p className="text-gray-600 text-sm mt-1">
             {items.length} {module} found
           </p>
         </div>
 
-        <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
-          <div className="flex-grow">
-            <UniversalFilters module={module} />
+        {isAvailable && (
+          <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+            <div className="flex-grow">
+              <UniversalFilters module={module} token={token} />
+            </div>
+            <Button onClick={() => openModal("create")} className="shrink-0">
+              <Plus className="h-4 w-4 mr-2" />
+              {addButtonText}
+            </Button>
           </div>
-          <Button onClick={() => openModal("create")} className="shrink-0">
-            <Plus className="h-4 w-4 mr-2" />
-            {addButtonText}
-          </Button>
-        </div>
+        )}
       </div>
 
       {/* Loading State */}
@@ -188,7 +196,9 @@ export default function UniversalCRUDManager({
         >
           {modalType === "delete" ? (
             <DeleteConfirmation
-              itemName={selectedItem?.name || selectedItem?.title || "this item"}
+              itemName={
+                selectedItem?.name || selectedItem?.title || "this item"
+              }
               onCancel={closeModal}
               onConfirm={handleDelete}
             />
@@ -198,6 +208,7 @@ export default function UniversalCRUDManager({
               onSubmit={handleSubmit}
               initialData={modalType === "edit" ? selectedItem : null}
               mode={modalType}
+              token={token}
             />
           )}
         </Modal>

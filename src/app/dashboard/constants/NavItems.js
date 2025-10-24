@@ -46,17 +46,18 @@ export const navItems = {
       icon: Factory,
       href: "/dashboard/admin/sites",
     },
-    {
-      id: "rules",
-      label: "Rules",
-      icon: FileText,
-      href: "/dashboard/admin/rules",
-    },
+   
     {
       id: "check-types",
       label: "Check Types",
       icon: ListChecks,
       href: "/dashboard/admin/check-types",
+    },
+     {
+      id: "rules",
+      label: "Rules",
+      icon: FileText,
+      href: "/dashboard/admin/rules",
     },
     {
       id: "templates",

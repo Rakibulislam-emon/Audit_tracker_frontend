@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { universalConfig } from "@/config/dynamicConfig";
 import { AlertCircle, Plus, Save } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"; // ✅ 1. Controller imported
+import RelationSelect from "./UniversalRelationSelect"; // ✅ 2. New component imported
+import { useActionState } from "react";
 
 export default function UniversalForm({
   module,
@@ -14,13 +16,20 @@ export default function UniversalForm({
   isSubmitting = false,
   initialData = {},
   mode = "create",
+  token,
 }) {
+  const {user} = useActionState()
   const config = universalConfig[module];
+ 
+  // check for permission will be implemented later
+
+
 
   const {
     register,
     handleSubmit,
     watch,
+    control, // ✅ 3. 'control' is now taken from useForm
     formState: { errors, isDirty },
   } = useForm({
     defaultValues: initialData,
@@ -40,8 +49,10 @@ export default function UniversalForm({
     );
   }
 
+  // ❌ 'getRelationData' function has been REMOVED
+  // ❌ 'renderRelationSelect' function has been REMOVED
+
   const renderField = (fieldKey, fieldConfig) => {
-    console.log("fieldConfig:", fieldConfig);
     // Skip fields based on mode
     if (mode === "edit" && fieldConfig.createOnly) return null;
     if (mode === "create" && fieldConfig.editOnly) return null;
@@ -49,9 +60,6 @@ export default function UniversalForm({
 
     const hasError = errors[fieldKey];
     const errorClass = hasError ? "border-red-500 focus:ring-red-500" : "";
-
-    // Watch current value for dynamic styling
-    const currentValue = watch(fieldKey);
 
     switch (fieldConfig.type) {
       case "text":
@@ -77,11 +85,59 @@ export default function UniversalForm({
             })}
           />
         );
-
+case "number": 
+        return (
+          <Input
+            type="number" 
+            placeholder={fieldConfig.placeholder}
+            disabled={isSubmitting}
+            className={`${errorClass} transition-colors`}
+            step={fieldConfig.step || "any"} // Allow decimals if needed, e.g., "0.1" for weight
+            {...register(fieldKey, {
+              required: fieldConfig.required
+                ? `${fieldConfig.label} is required`
+                : false,
+              
+          
+              valueAsNumber: true, 
+              
+            
+              min: {
+                value: fieldConfig.min ?? 0.1, // Config থেকে min নিন, না থাকলে 0.1
+                message: `${fieldConfig.label} must be at least ${fieldConfig.min ?? 0.1}`,
+              },
+              max: {
+                value: fieldConfig.max ?? 10,
+                message: `${fieldConfig.label} must be no more than ${fieldConfig.max ?? 10}`,
+              },
+              
+              pattern: {
+                value: /^\d*\.?\d*$/, 
+                message: "Please enter a valid number",
+              }
+            })}
+          />
+        );
       case "select":
-        const options = fieldConfig.options || [];
-        console.log("options:", options);
+        // ✅ 4. This logic is now clean
+        if (fieldConfig.relation) {
+          // If it's a relation, render the new component
+          return (
+            <RelationSelect
+              fieldKey={fieldKey}
+              fieldConfig={fieldConfig}
+              control={control}
+              token={token}
+              isSubmitting={isSubmitting}
+              errors={errors}
+            />
+          );
+        }
+        // Watch current value for dynamic styling
+        const currentValue = watch(fieldKey);
 
+        // This part is for STATIC dropdowns (like 'status' or 'role')
+        const options = fieldConfig.options || [];
         return (
           <div className="relative">
             <select

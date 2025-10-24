@@ -1,23 +1,9 @@
+// components/dynamic/universalColumns.js - Update করুন
 import { universalConfig } from "@/config/dynamicConfig";
 
-/**
- * UNIVERSAL COLUMNS GENERATOR
- *
- * Automatically generates TanStack Table columns from module configuration
- *
- * @param {string} module - Module name: "users", "groups", "companies"
- * @param {function} actionsComponent - Custom actions component (edit/delete buttons)
- * @returns {array} - Array of column definitions for TanStack Table
- *
- * USAGE:
- * const columns = generateUniversalColumns("users", UserActions);
- * const table = useReactTable({ columns, data });
- */
-export const generateUniversalColumns = (module, actionsComponent = null) => {
-  // 1. GET MODULE CONFIGURATION
+export const generateUniversalColumns = (module) => {
   const config = universalConfig[module];
 
-  // 2. SAFETY CHECK
   if (!config) {
     console.error(`❌ No configuration found for module: ${module}`);
     return [];
@@ -25,62 +11,127 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
 
   const columns = [];
 
-  // 3. LOOP THROUGH ALL FIELDS IN CONFIGURATION
   Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
-    // 4. ONLY INCLUDE FIELDS MARKED FOR TABLE DISPLAY
     if (fieldConfig.tableColumn) {
-      // 5. CREATE COLUMN DEFINITION
       const column = {
-        accessorKey: fieldKey, // Data key: "name", "email", "role"
-        header: fieldConfig.label, // Column header: "Full Name", "Email"
+        accessorKey: fieldKey,
+        header: fieldConfig.label,
 
-        // 6. CELL RENDERER - Transforms data for display based on field type
         cell: (info) => {
-          const value = info.getValue(); // Get actual value from data
+          const value = info.getValue();
 
-          // Handle different field types with special rendering
+          // ✅ ENHANCED RELATION FIELD HANDLING
+          if (fieldConfig.relation && value) {
+            // Value is the populated object from backend
+            if (typeof value === "object" && value !== null) {
+              return (
+                <div className="flex justify-center">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRelationBadgeColor(
+                      fieldKey,
+                      fieldConfig.relation
+                    )}`}
+                  >
+                    {getRelationDisplayValue(
+                      value,
+                      fieldConfig.relation,
+                      fieldKey
+                    )}
+                  </span>
+                </div>
+              );
+            }
+            return <span className="text-gray-400">N/A</span>;
+          }
+
+          // Handle different field types
           switch (fieldConfig.type) {
-            // SWITCH FIELDS (like isActive) - Show badge
             case "select":
-              // Special handling for status field
-
-              if (fieldKey === "isActive") {
-                // Handle both boolean and string values
-                const isActive = value === true || value === "active";
+              const getColorClass = (value, fieldKey, module) => {
+                const active = "bg-green-100 text-green-800";
+                const inActive = "bg-red-100 text-red-800";
+                // Your existing color logic...
+                const colorMaps = {
+                  users: {
+                    isActive: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                    role: {
+                      admin: "bg-purple-100 text-purple-800",
+                      auditor: "bg-blue-100 text-blue-800",
+                      compliance_officer: "bg-orange-100 text-orange-800",
+                      audit_manager: "bg-green-100 text-green-800",
+                      sysadmin: "bg-red-100 text-red-800",
+                    },
+                  },
+                  companies: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  groups: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  sites: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  checkTypes: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  rules: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  templates: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  questions: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                };
 
                 return (
-                  <div className="flex justify-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
+                  colorMaps[module]?.[fieldKey]?.[value] ||
+                  "bg-gray-100 text-gray-800"
                 );
-              }
-
-              // Existing role handling
-              const roleColors = {
-                admin: "bg-purple-100 text-purple-800",
-                audit_manager: "bg-blue-100 text-blue-800",
-                auditor: "bg-green-100 text-green-800",
-                compliance_officer: "bg-orange-100 text-orange-800",
-                sysadmin: "bg-red-100 text-red-800",
               };
+
+              let displayValue = value;
+              if (fieldKey === "isActive") {
+                displayValue =
+                  value === true || value === "active" ? "active" : "inactive";
+              }
 
               return (
                 <div className="flex justify-center">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      roleColors[value] || "bg-gray-100 text-gray-800"
-                    }`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getColorClass(
+                      displayValue,
+                      fieldKey,
+                      module
+                    )}`}
                   >
-                    {value
-                      ? value
+                    {displayValue
+                      ? displayValue
                           .split("_")
                           .map(
                             (word) =>
@@ -92,30 +143,36 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
                 </div>
               );
 
-            // TEXTAREA FIELDS - Truncate long text
             case "textarea":
               return value ? (
-                <div
-                  className="max-w-xs truncate"
-                  title={value} // Show full text on hover
-                >
+                <div className="max-w-xs truncate" title={value}>
                   {value.length > 50 ? `${value.substring(0, 50)}...` : value}
                 </div>
               ) : (
                 <span className="text-gray-400">N/A</span>
               );
 
-            // DATE FIELDS - Format properly
             case "date":
               return value ? (
                 <div className="text-center">
-                  {new Date(value).toLocaleDateString()}
+                  <div className="text-sm font-medium text-gray-900">
+                    {new Date(value).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {new Date(value).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
                 </div>
               ) : (
-                <span className="text-gray-400">Never</span>
+                <span className="text-gray-400 text-sm">Never</span>
               );
 
-            // EMAIL FIELDS - Make clickable
             case "email":
               return value ? (
                 <a
@@ -128,7 +185,6 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
                 <span className="text-gray-400">N/A</span>
               );
 
-            // DEFAULT - Just display value
             default:
               return value ? (
                 <div>{value}</div>
@@ -143,16 +199,48 @@ export const generateUniversalColumns = (module, actionsComponent = null) => {
     }
   });
 
-  // 7. ADD ACTIONS COLUMN IF PROVIDED
-  if (actionsComponent) {
-    columns.push({
-      id: "actions",
-      header: "Actions",
-      // cell: (info) => actionsComponent(info), // Use provided actions component
-      cell: actionsComponent,
-    });
-  }
-
   console.log(`✅ Generated ${columns.length} columns for ${module}`);
   return columns;
+};
+
+// ✅ ENHANCED: Relation Display Value Function
+const getRelationDisplayValue = (item, relationModule, fieldKey) => {
+  switch (relationModule) {
+    case "users":
+      // ✅ createdBy/updatedBy এর জন্য special formatting
+      if (fieldKey === "createdBy" || fieldKey === "updatedBy") {
+        return `${item.name} (${item.email})`;
+      }
+      return item.name || item.email;
+
+    case "companies":
+      return item.name;
+
+    case "groups":
+      return item.name;
+
+    default:
+      return item.name || item.title || "Unknown";
+  }
+};
+
+// ✅ NEW: Relation Badge Colors
+const getRelationBadgeColor = (fieldKey, relationModule) => {
+  const colorMap = {
+    users: {
+      createdBy: "bg-purple-100 text-purple-800",
+      updatedBy: "bg-blue-100 text-blue-800",
+    },
+    groups: {
+      group: "bg-green-100 text-green-800",
+    },
+    companies: {
+      company: "bg-orange-100 text-orange-800",
+    },
+    site: {
+      site: "bg-orange-100 text-orange-800",
+    },
+  };
+
+  return colorMap[relationModule]?.[fieldKey] || "bg-gray-100 text-gray-800";
 };
