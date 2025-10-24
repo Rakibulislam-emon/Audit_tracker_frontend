@@ -10,7 +10,7 @@ export default function SiteManagement() {
       module="sites"
       token={token}
       title="Site Management"
-      addButtonText="Add   Site"
+      addButtonText="Add Site"
     />
   );
 }

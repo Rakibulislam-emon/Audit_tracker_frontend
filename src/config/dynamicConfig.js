@@ -335,7 +335,7 @@ export const universalConfig = {
         type: "textarea", // লোকেশন লম্বা হতে পারে
         label: "Location / Address",
         placeholder: "Enter full address or location details",
-        required: false, // মডেল অনুযায়ী required নয়
+        required: true, // মডেল অনুযায়ী required নয়
         tableColumn: true,
         filterable: true, // সার্চের জন্য
         fullWidth: true, // ফর্মে পুরো জায়গা নিতে পারে
@@ -426,4 +426,103 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"], // কারা দেখতে পারবে
     },
   },
+
+
+
+  checkTypes: {
+        // API Configuration
+        endpoint: "checkTypes", // Ensure this matches your backend route name
+
+        // UI Configuration
+        title: "Check Type Management",
+        description: "Manage categories or classifications for audit checks",
+
+        // FIELD DEFINITIONS - Based on CheckType.js model
+        fields: {
+            name: {
+                type: "text",
+                label: "Check Type Name",
+                placeholder: "Enter name (e.g., Access Control)",
+                required: true,
+                tableColumn: true,
+                filterable: true, // For search
+            },
+            description: {
+                type: "textarea",
+                label: "Description",
+                placeholder: "Enter a detailed description",
+                required: true, // Required in your schema
+                tableColumn: true,
+                filterable: true, // For search
+                fullWidth: true,
+            },
+            status: {
+                type: "select",
+                label: "Status",
+                required: true,
+                options: ["active", "inactive"],
+                default: "active",
+                tableColumn: true,
+                filterable: true, // For filtering
+            },
+            // Common fields
+            createdBy: {
+                type: "relation",
+                label: "Created By",
+                relation: "users",
+                tableColumn: true,
+                formField: false,
+                readOnly: true,
+                dataAccessor: "createdBy.name", // To show user name
+            },
+            updatedBy: {
+                type: "relation",
+                label: "Updated By",
+                relation: "users",
+                tableColumn: true,
+                formField: false,
+                readOnly: true,
+                dataAccessor: "updatedBy.name", // To show user name
+            },
+            createdAt: {
+                type: "date",
+                label: "Created At",
+                tableColumn: true,
+                formField: false,
+                readOnly: true,
+            },
+            updatedAt: {
+                type: "date",
+                label: "Updated At",
+                tableColumn: true,
+                formField: false,
+                readOnly: true,
+            },
+        },
+
+        // FILTER CONFIGURATION
+        filters: {
+            search: {
+                type: "search",
+                label: "Search Check Types",
+                placeholder: "Search by name or description...",
+                apiParam: "search", // Matches req.query.search in backend
+            },
+            status: {
+                type: "select",
+                label: "Status",
+                placeholder: "All Statuses",
+                apiParam: "status", // Matches req.query.status
+                options: ["active", "inactive"],
+            },
+        },
+
+        // PERMISSIONS (Adjust according to your needs)
+        permissions: {
+            create: ["admin", "sysadmin", "audit_manager"],
+            edit: ["admin", "sysadmin", "audit_manager"],
+            delete: ["admin", "sysadmin"],
+            view: ["admin", "sysadmin", "audit_manager", "auditor"], // Everyone can view?
+        },
+    },
 };

@@ -42,13 +42,12 @@ export default function UniversalCRUDManager({
   module,
   token,
   title,
+  desc,
   addButtonText = "Add Item",
   getPriorityLevel = null,
   getRowCondition = null,
   isAvailable = true,
 }) {
-
-  
   const searchParams = useSearchParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,25 +55,21 @@ export default function UniversalCRUDManager({
   const [selectedItem, setSelectedItem] = useState(null);
 
   // Filters from URL
- const filters = useMemo(() => {
+  const filters = useMemo(() => {
     const newFilters = {};
     // ২. বর্তমান মডিউলের ফিল্টার কী-গুলো নিন (e.g., ['search', 'group', 'status'])
     const filterKeys = Object.keys(universalConfig[module]?.filters || {});
-    
+
     // ৩. প্রতিটি কী-এর জন্য URL থেকে ভ্যালু পড়ুন
     filterKeys.forEach((key) => {
       newFilters[key] = searchParams.get(key) || "";
     });
-    
+
     return newFilters;
   }, [searchParams, module]);
 
   // Data fetch
-  const {
-    data: response,
-    isLoading,
-    refetch,
-  } = useModuleData(module, token, filters);
+  const { data: response, isLoading } = useModuleData(module, token, filters);
 
   const items = response?.data || [];
   console.log("items:", items);
@@ -142,16 +137,14 @@ export default function UniversalCRUDManager({
     });
   };
 
-
-
-  
-
   return (
     <div className="container mx-auto p-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
+          {desc && <p className="text-gray-600 mt-1">{desc}</p>}
+
           <p className="text-gray-600 text-sm mt-1">
             {items.length} {module} found
           </p>

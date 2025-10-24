@@ -45,6 +45,8 @@ export const universalService = {
         },
         credentials: 'include',
       });
+//  console.log(response, "from 48")
+      // return
 
       // 4. HANDLE HTTP ERRORS
       if (!response.ok) {
@@ -54,7 +56,7 @@ export const universalService = {
 
       // 5. PARSE SUCCESSFUL RESPONSE
       const result = await response.json();
-      
+      console.log('result:', result)
       // 6. VALIDATE RESPONSE STRUCTURE
       if (!result || typeof result !== 'object') {
         throw new Error(`Invalid response format from ${endpoint}`);

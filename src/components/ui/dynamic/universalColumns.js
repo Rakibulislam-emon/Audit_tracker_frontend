@@ -48,12 +48,14 @@ export const generateUniversalColumns = (module) => {
           switch (fieldConfig.type) {
             case "select":
               const getColorClass = (value, fieldKey, module) => {
+                const active = "bg-green-100 text-green-800";
+                const inActive = "bg-red-100 text-red-800";
                 // Your existing color logic...
                 const colorMaps = {
                   users: {
                     isActive: {
-                      active: "bg-green-100 text-green-800",
-                      inactive: "bg-red-100 text-red-800",
+                      active: `${active}`,
+                      inactive: `${inActive}`,
                     },
                     role: {
                       admin: "bg-purple-100 text-purple-800",
@@ -65,14 +67,26 @@ export const generateUniversalColumns = (module) => {
                   },
                   companies: {
                     status: {
-                      active: "bg-green-100 text-green-800",
-                      inactive: "bg-red-100 text-red-800",
+                      active: `${active}`,
+                      inactive: `${inActive}`,
                     },
                   },
                   groups: {
                     status: {
-                      active: "bg-green-100 text-green-800",
-                      inactive: "bg-red-100 text-red-800",
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  sites: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  checkTypes: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
                     },
                   },
                 };
@@ -205,9 +219,9 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
     companies: {
       company: "bg-orange-100 text-orange-800",
     },
-    site:{
-      site:"bg-orange-100 text-orange-800"
-    }
+    site: {
+      site: "bg-orange-100 text-orange-800",
+    },
   };
 
   return colorMap[relationModule]?.[fieldKey] || "bg-gray-100 text-gray-800";
