@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { universalConfig } from "@/config/dynamicConfig";
 import { AlertCircle, Plus, Save } from "lucide-react";
-import { useForm, Controller } from "react-hook-form"; // ✅ 1. Controller imported
+import { useForm } from "react-hook-form"; // ✅ 1. Controller imported
 import RelationSelect from "./UniversalRelationSelect"; // ✅ 2. New component imported
+import { useActionState } from "react";
 
 export default function UniversalForm({
   module,
@@ -17,8 +18,13 @@ export default function UniversalForm({
   mode = "create",
   token,
 }) {
+  const {user} = useActionState()
   const config = universalConfig[module];
-console.log("arrived")
+ 
+  // check for permission will be implemented later
+
+
+
   const {
     register,
     handleSubmit,
@@ -55,7 +61,6 @@ console.log("arrived")
     const hasError = errors[fieldKey];
     const errorClass = hasError ? "border-red-500 focus:ring-red-500" : "";
 
-   
     switch (fieldConfig.type) {
       case "text":
       case "email":
@@ -96,8 +101,8 @@ console.log("arrived")
             />
           );
         }
- // Watch current value for dynamic styling
-    const currentValue = watch(fieldKey);
+        // Watch current value for dynamic styling
+        const currentValue = watch(fieldKey);
 
         // This part is for STATIC dropdowns (like 'status' or 'role')
         const options = fieldConfig.options || [];

@@ -72,7 +72,7 @@ export default function UniversalCRUDManager({
   const { data: response, isLoading } = useModuleData(module, token, filters);
 
   const items = response?.data || [];
-  console.log("items:", items);
+ 
 
   // Mutations
   const { mutate: createItem } = useCreateModule(module, token);
