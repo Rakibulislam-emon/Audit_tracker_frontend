@@ -89,6 +89,18 @@ export const generateUniversalColumns = (module) => {
                       inactive: `${inActive}`,
                     },
                   },
+                  rules: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
+                  templates: {
+                    status: {
+                      active: `${active}`,
+                      inactive: `${inActive}`,
+                    },
+                  },
                 };
 
                 return (
