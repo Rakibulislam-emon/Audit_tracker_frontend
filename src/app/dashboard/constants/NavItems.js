@@ -13,7 +13,6 @@ import {
   Users,
 } from "lucide-react";
 
-
 export const navItems = {
   admin: [
     {
@@ -46,14 +45,14 @@ export const navItems = {
       icon: Factory,
       href: "/dashboard/admin/sites",
     },
-   
+
     {
       id: "check-types",
       label: "Check Types",
       icon: ListChecks,
       href: "/dashboard/admin/check-types",
     },
-     {
+    {
       id: "rules",
       label: "Rules",
       icon: FileText,
@@ -82,6 +81,20 @@ export const navItems = {
       label: "Schedules",
       icon: Calendar,
       href: "/dashboard/admin/schedules",
+    },
+    // teams
+    {
+      id: "teams",
+      label: "Teams",
+      icon: Users,
+      href: "/dashboard/admin/teams",
+    },
+    //  auditSessions
+    {
+      id: "auditSessions",
+      label: "Audit Sessions",
+      icon: Calendar,
+      href: "/dashboard/admin/auditsessions",
     },
     {
       id: "settings",

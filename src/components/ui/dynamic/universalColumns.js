@@ -154,6 +154,14 @@ export const generateUniversalColumns = (module) => {
                       cancelled: "bg-red-50 text-red-700 border border-red-200",
                     },
                   },
+                  schedules: {
+                    status: {
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
+                    },
+                  },
                 };
 
                 return (
@@ -297,6 +305,9 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
     },
     programs: {
       program: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    },
+    schedules: {
+      schedule: "bg-blue-50 text-blue-700 border border-blue-200",
     },
   };
 

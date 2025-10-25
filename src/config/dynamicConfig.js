@@ -932,7 +932,7 @@ export const universalConfig = {
         type: "textarea",
         label: "Description",
         placeholder: "Enter program details",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: true, // For search
         fullWidth: true,
@@ -950,14 +950,14 @@ export const universalConfig = {
       startDate: {
         type: "date",
         label: "Start Date",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: false,
       },
@@ -1073,5 +1073,465 @@ export const universalConfig = {
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
-  }, 
+  },
+
+  schedules: {
+    // API Configuration
+    endpoint: "schedules", // Matches backend route
+
+    // UI Configuration
+    title: "Schedule Management",
+    description: "Manage audit schedules",
+
+    // FIELD DEFINITIONS - Based on Schedule.js model
+    fields: {
+      title: {
+        type: "text",
+        label: "Schedule Title",
+        placeholder: "Enter a title for the schedule",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        required: true,
+        relation: "companies",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "company.name",
+      },
+      program: {
+        // Optional program link
+        type: "select",
+        label: "Program (Optional)",
+        required: false,
+        relation: "programs",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "program.name", // Show program name
+        placeholder: "Select Program",
+      },
+      startDate: {
+        type: "date",
+        label: "Start Date",
+        required: true,
+        tableColumn: true,
+        filterable: false, // Usually filter by range
+      },
+      endDate: {
+        type: "date",
+        label: "End Date",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+        // Add frontend validation if desired (endDate > startDate)
+      },
+      status: {
+        // commonFields.status
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Schedules",
+        placeholder: "Search by title...",
+        apiParam: "search",
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        placeholder: "All Companies",
+        apiParam: "company",
+        relation: "companies",
+      },
+      program: {
+        type: "select",
+        label: "Program",
+        placeholder: "All Programs",
+        apiParam: "program",
+        relation: "programs", // Filter by program
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      // Date range filters require custom UI components
+      // startDate: { type: 'dateRangeStart', apiParam: 'startDate', label: 'Start Date After' },
+      // endDate: { type: 'dateRangeEnd', apiParam: 'endDate', label: 'End Date Before' },
+    },
+
+    // PERMISSIONS (Match backend roles)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
+
+  teams: {
+    // API Configuration
+    endpoint: "teams", // Matches backend route
+
+    // UI Configuration
+    title: "Team Assignments", // More descriptive title
+    description: "Manage user assignments and roles within audit sessions",
+
+    // FIELD DEFINITIONS - Based on Team.js model
+    fields: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        required: true,
+        relation: "auditSessions", // Link to auditSessions module (NEEDS TO BE CREATED LATER)
+        tableColumn: true,
+        filterable: true, // Allow filtering by session
+        dataAccessor: "auditSession.title", // Show session title in table
+        placeholder: "Select Audit Session", // Placeholder for form dropdown
+      },
+      user: {
+        type: "select",
+        label: "User",
+        required: true,
+        relation: "users", // Link to users module
+        tableColumn: true,
+        filterable: true, // Allow filtering by user
+        dataAccessor: "user.name", // Show user name in table
+        placeholder: "Select User", // Placeholder for form dropdown
+      },
+      roleInTeam: {
+        type: "select", // Changed to select assuming enum in schema
+        label: "Role in Team",
+        placeholder: "Select Role", // Placeholder for form dropdown
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering by role
+        options: ["lead", "member", "observer", "specialist"], // Use the same enum values as schema
+      },
+      status: {
+        // commonFields.status
+        type: "select",
+        label: "Assignment Status", // More specific label
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true, // Typically changed after creation
+      },
+      // Common fields (read-only in table)
+      createdBy: {
+        type: "relation",
+        label: "Assigned By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false, // Not editable
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Last Updated By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Assigned At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        placeholder: "All Sessions",
+        apiParam: "auditSession", // Matches req.query.auditSession
+        relation: "auditSessions", // Needs auditSessions module
+      },
+      user: {
+        // Allow filtering assignments for a specific user
+        type: "select",
+        label: "User",
+        placeholder: "All Users",
+        apiParam: "user", // Matches req.query.user
+        relation: "users",
+      },
+      roleInTeam: {
+        // Allow filtering by role using select
+        type: "select",
+        label: "Role in Team",
+        placeholder: "All Roles",
+        apiParam: "roleInTeam", // Matches req.query.roleInTeam
+        options: ["lead", "member", "observer", "specialist"], // Use enum values
+      },
+      status: {
+        // Filter by assignment status
+        type: "select",
+        label: "Assignment Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+      // Removed 'search' filter as specific filters are generally more useful here
+    },
+
+    // PERMISSIONS (Match roles in authorizeRoles middleware)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
+      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
+    },
+  },
+
+  
+  auditSessions: {
+    endpoint: "auditSessions",
+    title: "Audit Session Management",
+    description: "Manage ongoing and completed audit sessions",
+    fields: {
+      title: {
+        // Optional title
+        type: "text",
+        label: "Session Title (Optional)",
+        placeholder: "Enter optional title",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+      },
+      schedule: {
+        type: "select",
+        label: "Schedule",
+        required: true,
+        relation: "schedules",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "schedule.title",
+        placeholder: "Select Schedule",
+      },
+      template: {
+        type: "select",
+        label: "Template",
+        required: true,
+        relation: "templates",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "template.title",
+        placeholder: "Select Template",
+      },
+      site: {
+        type: "select",
+        label: "Site",
+        required: true,
+        relation: "sites",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "site.name",
+        placeholder: "Select Site",
+      },
+      checkType: {
+        // Optional Check Type focus
+        type: "select",
+        label: "Check Type (Optional)",
+        required: false,
+        relation: "checkTypes",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "checkType.name",
+        placeholder: "Select Check Type",
+      },
+      workflowStatus: {
+        // Operational status
+        type: "select",
+        label: "Workflow Status",
+        required: true,
+        options: ["planned", "in-progress", "completed", "cancelled"],
+        default: "planned",
+        tableColumn: true,
+        filterable: true,
+      },
+      startDate: {
+        // Actual start date
+        type: "date",
+        label: "Actual Start Date",
+        required: false, // Not required on create maybe
+        tableColumn: true,
+        filterable: false,
+        formField: true, // Show on form
+      },
+      endDate: {
+        // Actual end date
+        type: "date",
+        label: "Actual End Date",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+        formField: true, // Show on form
+      },
+      status: {
+        // System status
+        type: "select",
+        label: "System Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdBy: {
+        type: "relation",
+        label: "Assigned By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false, // Not editable
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Last Updated By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Assigned At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Title",
+        placeholder: "Search by title...",
+        apiParam: "search",
+      },
+      schedule: {
+        type: "select",
+        label: "Schedule",
+        placeholder: "All Schedules",
+        apiParam: "schedule",
+        relation: "schedules",
+      },
+      template: {
+        type: "select",
+        label: "Template",
+        placeholder: "All Templates",
+        apiParam: "template",
+        relation: "templates",
+      },
+      site: {
+        type: "select",
+        label: "Site",
+        placeholder: "All Sites",
+        apiParam: "site",
+        relation: "sites",
+      },
+      checkType: {
+        type: "select",
+        label: "Check Type",
+        placeholder: "All Check Types",
+        apiParam: "checkType",
+        relation: "checkTypes",
+      },
+      workflowStatus: {
+        type: "select",
+        label: "Workflow Status",
+        placeholder: "All Workflow Statuses",
+        apiParam: "workflowStatus",
+        options: ["planned", "in-progress", "completed", "cancelled"],
+      },
+      status: {
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      // Date range filters would need custom UI components
+    },
+    permissions: {
+      // Match backend roles
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Auditor might update status/dates
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
 };
