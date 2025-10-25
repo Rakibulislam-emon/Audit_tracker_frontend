@@ -72,7 +72,6 @@ export default function UniversalCRUDManager({
   const { data: response, isLoading } = useModuleData(module, token, filters);
 
   const items = response?.data || [];
- 
 
   // Mutations
   const { mutate: createItem } = useCreateModule(module, token);
@@ -138,30 +137,32 @@ export default function UniversalCRUDManager({
   };
 
   return (
-    <div className="container mx-auto p-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">{title}</h1>
-          {desc && <p className="text-gray-600 mt-1">{desc}</p>}
+    <div className="container mx-auto  ">
+      <div className="py-4 text-center">
+        <h1 className="text-4xl font-bold ">{title}</h1>
+        {desc && <p className="text-gray-600 mt-1">{desc}</p>}
 
-          <p className="text-gray-600 text-sm mt-1">
-            {items.length} {module} found
-          </p>
-        </div>
-
-        {isAvailable && (
-          <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
-            <div className="flex-grow">
-              <UniversalFilters module={module} token={token} />
-            </div>
-            <Button onClick={() => openModal("create")} className="shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              {addButtonText}
-            </Button>
-          </div>
-        )}
+        <p className="text-gray-600 text-sm mt-2 font-bold">
+          {items.length} {module} found
+        </p>
       </div>
+     <div className=" flex">
+  {/* Header */}
+  <div className="flex flex-col lg:flex-row justify-end items-end gap-4 mb-6 w-full">
+    {isAvailable && (
+      <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-end justify-end">
+        <div className="md:flex-grow flex-grow-0  ">
+          <UniversalFilters module={module} token={token} />
+        </div>
+        <Button onClick={() => openModal("create")} className="shrink-0">
+          <Plus className="h-4 w-4 mr-2" />
+          {addButtonText}
+        </Button>
+      </div>
+    )}
+  </div>
+</div>
+
 
       {/* Loading State */}
       {isLoading ? (
