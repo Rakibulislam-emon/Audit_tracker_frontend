@@ -100,7 +100,7 @@ export default function UniversalFilters({ module, token }) {
                 value={filters[key] || ""}
                 onChange={(e) => handleFilterChange(key, e.target.value)}
                 placeholder={filter.placeholder || `Search ${module}...`}
-                className="w-full pl-10 pr-10"
+                className="w-full pl-10 pr-10 "
               />
               {filters[key] && (
                 <button
@@ -140,7 +140,7 @@ export default function UniversalFilters({ module, token }) {
 
         // ✅ স্ট্যাটিক সিলেক্ট (যেমন 'status')
         return (
-          <div key={key} className="flex-1 min-w-[150px]">
+          <div key={key} className="flex-1 min-w-[150px] ">
             <Label
               htmlFor={key}
               className="text-sm font-medium text-gray-700 mb-1 block"
@@ -176,13 +176,13 @@ export default function UniversalFilters({ module, token }) {
   };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap md:flex-wrap lg:flex-nowrap items-end gap-2 w-full">
+    <div className="w-full ">
+      <div className="flex flex-wrap md:flex-wrap lg:flex-nowrap items-end gap-2 ">
         {/* ✅ ডাইনামিক লুপের মাধ্যমে সব ফিল্টার রেন্ডার করা */}
         {filterEntries.map(([key, filter]) => renderFilter(key, filter))}
 
         {/* Clear Button */}
-        <div className="sm:w-1/5 w-full">
+        <div className="sm:w-1/5 w-full ">
           <Button
             variant={hasActiveFilters ? "outline" : "ghost"}
             onClick={clearAllFilters}
