@@ -932,7 +932,7 @@ export const universalConfig = {
         type: "textarea",
         label: "Description",
         placeholder: "Enter program details",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: true, // For search
         fullWidth: true,
@@ -950,14 +950,14 @@ export const universalConfig = {
       startDate: {
         type: "date",
         label: "Start Date",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: false,
+        required: true,
         tableColumn: true,
         filterable: false,
       },
@@ -1073,5 +1073,147 @@ export const universalConfig = {
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
-  }, 
+  },
+
+  schedules: {
+    // API Configuration
+    endpoint: "schedules", // Matches backend route
+
+    // UI Configuration
+    title: "Schedule Management",
+    description: "Manage audit schedules",
+
+    // FIELD DEFINITIONS - Based on Schedule.js model
+    fields: {
+      title: {
+        type: "text",
+        label: "Schedule Title",
+        placeholder: "Enter a title for the schedule",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        required: true,
+        relation: "companies",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "company.name",
+      },
+      program: {
+        // Optional program link
+        type: "select",
+        label: "Program (Optional)",
+        required: false,
+        relation: "programs",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "program.name", // Show program name
+        placeholder: "Select Program",
+      },
+      startDate: {
+        type: "date",
+        label: "Start Date",
+        required: true,
+        tableColumn: true,
+        filterable: false, // Usually filter by range
+      },
+      endDate: {
+        type: "date",
+        label: "End Date",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+        // Add frontend validation if desired (endDate > startDate)
+      },
+      status: {
+        // commonFields.status
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Schedules",
+        placeholder: "Search by title...",
+        apiParam: "search",
+      },
+      company: {
+        type: "select",
+        label: "Company",
+        placeholder: "All Companies",
+        apiParam: "company",
+        relation: "companies",
+      },
+      program: {
+        type: "select",
+        label: "Program",
+        placeholder: "All Programs",
+        apiParam: "program",
+        relation: "programs", // Filter by program
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      // Date range filters require custom UI components
+      // startDate: { type: 'dateRangeStart', apiParam: 'startDate', label: 'Start Date After' },
+      // endDate: { type: 'dateRangeEnd', apiParam: 'endDate', label: 'End Date Before' },
+    },
+
+    // PERMISSIONS (Match backend roles)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
 };
