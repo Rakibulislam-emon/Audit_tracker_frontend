@@ -799,9 +799,10 @@ export const universalConfig = {
         filterable: true, // Allow filtering by type
       },
       severityDefault: {
-        type: "text", // Or select if you have predefined severities
+        type: "select", // Or select if you have predefined severities
         label: "Default Severity",
         placeholder: "e.g., High, Medium, Low (optional)",
+        options: ["high", "medium", "low"],
         required: true,
         tableColumn: true,
         filterable: true,
@@ -908,4 +909,169 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
   },
+
+  programs: {
+    // API Configuration
+    endpoint: "programs", // Matches backend route
+
+    // UI Configuration
+    title: "Program Management",
+    description: "Manage audit programs and initiatives",
+
+    // FIELD DEFINITIONS - Based on Program.js model (with company relation)
+    fields: {
+      name: {
+        type: "text",
+        label: "Program Name",
+        placeholder: "Enter program name",
+        required: true,
+        tableColumn: true,
+        filterable: true, // For search
+      },
+      description: {
+        type: "textarea",
+        label: "Description",
+        placeholder: "Enter program details",
+        required: false,
+        tableColumn: true,
+        filterable: true, // For search
+        fullWidth: true,
+      },
+      company: {
+        // Assuming company relation is added
+        type: "select",
+        label: "Company",
+        required: true,
+        relation: "companies",
+        tableColumn: true,
+        filterable: true, // For filtering
+        dataAccessor: "company.name", // Show company name
+      },
+      startDate: {
+        type: "date",
+        label: "Start Date",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+      },
+      endDate: {
+        type: "date",
+        label: "End Date",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+      },
+      programStatus: {
+        // Operational Status
+        type: "select",
+        label: "Program Status",
+        required: true, // Has default, but good to set in form
+        options: [
+          "planning",
+          "in-progress",
+          "completed",
+          "on-hold",
+          "cancelled",
+        ],
+        default: "planning",
+        tableColumn: true,
+        filterable: true, // For filtering
+      },
+      // ✅ commonFields.status field configuration
+      status: {
+        // System Status (Active/Inactive)
+        type: "select",
+        label: "System Status",
+        required: true, // From commonFields default
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true, // Show in table
+        filterable: true, // Allow filtering
+        editOnly: true, // Usually only editable
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Programs",
+        placeholder: "Search by name or description...",
+        apiParam: "search",
+      },
+      company: {
+        // Assuming company relation
+        type: "select",
+        label: "Company",
+        placeholder: "All Companies",
+        apiParam: "company",
+        relation: "companies",
+      },
+      programStatus: {
+        // Filter by operational status
+        type: "select",
+        label: "Program Status",
+        placeholder: "All Program Statuses",
+        apiParam: "programStatus", // Matches req.query.programStatus
+        options: [
+          "planning",
+          "in-progress",
+          "completed",
+          "on-hold",
+          "cancelled",
+        ],
+      },
+      // ✅ Filter for commonFields.status
+      status: {
+        // Filter by system status
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+      // Date range filters could be added here if needed (requires custom UI)
+    },
+
+    // PERMISSIONS (Match backend roles)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  }, 
 };

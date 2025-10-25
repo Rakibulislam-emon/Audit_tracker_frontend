@@ -1,4 +1,4 @@
-// components/dynamic/universalColumns.js - Update করুন
+// components/dynamic/universalColumns.js - Improved color scheme
 import { universalConfig } from "@/config/dynamicConfig";
 
 export const generateUniversalColumns = (module) => {
@@ -27,7 +27,7 @@ export const generateUniversalColumns = (module) => {
               return (
                 <div className="flex justify-center">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRelationBadgeColor(
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getRelationBadgeColor(
                       fieldKey,
                       fieldConfig.relation
                     )}`}
@@ -41,77 +41,124 @@ export const generateUniversalColumns = (module) => {
                 </div>
               );
             }
-            return <span className="text-gray-400">N/A</span>;
+            return <span className="text-gray-400 text-sm">N/A</span>;
           }
 
           // Handle different field types
           switch (fieldConfig.type) {
             case "select":
               const getColorClass = (value, fieldKey, module) => {
-                const active = "bg-green-100 text-green-800";
-                const inActive = "bg-red-100 text-red-800";
-                // Your existing color logic...
+                // Enhanced color scheme with better contrast
                 const colorMaps = {
                   users: {
                     isActive: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                     role: {
-                      admin: "bg-purple-100 text-purple-800",
-                      auditor: "bg-blue-100 text-blue-800",
-                      compliance_officer: "bg-orange-100 text-orange-800",
-                      audit_manager: "bg-green-100 text-green-800",
-                      sysadmin: "bg-red-100 text-red-800",
+                      admin:
+                        "bg-violet-50 text-violet-700 border border-violet-200",
+                      auditor:
+                        "bg-blue-50 text-blue-700 border border-blue-200",
+                      compliance_officer:
+                        "bg-amber-50 text-amber-700 border border-amber-200",
+                      audit_manager:
+                        "bg-teal-50 text-teal-700 border border-teal-200",
+                      sysadmin: "bg-red-50 text-red-700 border border-red-200",
                     },
                   },
                   companies: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   groups: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   sites: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   checkTypes: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   rules: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   templates: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
                     },
                   },
                   questions: {
                     status: {
-                      active: `${active}`,
-                      inactive: `${inActive}`,
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
+                    },
+                    responseType: {
+                      "yes/no":
+                        "bg-indigo-50 text-indigo-700 border border-indigo-200",
+                      text: "bg-sky-50 text-sky-700 border border-sky-200",
+                      number: "bg-cyan-50 text-cyan-700 border border-cyan-200",
+                      rating:
+                        "bg-amber-50 text-amber-700 border border-amber-200",
+                      dropdown:
+                        "bg-purple-50 text-purple-700 border border-purple-200",
+                    },
+                  },
+                  programs: {
+                    status: {
+                      active:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      inactive:
+                        "bg-rose-50 text-rose-700 border border-rose-200",
+                    },
+                    programStatus: {
+                      planning:
+                        "bg-blue-50 text-blue-700 border border-blue-200",
+                      "in-progress":
+                        "bg-amber-50 text-amber-700 border border-amber-200",
+                      completed:
+                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
+                      "on-hold":
+                        "bg-slate-50 text-slate-700 border border-slate-200",
+                      cancelled: "bg-red-50 text-red-700 border border-red-200",
                     },
                   },
                 };
 
                 return (
                   colorMaps[module]?.[fieldKey]?.[value] ||
-                  "bg-gray-100 text-gray-800"
+                  "bg-slate-50 text-slate-700 border border-slate-200"
                 );
               };
 
@@ -124,7 +171,7 @@ export const generateUniversalColumns = (module) => {
               return (
                 <div className="flex justify-center">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getColorClass(
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getColorClass(
                       displayValue,
                       fieldKey,
                       module
@@ -145,11 +192,13 @@ export const generateUniversalColumns = (module) => {
 
             case "textarea":
               return value ? (
-                <div className="max-w-xs truncate" title={value}>
-                  {value.length > 50 ? `${value.substring(0, 50)}...` : value}
+                <div className="max-w-xs" title={value}>
+                  <div className="text-sm text-gray-900 line-clamp-2">
+                    {value.length > 50 ? `${value.substring(0, 50)}...` : value}
+                  </div>
                 </div>
               ) : (
-                <span className="text-gray-400">N/A</span>
+                <span className="text-gray-400 text-sm">N/A</span>
               );
 
             case "date":
@@ -177,19 +226,19 @@ export const generateUniversalColumns = (module) => {
               return value ? (
                 <a
                   href={`mailto:${value}`}
-                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                  className="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200"
                 >
                   {value}
                 </a>
               ) : (
-                <span className="text-gray-400">N/A</span>
+                <span className="text-gray-400 text-sm">N/A</span>
               );
 
             default:
               return value ? (
-                <div>{value}</div>
+                <div className="text-sm text-gray-900">{value}</div>
               ) : (
-                <span className="text-gray-400">N/A</span>
+                <span className="text-gray-400 text-sm">N/A</span>
               );
           }
         },
@@ -224,23 +273,35 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
   }
 };
 
-// ✅ NEW: Relation Badge Colors
+// ✅ IMPROVED: Relation Badge Colors with better visual hierarchy
 const getRelationBadgeColor = (fieldKey, relationModule) => {
   const colorMap = {
     users: {
-      createdBy: "bg-purple-100 text-purple-800",
-      updatedBy: "bg-blue-100 text-blue-800",
+      createdBy: "bg-violet-50 text-violet-700 border border-violet-200",
+      updatedBy: "bg-blue-50 text-blue-700 border border-blue-200",
     },
     groups: {
-      group: "bg-green-100 text-green-800",
+      group: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     },
     companies: {
-      company: "bg-orange-100 text-orange-800",
+      company: "bg-amber-50 text-amber-700 border border-amber-200",
     },
-    site: {
-      site: "bg-orange-100 text-orange-800",
+    sites: {
+      site: "bg-orange-50 text-orange-700 border border-orange-200",
+    },
+    templates: {
+      template: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    },
+    checkTypes: {
+      checkType: "bg-cyan-50 text-cyan-700 border border-cyan-200",
+    },
+    programs: {
+      program: "bg-indigo-50 text-indigo-700 border border-indigo-200",
     },
   };
 
-  return colorMap[relationModule]?.[fieldKey] || "bg-gray-100 text-gray-800";
+  return (
+    colorMap[relationModule]?.[fieldKey] ||
+    "bg-slate-50 text-slate-700 border border-slate-200"
+  );
 };
