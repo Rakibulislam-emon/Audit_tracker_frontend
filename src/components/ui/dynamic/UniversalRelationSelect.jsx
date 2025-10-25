@@ -3,7 +3,6 @@
 import { useModuleData } from "@/hooks/useUniversal";
 import { Controller } from "react-hook-form";
 
-
 export default function RelationSelect({
   fieldKey,
   fieldConfig,
@@ -39,9 +38,13 @@ export default function RelationSelect({
       render={({ field }) => (
         <div className="relative">
           <select
- 
-
+          
             {...field} // Use 'field' from Controller
+            value={field.value === null ? "" : field.value} // যদি null হয়, "" ব্যবহার করুন
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            ref={field.ref}
+            name={field.name}
             disabled={isSubmitting || relationInfo.isLoading}
             className={`
               flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm 
