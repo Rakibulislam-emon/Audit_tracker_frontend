@@ -146,23 +146,22 @@ export default function UniversalCRUDManager({
           {items.length} {module} found
         </p>
       </div>
-     <div className=" flex">
-  {/* Header */}
-  <div className="flex flex-col lg:flex-row justify-end items-end gap-4 mb-6 w-full">
-    {isAvailable && (
-      <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-end justify-end">
-        <div className="md:flex-grow flex-grow-0  ">
-          <UniversalFilters module={module} token={token} />
+      <div className=" flex">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-end items-end gap-4 mb-6 w-full">
+          {isAvailable && (
+            <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-end justify-end">
+              <div className="md:flex-grow flex-grow-0  ">
+                <UniversalFilters module={module} token={token} />
+              </div>
+              <Button onClick={() => openModal("create")} className="shrink-0">
+                <Plus className="h-4 w-4 mr-2" />
+                {addButtonText}
+              </Button>
+            </div>
+          )}
         </div>
-        <Button onClick={() => openModal("create")} className="shrink-0">
-          <Plus className="h-4 w-4 mr-2" />
-          {addButtonText}
-        </Button>
       </div>
-    )}
-  </div>
-</div>
-
 
       {/* Loading State */}
       {isLoading ? (
