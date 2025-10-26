@@ -9,7 +9,6 @@ import { useState } from "react";
 import useSWRMutation from "swr/mutation";
 
 async function loginRequest(url, { arg }) {
-   
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -26,15 +25,14 @@ async function loginRequest(url, { arg }) {
 }
 
 export default function LoginForm() {
-
   const router = useRouter();
-  
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { trigger, isMutating, error } = useSWRMutation(
-    "http://localhost:5000/api/users/login",
+    // "http://localhost:5000/api/users/login",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/login`,
     loginRequest
   );
 
@@ -53,9 +51,9 @@ export default function LoginForm() {
           email: result.email,
           role: result.role,
         };
-        console.log(user)
+        console.log(user);
         useAuthStore.getState().login(user, result.token);
-        
+
         router.push(`/dashboard/${user.role}`);
       }
     } catch (error) {
