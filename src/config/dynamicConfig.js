@@ -1944,4 +1944,247 @@ export const universalConfig = {
       ],
     },
   },
+
+  fixActions: {
+    endpoint: "fix-actions", // Matches backend route (e.g., /api/fix-actions)
+    title: "Corrective Actions", // Changed title slightly
+    description: "Manage and track corrective actions for identified problems",
+    fields: {
+      problem: {
+        type: "select",
+        label: "Related Problem",
+        required: true,
+        relation: "problems",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "problem.title", // Show problem title
+        placeholder: "Link to Problem",
+      },
+      actionText: {
+        type: "textarea",
+        label: "Action Description",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        placeholder: "Describe the corrective action needed",
+      },
+      owner: {
+        // Assigned User
+        type: "select",
+        label: "Owner",
+        required: true,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "owner.name", // Show owner name
+        placeholder: "Assign Owner",
+      },
+      deadline: {
+        type: "date",
+        label: "Deadline",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+      },
+      actionStatus: {
+        // Workflow status
+        type: "select",
+        label: "Action Status",
+        required: true,
+        options: [
+          "Pending",
+          "In Progress",
+          "Completed",
+          "Verified",
+          "Rejected",
+        ],
+        default: "Pending",
+        tableColumn: true,
+        filterable: true,
+      },
+      // Verification fields (mostly read-only in table, maybe editable in form for verifiers)
+      verifiedBy: {
+        type: "select",
+        label: "Verified By",
+        required: false,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "verifiedBy.name",
+        formField: true, // Allow setting verifier in form (maybe edit only?)
+        readOnly: false, // Make editable
+        editOnly: true, // Only show on edit form
+        placeholder: "Select Verifier (if verified)",
+      },
+      verifiedAt: {
+        type: "date",
+        label: "Verified At",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+        formField: true, // Allow setting date
+        readOnly: false,
+        editOnly: true,
+      },
+      verificationResult: {
+        type: "select",
+        label: "Verification Result",
+        required: false,
+        options: [
+          "Effective",
+          "Ineffective",
+          "Partially Effective",
+          "Not Applicable",
+          "Pending Verification",
+        ],
+        tableColumn: true,
+        filterable: true,
+        formField: true, // Allow setting result
+        readOnly: false,
+        editOnly: true,
+        placeholder: "Select Verification Result (if verified)",
+      },
+      reviewNotes: {
+        type: "textarea",
+        label: "Review/Verification Notes",
+        required: false,
+        tableColumn: false,
+        filterable: false, // Maybe hide from main table
+        formField: true,
+        fullWidth: true,
+        readOnly: false, // Allow editing notes
+        editOnly: true, // Only needed during/after completion?
+        placeholder: "Enter review or verification notes",
+      },
+      verificationMethod: {
+        type: "textarea",
+        label: "Verification Method",
+        required: false,
+        tableColumn: false,
+        filterable: false,
+        formField: true,
+        fullWidth: true,
+        readOnly: false,
+        editOnly: true,
+        placeholder: "Describe how completion was verified",
+      },
+      status: {
+        // System Status
+        type: "select",
+        label: "System Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Actions",
+        placeholder: "Search action text...",
+        apiParam: "search",
+      },
+      problem: {
+        type: "select",
+        label: "Problem",
+        placeholder: "All Problems",
+        apiParam: "problem",
+        relation: "problems",
+      },
+      owner: {
+        type: "select",
+        label: "Owner",
+        placeholder: "All Owners",
+        apiParam: "owner",
+        relation: "users",
+      },
+      actionStatus: {
+        type: "select",
+        label: "Action Status",
+        placeholder: "All Action Statuses",
+        apiParam: "actionStatus",
+        options: [
+          "Pending",
+          "In Progress",
+          "Completed",
+          "Verified",
+          "Rejected",
+        ],
+      },
+      status: {
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      verificationResult: {
+        type: "select",
+        label: "Verification Result",
+        placeholder: "All Results",
+        apiParam: "verificationResult",
+        options: [
+          "Effective",
+          "Ineffective",
+          "Partially Effective",
+          "Not Applicable",
+          "Pending Verification",
+        ],
+      },
+      // Filter by deadline range would need custom UI
+    },
+    permissions: {
+      // Match backend roles
+      // Who can view? Probably everyone involved.
+      view: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ],
+      // Who creates actions? Usually Managers/Admins based on Problems.
+      create: ["admin", "sysadmin", "audit_manager"],
+      // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
+      edit: ["admin", "sysadmin", "audit_manager" /*, add owner role? */],
+      // Who deletes? Restricted.
+      delete: ["admin", "sysadmin"],
+    },
+  },
 };

@@ -110,6 +110,13 @@ export const navItems = {
       icon: ListChecks,
       href: "/dashboard/admin/problems",
     },
+    // fix-actions
+    {
+      id: "fix-actions",
+      label: "Fix Actions",
+      icon: ClipboardCheck,
+      href: "/dashboard/admin/fix-actions",
+    },
 
     {
       id: "settings",
