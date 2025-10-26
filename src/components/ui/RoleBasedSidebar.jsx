@@ -23,8 +23,10 @@ export function RoleBasedSidebar({ role, isOpen, onToggle }) {
 
   return (
     <>
+    
       {/* Desktop Sidebar — always visible */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:h-screen lg:border-r lg:bg-background lg:z-50">
+      <aside className="hidden overflow-y-auto lg:flex lg:flex-col lg:w-64 lg:fixed lg:h-screen lg:border-r lg:bg-background lg:z-50">
+        
         <SidebarContent role={role} items={sidebarItems} pathname={pathname} />
       </aside>
 

@@ -47,128 +47,146 @@ export const generateUniversalColumns = (module) => {
           // Handle different field types
           switch (fieldConfig.type) {
             case "select":
-              const getColorClass = (value, fieldKey, module) => {
-                // Enhanced color scheme with better contrast
-                const colorMaps = {
-                  users: {
-                    isActive: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                    role: {
-                      admin:
-                        "bg-violet-50 text-violet-700 border border-violet-200",
-                      auditor:
-                        "bg-blue-50 text-blue-700 border border-blue-200",
-                      compliance_officer:
-                        "bg-amber-50 text-amber-700 border border-amber-200",
-                      audit_manager:
-                        "bg-teal-50 text-teal-700 border border-teal-200",
-                      sysadmin: "bg-red-50 text-red-700 border border-red-200",
-                    },
-                  },
-                  companies: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  groups: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  sites: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  checkTypes: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  rules: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  templates: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                  questions: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                    responseType: {
-                      "yes/no":
-                        "bg-indigo-50 text-indigo-700 border border-indigo-200",
-                      text: "bg-sky-50 text-sky-700 border border-sky-200",
-                      number: "bg-cyan-50 text-cyan-700 border border-cyan-200",
-                      rating:
-                        "bg-amber-50 text-amber-700 border border-amber-200",
-                      dropdown:
-                        "bg-purple-50 text-purple-700 border border-purple-200",
-                    },
-                  },
-                  programs: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                    programStatus: {
-                      planning:
-                        "bg-blue-50 text-blue-700 border border-blue-200",
-                      "in-progress":
-                        "bg-amber-50 text-amber-700 border border-amber-200",
-                      completed:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      "on-hold":
-                        "bg-slate-50 text-slate-700 border border-slate-200",
-                      cancelled: "bg-red-50 text-red-700 border border-red-200",
-                    },
-                  },
-                  schedules: {
-                    status: {
-                      active:
-                        "bg-emerald-50 text-emerald-700 border border-emerald-200",
-                      inactive:
-                        "bg-rose-50 text-rose-700 border border-rose-200",
-                    },
-                  },
-                };
+            const getColorClass = (value, fieldKey, module) => {
+  // Centralized color palettes
+  const baseColors = {
+    active: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    inactive: "bg-rose-50 text-rose-700 border border-rose-200",
+  };
 
-                return (
-                  colorMaps[module]?.[fieldKey]?.[value] ||
-                  "bg-slate-50 text-slate-700 border border-slate-200"
-                );
-              };
+  const roleColors = {
+    admin: "bg-violet-50 text-violet-700 border border-violet-200",
+    auditor: "bg-blue-50 text-blue-700 border border-blue-200",
+    compliance_officer: "bg-amber-50 text-amber-700 border border-amber-200",
+    audit_manager: "bg-teal-50 text-teal-700 border border-teal-200",
+    sysadmin: "bg-red-50 text-red-700 border border-red-200",
+    user: "bg-green-50 text-green-700 border border-green-200",
+    lead: "bg-amber-50 text-amber-700 border border-amber-200",
+    member: "bg-sky-50 text-sky-700 border border-sky-200",
+    observer: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    specialist: "bg-purple-50 text-purple-700 border border-purple-200",
+  };
+
+  const responseColors = {
+    "yes/no": "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    text: "bg-sky-50 text-sky-700 border border-sky-200",
+    number: "bg-cyan-50 text-cyan-700 border border-cyan-200",
+    rating: "bg-amber-50 text-amber-700 border border-amber-200",
+    dropdown: "bg-purple-50 text-purple-700 border border-purple-200",
+  };
+
+  const programStatusColors = {
+    planning: "bg-blue-50 text-blue-700 border border-blue-200",
+    "in-progress": "bg-amber-50 text-amber-700 border border-amber-200",
+    completed: baseColors.active,
+    "on-hold": "bg-slate-50 text-slate-700 border border-slate-200",
+    cancelled: baseColors.inactive,
+  };
+
+  const workflowStatusColors = {
+    planned: "bg-blue-50 text-blue-700 border border-blue-200",
+    "in-progress": "bg-amber-50 text-amber-700 border border-amber-200",
+    completed: baseColors.active,
+    cancelled: baseColors.inactive,
+  };
+
+  const severityColors = {
+    informational: "bg-slate-50 text-slate-700 border border-slate-200",
+    low: "bg-sky-50 text-sky-700 border border-sky-200",
+    medium: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    high: "bg-orange-50 text-orange-700 border border-orange-200",
+    critical: "bg-red-50 text-red-700 border border-red-200",
+  };
+
+  const resolutionStatusColors = {
+    open: baseColors.inactive,
+    "in progress": "bg-amber-50 text-amber-700 border border-amber-200",
+    resolved: "bg-blue-50 text-blue-700 border border-blue-200",
+    "closed - verified": baseColors.active,
+    "closed - risk accepted": "bg-slate-50 text-slate-700 border border-slate-200",
+    closed: baseColors.active,
+  };
+
+  const riskRatingColors = {
+    low: "bg-sky-50 text-sky-700 border border-sky-200",
+    medium: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    high: "bg-orange-50 text-orange-700 border border-orange-200",
+    critical: "bg-red-50 text-red-700 border border-red-200",
+  };
+
+  const likelihoodColors = {
+    rare: "bg-sky-50 text-sky-700 border border-sky-200",
+    unlikely: "bg-blue-50 text-blue-700 border border-blue-200",
+    possible: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    likely: "bg-orange-50 text-orange-700 border border-orange-200",
+    "almost certain": "bg-red-50 text-red-700 border border-red-200",
+  };
+
+  // Module-specific mappings
+  const moduleMappings = {
+    users: { 
+      isActive: baseColors, 
+      role: roleColors,
+      status: baseColors 
+    },
+    companies: { 
+      status: baseColors 
+    },
+    groups: { 
+      status: baseColors 
+    },
+    sites: { 
+      status: baseColors 
+    },
+    checkTypes: { 
+      status: baseColors 
+    },
+    rules: { 
+      status: baseColors 
+    },
+    templates: { 
+      status: baseColors 
+    },
+    questions: {
+      status: baseColors,
+      responseType: responseColors,
+      severityDefault: severityColors
+    },
+    programs: {
+      status: baseColors,
+      programStatus: programStatusColors
+    },
+    schedules: { 
+      status: baseColors 
+    },
+    teams: { 
+      status: baseColors, 
+      roleInTeam: roleColors 
+    },
+    auditSessions: {
+      status: baseColors,
+      workflowStatus: workflowStatusColors
+    },
+    observations: {
+      status: baseColors,
+      severity: severityColors,
+      resolutionStatus: resolutionStatusColors
+    },
+    problems: {
+      status: baseColors,
+      impact: riskRatingColors,
+      likelihood: likelihoodColors,
+      riskRating: riskRatingColors,
+      problemStatus: resolutionStatusColors
+    },
+  };
+
+  const fieldMap = moduleMappings[module]?.[fieldKey];
+  return (
+    fieldMap?.[value] ||
+    "bg-slate-50 text-slate-700 border border-slate-200"
+  );
+};
 
               let displayValue = value;
               if (fieldKey === "isActive") {
@@ -287,6 +305,8 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
     users: {
       createdBy: "bg-violet-50 text-violet-700 border border-violet-200",
       updatedBy: "bg-blue-50 text-blue-700 border border-blue-200",
+      user: "bg-green-50 text-green-700 border border-green-200",
+      assignedBy: "bg-violet-50 text-violet-700 border border-violet-200",
     },
     groups: {
       group: "bg-emerald-50 text-emerald-700 border border-emerald-200",
@@ -309,6 +329,22 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
     schedules: {
       schedule: "bg-blue-50 text-blue-700 border border-blue-200",
     },
+    auditSessions: {
+      auditSession: "bg-purple-50 text-purple-700 border border-purple-200",
+    },
+    questions: {
+      question: "bg-teal-50 text-teal-700 border border-teal-200",
+    },
+    observations: {
+      observation: "bg-pink-50 text-pink-700 border border-pink-200",
+    },
+    problems: {
+      problem: "bg-red-50 text-red-700 border border-red-200",
+    },
+    // FixActions module (future)
+    fixActions: {
+      fixActions: "bg-lime-50 text-lime-700 border border-lime-200",
+    }
   };
 
   return (

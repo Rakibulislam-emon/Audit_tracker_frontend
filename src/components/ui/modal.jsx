@@ -8,7 +8,7 @@ const Modal = ({
   onClose,
   children,
   title,
-  size = "md",
+  size = "xl",
   animation = "scale",
 }) => {
   // Animation variants based on animation type
@@ -169,7 +169,7 @@ const Modal = ({
   return createPortal(<AnimatePresence>
     {isOpen && (
       <motion.div
-        className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto"
+        className="fixed  inset-0 z-[9999] flex items-center justify-center pointer-events-auto "
         initial="hidden"
         animate="visible"
         exit="exit"
@@ -177,7 +177,7 @@ const Modal = ({
         transition={{ duration: 0.2 }}>
         {/* Backdrop */}
         <motion.div
-          className={cn("absolute inset-0 backdrop-blur-sm", "bg-black/50 dark:bg-black/70")}
+          className={cn("absolute inset-0 backdrop-blur-sm ", "bg-black/50 dark:bg-black/70 ")}
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -186,7 +186,7 @@ const Modal = ({
         {/* Modal Content */}
         <motion.div
           className={cn(
-            "relative rounded-lg shadow-xl w-full mx-4 max-h-[90vh] overflow-auto",
+            "relative  rounded-lg shadow-xl w-full mx-4 max-h-[90vh] overflow-auto",
             "bg-white dark:bg-gray-900",
             "border-0 dark:border dark:border-gray-700",
             sizeClasses[size]

@@ -75,7 +75,7 @@ export default function RelationSelect({
                   value={item._id}
                   className="text-gray-900"
                 >
-                  {item.name || item.title || item.email}
+                  {item.name || item.title || item.email || item.questionText}
                 </option>
               ))}
           </select>

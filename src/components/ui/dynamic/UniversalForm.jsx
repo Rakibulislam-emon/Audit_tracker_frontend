@@ -122,6 +122,10 @@ case "number":
         // ✅ 4. This logic is now clean
         if (fieldConfig.relation) {
           // If it's a relation, render the new component
+          console.log(
+            fieldConfig.relation, fieldKey,
+            "Rendering RelationSelect for relation field"
+          )
           return (
             <RelationSelect
               fieldKey={fieldKey}
@@ -270,7 +274,7 @@ case "number":
         e.preventDefault();
         handleSubmit(onSubmit)(e);
       }}
-      className="space-y-5"
+      className="space-y-5 border "
     >
       {/* Form Fields - Grid Layout for better space usage */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

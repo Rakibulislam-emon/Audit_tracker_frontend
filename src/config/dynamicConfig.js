@@ -1347,7 +1347,6 @@ export const universalConfig = {
     },
   },
 
-  
   auditSessions: {
     endpoint: "auditSessions",
     title: "Audit Session Management",
@@ -1532,6 +1531,417 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Auditor might update status/dates
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
+
+  observations: {
+    endpoint: "observations",
+    title: "Observations Management",
+    description: "Manage audit observations and findings",
+    fields: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        required: true,
+        relation: "auditSessions",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "auditSession.title",
+        placeholder: "Select Audit Session",
+      },
+      question: {
+        // Optional linked question
+        type: "select",
+        label: "Related Question (Optional)",
+        required: false,
+        relation: "questions",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "question.questionText", // Show question text
+        placeholder: "Select Related Question",
+      },
+      questionText: {
+        // The actual observation detail/question asked
+        type: "textarea",
+        label: "Observation / Question Text",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        placeholder: "Enter observation details or the question asked",
+      },
+      response: {
+        type: "textarea", // Allow detailed response
+        label: "Response",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        placeholder: "Enter the response received",
+      },
+      severity: {
+        type: "select",
+        label: "Severity",
+        required: false,
+        options: ["Informational", "Low", "Medium", "High", "Critical"],
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Select Severity (if applicable)",
+      },
+      resolutionStatus: {
+        type: "select",
+        label: "Resolution Status",
+        required: true,
+        options: [
+          "Open",
+          "In Progress",
+          "Resolved",
+          "Closed - Verified",
+          "Closed - Risk Accepted",
+        ],
+        default: "Open",
+        tableColumn: true,
+        filterable: true,
+      },
+      problem: {
+        // Link to Problem module (read-only in table)
+        type: "relation",
+        label: "Linked Problem",
+        required: false,
+        relation: "problems", // Needs problems module
+        tableColumn: true,
+        filterable: true, // Filter by linked problem?
+        dataAccessor: "problem.problemId", // Show problem ID or title
+        formField: false, // Usually linked via workflow, not direct edit
+      },
+      status: {
+        // System Status (active/inactive)
+        type: "select",
+        label: "System Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdBy: {
+        type: "relation",
+        label: "Assigned By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false, // Not editable
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Last Updated By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Assigned At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Observations",
+        placeholder: "Search text/response...",
+        apiParam: "search",
+      },
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        placeholder: "All Sessions",
+        apiParam: "auditSession",
+        relation: "auditSessions",
+      },
+      question: {
+        type: "select",
+        label: "Question",
+        placeholder: "All Questions",
+        apiParam: "question",
+        relation: "questions",
+      },
+      severity: {
+        type: "select",
+        label: "Severity",
+        placeholder: "All Severities",
+        apiParam: "severity",
+        options: ["Informational", "Low", "Medium", "High", "Critical"],
+      },
+      resolutionStatus: {
+        type: "select",
+        label: "Resolution Status",
+        placeholder: "All Resolution Statuses",
+        apiParam: "resolutionStatus",
+        options: [
+          "Open",
+          "In Progress",
+          "Resolved",
+          "Closed - Verified",
+          "Closed - Risk Accepted",
+        ],
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All  Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      // Filter by linked Problem? Needs 'problems' module config
+      // problem: { type:'relationSelect', relation:'problems', apiParam:'problem', placeholder:'Filter by Problem...'},
+    },
+    permissions: {
+      // Match backend roles
+      create: ["admin", "sysadmin", "audit_manager", "auditor"],
+      edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Might need finer control later
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
+
+  problems: {
+    endpoint: "problems",
+    title: "Problem Management",
+    description: "Manage identified audit problems and findings",
+    fields: {
+      title: {
+        type: "text",
+        label: "Problem Title",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Enter a concise title for the problem",
+      },
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        required: true,
+        relation: "auditSessions",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "auditSession.title",
+        placeholder: "Select Audit Session",
+      },
+      observation: {
+        // Optional link
+        type: "select",
+        label: "Originating Observation (Optional)",
+        required: false,
+        relation: "observations",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "observation._id", // Show Obs ID or maybe severity?
+        placeholder: "Link Observation",
+        formField: true, // Allow linking on create/edit
+      },
+      question: {
+        // Optional link
+        type: "select",
+        label: "Related Question (Optional)",
+        required: false,
+        relation: "questions",
+        tableColumn: false,
+        filterable: true, // Maybe hide from main table?
+        dataAccessor: "question.questionText",
+        placeholder: "Link Question",
+        formField: true,
+      },
+      description: {
+        type: "textarea",
+        label: "Description",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        placeholder: "Describe the problem in detail",
+      },
+      impact: {
+        type: "select",
+        label: "Impact",
+        required: true,
+        options: ["Low", "Medium", "High"],
+        default: "Medium",
+        tableColumn: true,
+        filterable: true,
+      },
+      likelihood: {
+        type: "select",
+        label: "Likelihood",
+        required: true,
+        options: ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"],
+        default: "Possible",
+        tableColumn: true,
+        filterable: true,
+      },
+      riskRating: {
+        type: "select",
+        label: "Risk Rating",
+        required: true,
+        options: ["Low", "Medium", "High", "Critical"],
+        default: "Medium",
+        tableColumn: true,
+        filterable: true,
+      },
+      problemStatus: {
+        // Operational status
+        type: "select",
+        label: "Problem Status",
+        required: true,
+        options: ["Open", "In Progress", "Resolved", "Closed"],
+        default: "Open",
+        tableColumn: true,
+        filterable: true,
+      },
+      methodology: {
+        type: "textarea",
+        label: "Methodology (Optional)",
+        required: false,
+        tableColumn: false,
+        filterable: false, // Hide from table maybe?
+        placeholder: "How was this identified?",
+      },
+      fixActions: {
+        // TODO: Needs multi-select/tag component for Form
+        type: "text", // Placeholder type for table display
+        label: "Corrective Actions",
+        required: false,
+        relation: "fixActions", // Link to FixAction model
+        tableColumn: true,
+        filterable: false, // Filtering might be complex
+        // Displaying multiple requires custom cell or backend format
+        dataAccessor: "fixActions", // Shows array of objects/IDs for now
+        formField: false, // Hide until UI component is ready
+      },
+      status: {
+        // System Status
+        type: "select",
+        label: "System Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      // ✅ নিশ্চিত করুন common fields যোগ করা হয়েছে
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Problems",
+        placeholder: "Search title/description...",
+        apiParam: "search",
+      },
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        placeholder: "All Sessions",
+        apiParam: "auditSession",
+        relation: "auditSessions",
+      },
+      // observation: { type:'relationSelect', relation:'observations', apiParam:'observation', placeholder:'Filter by Observation...'},
+      // question: { type:'relationSelect', relation:'questions', apiParam:'question', placeholder:'Filter by Question...'},
+      impact: {
+        type: "select",
+        label: "Impact",
+        placeholder: "All Impacts",
+        apiParam: "impact",
+        options: ["Low", "Medium", "High"],
+      },
+      likelihood: {
+        type: "select",
+        label: "Likelihood",
+        placeholder: "All Likelihoods",
+        apiParam: "likelihood",
+        options: ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"],
+      },
+      riskRating: {
+        type: "select",
+        label: "Risk Rating",
+        placeholder: "All Ratings",
+        apiParam: "riskRating",
+        options: ["Low", "Medium", "High", "Critical"],
+      },
+      problemStatus: {
+        type: "select",
+        label: "Problem Status",
+        placeholder: "All Problem Statuses",
+        apiParam: "problemStatus",
+        options: ["Open", "In Progress", "Resolved", "Closed"],
+      },
+      status: {
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      // Filter by Fix Action? Needs FixAction module
+      // fixAction: { type:'relationSelect', relation:'fixActions', apiParam:'fixAction', placeholder:'Filter by Fix Action...'},
+    },
+    permissions: {
+      // Match backend roles
+      create: ["admin", "sysadmin", "audit_manager", "auditor"],
+      edit: ["admin", "sysadmin", "audit_manager"], // Who can edit problem details?
+      delete: ["admin", "sysadmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ],
     },
   },
 };

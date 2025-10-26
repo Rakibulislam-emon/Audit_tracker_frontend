@@ -96,6 +96,21 @@ export const navItems = {
       icon: Calendar,
       href: "/dashboard/admin/auditsessions",
     },
+    // observations
+    {
+      id: "observations",
+      label: "Observations",
+      icon: FileText,
+      href: "/dashboard/admin/observations",
+    },
+    // problems
+    {
+      id: "problems",
+      label: "Problems",
+      icon: ListChecks,
+      href: "/dashboard/admin/problems",
+    },
+
     {
       id: "settings",
       label: "Settings",
