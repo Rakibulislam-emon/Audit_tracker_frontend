@@ -1538,6 +1538,7 @@ export const universalConfig = {
     endpoint: "observations",
     title: "Observations Management",
     description: "Manage audit observations and findings",
+
     fields: {
       auditSession: {
         type: "select",
@@ -1949,6 +1950,7 @@ export const universalConfig = {
     endpoint: "fix-actions", // Matches backend route (e.g., /api/fix-actions)
     title: "Corrective Actions", // Changed title slightly
     description: "Manage and track corrective actions for identified problems",
+    displayField: "actionText",
     fields: {
       problem: {
         type: "select",
@@ -2186,5 +2188,229 @@ export const universalConfig = {
       // Who deletes? Restricted.
       delete: ["admin", "sysadmin"],
     },
+  },
+
+  proofs: {
+    endpoint: "proofs", // Matches backend route
+    title: "Proof Management",
+    description:
+      "Manage uploaded evidence files for observations, problems, and actions",
+
+    // Field definitions focus on table display, not a standard form
+    fields: {
+      // --- Relation fields (Read-only in table, not on form) ---
+      problem: {
+        type: "select",
+        label: "Related Problem",
+        relation: "problems",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "problem.title",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+      observation: {
+        type: "select",
+        label: "Related Observation",
+        relation: "observations",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "observation._id",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+      fixAction: {
+        type: "select",
+        label: "Related Fix Action",
+        relation: "FixAction",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "fixAction.actionText",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+
+      // --- File Info (Read-only in table, not on form) ---
+      originalName: {
+        type: "text",
+        label: "Filename",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      fileType: {
+        type: "select",
+        label: "File Type",
+        required: true,
+        options: ["image", "document", "video", "audio", "other"],
+        tableColumn: true,
+        filterable: true,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      size: {
+        type: "number",
+        label: "Size (Bytes)",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      uploadedAt: {
+        type: "date",
+        label: "Uploaded At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+
+      // --- Editable Fields (Show on Edit Form) ---
+      caption: {
+        type: "textarea",
+        label: "Caption",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        formField: true, // ✅ ফর্মে দেখাবে
+        editOnly: true, // ✅ শুধু Edit মোডে
+        readOnly: false, // ✅ এডিট করা যাবে
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        formField: true, // ✅ ফর্মে দেখাবে
+        editOnly: true, // ✅ শুধু Edit মোডে
+        readOnly: false, // ✅ এডিট করা যাবে
+      },
+
+      // --- Common Fields (Hidden from form) ---
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+
+      // --- Cloudinary data (Hidden everywhere) ---
+      cloudinaryId: { tableColumn: false, formField: false, readOnly: true },
+      cloudinaryUrl: { tableColumn: false, formField: false, readOnly: true },
+      cloudinaryFormat: {
+        tableColumn: false,
+        formField: false,
+        readOnly: true,
+      },
+      cloudinaryResourceType: {
+        tableColumn: false,
+        formField: false,
+        readOnly: true,
+      },
+      width: { tableColumn: false, formField: false, readOnly: true },
+      height: { tableColumn: false, formField: false, readOnly: true },
+      duration: { tableColumn: false, formField: false, readOnly: true },
+      version: { tableColumn: false, formField: false, readOnly: true },
+    },
+
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Proofs",
+        placeholder: "Search filename or caption...",
+        apiParam: "search",
+      },
+      problem: {
+        type: "select",
+        label: "Problem",
+        placeholder: "Filter by Problem",
+        apiParam: "problem",
+        relation: "problems",
+      },
+      observation: {
+        type: "select",
+        label: "Observation",
+        placeholder: "Filter by Observation",
+        apiParam: "observation",
+        relation: "observations",
+      },
+      fixAction: {
+        type: "select",
+        label: "Fix Action",
+        placeholder: "Filter by Fix Action",
+        apiParam: "fix-action",
+        relation: "fixActions",
+      }, // Needs fixActions module
+      fileType: {
+        type: "select",
+        label: "File Type",
+        placeholder: "All File Types",
+        apiParam: "fileType",
+        options: ["image", "document", "video", "audio", "other"],
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      uploader: {
+        type: "select",
+        label: "Uploaded By",
+        placeholder: "All Users",
+        apiParam: "uploader",
+        relation: "users",
+      }, // Filter by createdBy
+    },
+
+    // Permissions - Need careful consideration for file uploads/deletes
+    permissions: {
+      // View might be broad
+      view: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ],
+      // Create (Upload) - Who can upload evidence?
+      create: ["admin", "sysadmin", "audit_manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
+      // Edit (Caption/Status only) - Who can edit metadata?
+      edit: ["admin", "sysadmin", "audit_manager"], // UniversalForm edit can handle caption/status
+      // Delete - Highly restricted
+      delete: ["admin", "sysadmin"],
+    },
+    // ✅ Indicate that standard CRUD form isn't fully applicable
+    hasCustomCreate: true, // Signal to hide default "Add" button
+    // hasCustomEdit: false, // Can use UniversalForm for simple edits (caption, status)
   },
 };

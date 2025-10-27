@@ -117,6 +117,13 @@ export const navItems = {
       icon: ClipboardCheck,
       href: "/dashboard/admin/fix-actions",
     },
+    // proofs
+    {
+      id: "proofs",
+      label: "Proofs",
+      icon: FileText,
+      href: "/dashboard/admin/proofs",
+    },
 
     {
       id: "settings",
