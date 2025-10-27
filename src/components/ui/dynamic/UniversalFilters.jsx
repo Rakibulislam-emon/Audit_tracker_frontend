@@ -177,10 +177,8 @@ export default function UniversalFilters({ module, token }) {
 
   return (
     <div className="w-full ">
-      <div className="flex flex-wrap md:flex-wrap lg:flex-nowrap items-end gap-2 ">
-        {/* ✅ ডাইনামিক লুপের মাধ্যমে সব ফিল্টার রেন্ডার করা */}
+      <div className="flex flex-wrap md:flex-wrap lg:flex-wrap items-end gap-2 ">
         {filterEntries.map(([key, filter]) => renderFilter(key, filter))}
-
         {/* Clear Button */}
         <div className="sm:w-1/5 w-full ">
           <Button

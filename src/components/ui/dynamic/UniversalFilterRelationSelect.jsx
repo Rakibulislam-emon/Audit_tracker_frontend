@@ -19,9 +19,13 @@ export default function UniversalFilterRelationSelect({
   onChange,
 }) {
   const [data, setData] = useState([]);
-  
+
   // ✅ API থেকে রিলেটেড ডেটা (যেমন 'groups') ফেচ করা
-  const { data: relationData, isLoading } = useModuleData(moduleName, token, {});
+  const { data: relationData, isLoading } = useModuleData(
+    moduleName,
+    token,
+    {}
+  );
 
   useEffect(() => {
     if (relationData?.data) {
@@ -45,7 +49,12 @@ export default function UniversalFilterRelationSelect({
         {!isLoading &&
           data.map((item) => (
             <SelectItem key={item._id} value={item._id}>
-              {item.name || item.title}
+              {item.name ||
+                item.title ||
+                item.email ||
+                item.questionText ||
+                item.actionText ||
+                `ID: ${item._id.slice(-6)}`}
             </SelectItem>
           ))}
       </SelectContent>

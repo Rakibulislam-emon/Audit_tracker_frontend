@@ -121,6 +121,21 @@ export const generateUniversalColumns = (module) => {
     likely: "bg-orange-50 text-orange-700 border border-orange-200",
     "almost certain": "bg-red-50 text-red-700 border border-red-200",
   };
+   const actionStatusColors = {
+    Pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    "In Progress": "bg-blue-50 text-blue-700 border border-blue-200",
+    Completed: "bg-green-50 text-green-700 border border-green-200",
+    Verified: baseColors.active, // "bg-emerald-50 text-emerald-700..."
+    Rejected: baseColors.inactive, // "bg-rose-50 text-rose-700..."
+  };
+
+  const verificationResultColors = {
+    "Pending Verification": "bg-slate-50 text-slate-700 border border-slate-200",
+    Effective: baseColors.active,
+    Ineffective: baseColors.inactive,
+    "Partially Effective": "bg-amber-50 text-amber-700 border border-amber-200",
+    "Not Applicable": "bg-slate-50 text-slate-700 border border-slate-200",
+  };
 
   // Module-specific mappings
   const moduleMappings = {
@@ -178,6 +193,11 @@ export const generateUniversalColumns = (module) => {
       likelihood: likelihoodColors,
       riskRating: riskRatingColors,
       problemStatus: resolutionStatusColors
+    },
+    fixActions: {
+      status: baseColors,
+      actionStatus: actionStatusColors,
+      verificationResult: verificationResultColors,
     },
   };
 
