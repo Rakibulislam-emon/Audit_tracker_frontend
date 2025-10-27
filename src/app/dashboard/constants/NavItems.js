@@ -110,6 +110,20 @@ export const navItems = {
       icon: ListChecks,
       href: "/dashboard/admin/problems",
     },
+    // fix-actions
+    {
+      id: "fix-actions",
+      label: "Fix Actions",
+      icon: ClipboardCheck,
+      href: "/dashboard/admin/fix-actions",
+    },
+    // proofs
+    {
+      id: "proofs",
+      label: "Proofs",
+      icon: FileText,
+      href: "/dashboard/admin/proofs",
+    },
 
     {
       id: "settings",

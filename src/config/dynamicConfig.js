@@ -1538,6 +1538,7 @@ export const universalConfig = {
     endpoint: "observations",
     title: "Observations Management",
     description: "Manage audit observations and findings",
+
     fields: {
       auditSession: {
         type: "select",
@@ -1943,5 +1944,473 @@ export const universalConfig = {
         "compliance_officer",
       ],
     },
+  },
+
+  fixActions: {
+    endpoint: "fix-actions", // Matches backend route (e.g., /api/fix-actions)
+    title: "Corrective Actions", // Changed title slightly
+    description: "Manage and track corrective actions for identified problems",
+    displayField: "actionText",
+    fields: {
+      problem: {
+        type: "select",
+        label: "Related Problem",
+        required: true,
+        relation: "problems",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "problem.title", // Show problem title
+        placeholder: "Link to Problem",
+      },
+      actionText: {
+        type: "textarea",
+        label: "Action Description",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        placeholder: "Describe the corrective action needed",
+      },
+      owner: {
+        // Assigned User
+        type: "select",
+        label: "Owner",
+        required: true,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "owner.name", // Show owner name
+        placeholder: "Assign Owner",
+      },
+      deadline: {
+        type: "date",
+        label: "Deadline",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+      },
+      actionStatus: {
+        // Workflow status
+        type: "select",
+        label: "Action Status",
+        required: true,
+        options: [
+          "Pending",
+          "In Progress",
+          "Completed",
+          "Verified",
+          "Rejected",
+        ],
+        default: "Pending",
+        tableColumn: true,
+        filterable: true,
+      },
+      // Verification fields (mostly read-only in table, maybe editable in form for verifiers)
+      verifiedBy: {
+        type: "select",
+        label: "Verified By",
+        required: false,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "verifiedBy.name",
+        formField: true, // Allow setting verifier in form (maybe edit only?)
+        readOnly: false, // Make editable
+        editOnly: true, // Only show on edit form
+        placeholder: "Select Verifier (if verified)",
+      },
+      verifiedAt: {
+        type: "date",
+        label: "Verified At",
+        required: false,
+        tableColumn: true,
+        filterable: false,
+        formField: true, // Allow setting date
+        readOnly: false,
+        editOnly: true,
+      },
+      verificationResult: {
+        type: "select",
+        label: "Verification Result",
+        required: false,
+        options: [
+          "Effective",
+          "Ineffective",
+          "Partially Effective",
+          "Not Applicable",
+          "Pending Verification",
+        ],
+        tableColumn: true,
+        filterable: true,
+        formField: true, // Allow setting result
+        readOnly: false,
+        editOnly: true,
+        placeholder: "Select Verification Result (if verified)",
+      },
+      reviewNotes: {
+        type: "textarea",
+        label: "Review/Verification Notes",
+        required: false,
+        tableColumn: false,
+        filterable: false, // Maybe hide from main table
+        formField: true,
+        fullWidth: true,
+        readOnly: false, // Allow editing notes
+        editOnly: true, // Only needed during/after completion?
+        placeholder: "Enter review or verification notes",
+      },
+      verificationMethod: {
+        type: "textarea",
+        label: "Verification Method",
+        required: false,
+        tableColumn: false,
+        filterable: false,
+        formField: true,
+        fullWidth: true,
+        readOnly: false,
+        editOnly: true,
+        placeholder: "Describe how completion was verified",
+      },
+      status: {
+        // System Status
+        type: "select",
+        label: "System Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true,
+      },
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Actions",
+        placeholder: "Search action text...",
+        apiParam: "search",
+      },
+      problem: {
+        type: "select",
+        label: "Problem",
+        placeholder: "All Problems",
+        apiParam: "problem",
+        relation: "problems",
+      },
+      owner: {
+        type: "select",
+        label: "Owner",
+        placeholder: "All Owners",
+        apiParam: "owner",
+        relation: "users",
+      },
+      actionStatus: {
+        type: "select",
+        label: "Action Status",
+        placeholder: "All Action Statuses",
+        apiParam: "actionStatus",
+        options: [
+          "Pending",
+          "In Progress",
+          "Completed",
+          "Verified",
+          "Rejected",
+        ],
+      },
+      status: {
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      verificationResult: {
+        type: "select",
+        label: "Verification Result",
+        placeholder: "All Results",
+        apiParam: "verificationResult",
+        options: [
+          "Effective",
+          "Ineffective",
+          "Partially Effective",
+          "Not Applicable",
+          "Pending Verification",
+        ],
+      },
+      // Filter by deadline range would need custom UI
+    },
+    permissions: {
+      // Match backend roles
+      // Who can view? Probably everyone involved.
+      view: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ],
+      // Who creates actions? Usually Managers/Admins based on Problems.
+      create: ["admin", "sysadmin", "audit_manager"],
+      // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
+      edit: ["admin", "sysadmin", "audit_manager" /*, add owner role? */],
+      // Who deletes? Restricted.
+      delete: ["admin", "sysadmin"],
+    },
+  },
+
+  proofs: {
+    endpoint: "proofs", // Matches backend route
+    title: "Proof Management",
+    description:
+      "Manage uploaded evidence files for observations, problems, and actions",
+
+    // Field definitions focus on table display, not a standard form
+    fields: {
+      // --- Relation fields (Read-only in table, not on form) ---
+      problem: {
+        type: "select",
+        label: "Related Problem",
+        relation: "problems",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "problem.title",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+      observation: {
+        type: "select",
+        label: "Related Observation",
+        relation: "observations",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "observation._id",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+      fixAction: {
+        type: "select",
+        label: "Related Fix Action",
+        relation: "FixAction",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "fixAction.actionText",
+        formField: false, // ✅ ফর্মে দেখাবে না
+      },
+
+      // --- File Info (Read-only in table, not on form) ---
+      originalName: {
+        type: "text",
+        label: "Filename",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      fileType: {
+        type: "select",
+        label: "File Type",
+        required: true,
+        options: ["image", "document", "video", "audio", "other"],
+        tableColumn: true,
+        filterable: true,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      size: {
+        type: "number",
+        label: "Size (Bytes)",
+        required: true,
+        tableColumn: true,
+        filterable: false,
+        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        readOnly: true,
+      },
+      uploadedAt: {
+        type: "date",
+        label: "Uploaded At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+
+      // --- Editable Fields (Show on Edit Form) ---
+      caption: {
+        type: "textarea",
+        label: "Caption",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        formField: true, // ✅ ফর্মে দেখাবে
+        editOnly: true, // ✅ শুধু Edit মোডে
+        readOnly: false, // ✅ এডিট করা যাবে
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        formField: true, // ✅ ফর্মে দেখাবে
+        editOnly: true, // ✅ শুধু Edit মোডে
+        readOnly: false, // ✅ এডিট করা যাবে
+      },
+
+      // --- Common Fields (Hidden from form) ---
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+
+      // --- Cloudinary data (Hidden everywhere) ---
+      cloudinaryId: { tableColumn: false, formField: false, readOnly: true },
+      cloudinaryUrl: { tableColumn: false, formField: false, readOnly: true },
+      cloudinaryFormat: {
+        tableColumn: false,
+        formField: false,
+        readOnly: true,
+      },
+      cloudinaryResourceType: {
+        tableColumn: false,
+        formField: false,
+        readOnly: true,
+      },
+      width: { tableColumn: false, formField: false, readOnly: true },
+      height: { tableColumn: false, formField: false, readOnly: true },
+      duration: { tableColumn: false, formField: false, readOnly: true },
+      version: { tableColumn: false, formField: false, readOnly: true },
+    },
+
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Proofs",
+        placeholder: "Search filename or caption...",
+        apiParam: "search",
+      },
+      problem: {
+        type: "select",
+        label: "Problem",
+        placeholder: "Filter by Problem",
+        apiParam: "problem",
+        relation: "problems",
+      },
+      observation: {
+        type: "select",
+        label: "Observation",
+        placeholder: "Filter by Observation",
+        apiParam: "observation",
+        relation: "observations",
+      },
+      fixAction: {
+        type: "select",
+        label: "Fix Action",
+        placeholder: "Filter by Fix Action",
+        apiParam: "fix-action",
+        relation: "fixActions",
+      }, // Needs fixActions module
+      fileType: {
+        type: "select",
+        label: "File Type",
+        placeholder: "All File Types",
+        apiParam: "fileType",
+        options: ["image", "document", "video", "audio", "other"],
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+      uploader: {
+        type: "select",
+        label: "Uploaded By",
+        placeholder: "All Users",
+        apiParam: "uploader",
+        relation: "users",
+      }, // Filter by createdBy
+    },
+
+    // Permissions - Need careful consideration for file uploads/deletes
+    permissions: {
+      // View might be broad
+      view: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ],
+      // Create (Upload) - Who can upload evidence?
+      create: ["admin", "sysadmin", "audit_manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
+      // Edit (Caption/Status only) - Who can edit metadata?
+      edit: ["admin", "sysadmin", "audit_manager"], // UniversalForm edit can handle caption/status
+      // Delete - Highly restricted
+      delete: ["admin", "sysadmin"],
+    },
+    // ✅ Indicate that standard CRUD form isn't fully applicable
+    hasCustomCreate: true, // Signal to hide default "Add" button
+    // hasCustomEdit: false, // Can use UniversalForm for simple edits (caption, status)
   },
 };
