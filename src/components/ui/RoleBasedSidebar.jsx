@@ -23,10 +23,8 @@ export function RoleBasedSidebar({ role, isOpen, onToggle }) {
 
   return (
     <>
-    
       {/* Desktop Sidebar — always visible */}
-      <aside className="hidden overflow-y-auto lg:flex lg:flex-col lg:w-64 lg:fixed lg:h-screen lg:border-r lg:bg-background lg:z-50">
-        
+      <aside className="hidden  lg:flex lg:flex-col lg:w-64 lg:fixed lg:h-screen lg:border-r lg:bg-background lg:z-50">
         <SidebarContent role={role} items={sidebarItems} pathname={pathname} />
       </aside>
 
@@ -45,8 +43,8 @@ export function RoleBasedSidebar({ role, isOpen, onToggle }) {
 
 function SidebarContent({ role, items, pathname }) {
   return (
-    <>
-      <div className="flex h-16 items-center px-6 border-b">
+    <div className="scroll-smooth ">
+      <div className="flex h-16 items-center px-6 border-b ">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">
@@ -57,7 +55,7 @@ function SidebarContent({ role, items, pathname }) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-3 py-4">
+      <ScrollArea className="flex-1 px-3 py-4 h-[80vh] md:h-[82vh]">
         <nav className="grid gap-1">
           {items.map((item) => {
             const Icon = item.icon;
@@ -98,6 +96,6 @@ function SidebarContent({ role, items, pathname }) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
