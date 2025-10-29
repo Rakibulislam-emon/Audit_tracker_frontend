@@ -76,7 +76,7 @@ export default function RoleLayout({ children }) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-auto ">{children}</main>
+        <main className="flex-1 overflow-auto p-4">{children}</main>
       </div>
 
       {/* Mobile Overlay */}
@@ -89,6 +89,4 @@ export default function RoleLayout({ children }) {
     </div>
   );
 }
-// make a div
- 
- 
+

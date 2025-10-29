@@ -132,7 +132,7 @@ export default function UniversalCRUDManager({
 
 
   return (
-    <div className="container mx-auto p-4 md:p-6"> {/* Added padding */}
+    <div className=" "> {/* Added padding */}
 
       {/* Header Section (Centered) */}
       <div className="py-4 text-center mb-6">
