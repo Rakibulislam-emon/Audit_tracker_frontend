@@ -43,7 +43,7 @@ export function RoleBasedSidebar({ role, isOpen, onToggle }) {
 
 function SidebarContent({ role, items, pathname }) {
   return (
-    <div className="scroll-smooth ">
+    <div className="scroll-smooth  ">
       <div className="flex h-16 items-center px-6 border-b ">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
@@ -55,7 +55,7 @@ function SidebarContent({ role, items, pathname }) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 px-3 py-4 h-[80vh] md:h-[82vh]">
+      <ScrollArea className=" flex-1 px-3 py-4 h-[80vh] md:h-[82vh]">
         <nav className="grid gap-1">
           {items.map((item) => {
             const Icon = item.icon;
@@ -81,7 +81,7 @@ function SidebarContent({ role, items, pathname }) {
         </nav>
       </ScrollArea>
 
-      <div className="mt-auto border-t p-4">
+      <div className=" mt-auto border-t p-4">
         <div className="space-y-3">
           <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">

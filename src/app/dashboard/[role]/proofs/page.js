@@ -68,7 +68,7 @@ export default function ProofManagementPage() {
 
   return (
     // Main container div
-    <div className="container mx-auto p-4 md:p-6">
+    <div className="container mx-auto p-4 md:p-16">
       {" "}
       {/* Added padding */}
       {/* UniversalCRUDManager handles List, Edit (caption/status), Delete */}
