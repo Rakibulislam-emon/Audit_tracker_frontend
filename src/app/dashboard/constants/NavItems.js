@@ -83,18 +83,19 @@ export const navItems = {
       href: "/dashboard/admin/schedules",
     },
     // teams
-    {
-      id: "teams",
-      label: "Teams",
-      icon: Users,
-      href: "/dashboard/admin/teams",
-    },
+
     //  auditSessions
     {
       id: "auditSessions",
       label: "Audit Sessions",
       icon: Calendar,
       href: "/dashboard/admin/auditsessions",
+    },
+    {
+      id: "teams",
+      label: "Teams",
+      icon: Users,
+      href: "/dashboard/admin/teams",
     },
     // observations
     {
@@ -124,7 +125,7 @@ export const navItems = {
       icon: FileText,
       href: "/dashboard/admin/proofs",
     },
-{
+    {
       id: "reports",
       label: "Reports",
       icon: FileText,
