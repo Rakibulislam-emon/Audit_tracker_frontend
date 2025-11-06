@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { universalConfig } from "@/config/dynamicConfig";
 import { AlertCircle, Plus, Save } from "lucide-react";
-import { useForm } from "react-hook-form"; // ✅ 1. Controller imported
-import RelationSelect from "./UniversalRelationSelect"; // ✅ 2. New component imported
 import { useActionState } from "react";
+import { useForm } from "react-hook-form"; // ✅ 1. Controller imported
+import MultiSelectRelation from "../template/MultiSelectRelation";
+import RelationSelect from "./UniversalRelationSelect"; // ✅ 2. New component imported
 
 export default function UniversalForm({
   module,
@@ -18,12 +19,10 @@ export default function UniversalForm({
   mode = "create",
   token,
 }) {
-  const {user} = useActionState()
+  const { user } = useActionState();
   const config = universalConfig[module];
- 
+
   // check for permission will be implemented later
-
-
 
   const {
     register,
@@ -85,10 +84,10 @@ export default function UniversalForm({
             })}
           />
         );
-case "number": 
+      case "number":
         return (
           <Input
-            type="number" 
+            type="number"
             placeholder={fieldConfig.placeholder}
             disabled={isSubmitting}
             className={`${errorClass} transition-colors`}
@@ -97,24 +96,26 @@ case "number":
               required: fieldConfig.required
                 ? `${fieldConfig.label} is required`
                 : false,
-              
-          
-              valueAsNumber: true, 
-              
-            
+
+              valueAsNumber: true,
+
               min: {
                 value: fieldConfig.min ?? 0.1, // Config থেকে min নিন, না থাকলে 0.1
-                message: `${fieldConfig.label} must be at least ${fieldConfig.min ?? 0.1}`,
+                message: `${fieldConfig.label} must be at least ${
+                  fieldConfig.min ?? 0.1
+                }`,
               },
               max: {
                 value: fieldConfig.max ?? 10,
-                message: `${fieldConfig.label} must be no more than ${fieldConfig.max ?? 10}`,
+                message: `${fieldConfig.label} must be no more than ${
+                  fieldConfig.max ?? 10
+                }`,
               },
-              
+
               pattern: {
-                value: /^\d*\.?\d*$/, 
+                value: /^\d*\.?\d*$/,
                 message: "Please enter a valid number",
-              }
+              },
             })}
           />
         );
@@ -123,9 +124,10 @@ case "number":
         if (fieldConfig.relation) {
           // If it's a relation, render the new component
           console.log(
-            fieldConfig.relation, fieldKey,
+            fieldConfig.relation,
+            fieldKey,
             "Rendering RelationSelect for relation field"
-          )
+          );
           return (
             <RelationSelect
               fieldKey={fieldKey}
@@ -211,7 +213,22 @@ case "number":
             </div>
           </div>
         );
-
+      case "select-multi":
+        console.log(
+          fieldConfig.relation,
+          fieldKey,
+          "Rendering MultiSelectRelation for multi-select relation field"
+        );
+        return (
+          <MultiSelectRelation
+            fieldKey={fieldKey}
+            fieldConfig={fieldConfig}
+            control={control}
+            token={token}
+            isSubmitting={isSubmitting}
+            errors={errors}
+          />
+        );
       case "textarea":
         return (
           <Textarea
@@ -274,13 +291,13 @@ case "number":
         e.preventDefault();
         handleSubmit(onSubmit)(e);
       }}
-      className="space-y-5 border "
+      className="space-y-5  "
     >
       {/* Form Fields - Grid Layout for better space usage */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {visibleFields.map(([fieldKey, fieldConfig]) => {
           const isFullWidth =
-            fieldConfig.type === "textarea" || fieldConfig.fullWidth;
+            fieldConfig.type === "textarea" || fieldConfig.type === "select-multi" || fieldConfig.fullWidth;
 
           return (
             <div

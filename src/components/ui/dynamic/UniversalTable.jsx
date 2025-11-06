@@ -30,6 +30,7 @@ import { generateUniversalColumns } from "./universalColumns";
  * @param {function} getRowCondition - Function for conditional row styling (optional)
  */
 export default function UniversalTable({
+ 
   module,
   data = [],
   enableActions = true,
