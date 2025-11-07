@@ -658,14 +658,14 @@ export const universalConfig = {
 
     // FIELD DEFINITIONS - Based on Question.js model
     fields: {
-      section: {
-        type: "text",
-        label: "Section",
-        placeholder: "Enter section name (e.g., Fire Safety)",
-        required: true,
-        tableColumn: true,
-        filterable: true, // Allow filtering/searching if needed later
-      },
+      // section: {
+      //   type: "text",
+      //   label: "Section",
+      //   placeholder: "Enter section name (e.g., Fire Safety)",
+      //   required: true,
+      //   tableColumn: true,
+      //   filterable: true, // Allow filtering/searching if needed later
+      // },
       questionText: {
         type: "textarea", // Questions can be long
         label: "Question Text",

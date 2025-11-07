@@ -169,7 +169,7 @@ const Modal = ({
   return createPortal(<AnimatePresence>
     {isOpen && (
       <motion.div
-        className="fixed  inset-0 z-[9999] flex items-center justify-center pointer-events-auto "
+        className="fixed  inset-0 z-[9999] flex items-center justify-center pointer-events-auto bg-black/30"
         initial="hidden"
         animate="visible"
         exit="exit"

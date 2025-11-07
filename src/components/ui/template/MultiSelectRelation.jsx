@@ -1,37 +1,22 @@
-// src/components/ui/template/MultiSelectRelation.jsx
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { useModuleData } from "@/hooks/useUniversal";
 import { cn } from "@/lib/utils";
-import { Check, Loader2, X } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Search, X } from "lucide-react";
 import * as React from "react";
 import { Controller } from "react-hook-form";
 
-// Helper function to get the correct display text for any module
 const getDisplayValue = (item) => {
   if (!item) return "";
   return (
-    item.title || // Program, Template, Schedule, Problem, AuditSession
-    item.name || // User, Group, Company, Site, CheckType, Rule
-    item.questionText || // Question, Observation
-    item.actionText || // FixAction
-    item.email || // User (fallback)
-    `ID: ${item._id.slice(-6)}` // Fallback
+    item.title ||
+    item.name ||
+    item.questionText ||
+    item.actionText ||
+    item.email ||
+    `ID: ${item._id?.slice(-6) || "Unknown"}`
   );
 };
 
@@ -43,144 +28,178 @@ export default function MultiSelectRelation({
   isSubmitting,
   errors,
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-
-  console.log("fieldConfig from 49",fieldConfig?.relation)
-  // 1. Load all options from the related module (e.g., all "questions")
   const { data: relationData, isLoading } = useModuleData(
-    fieldConfig.relation, // e.g., "questions"
+    fieldConfig.relation,
     token,
-    {}
+    { search: searchTerm }
   );
 
   const options = relationData?.data || [];
-  console.log('options:', options)
   const hasError = !!errors[fieldKey];
 
+  // Filter options based on search term
+  const filteredOptions = options.filter((option) =>
+    getDisplayValue(option).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    // 2. Use Controller to connect to react-hook-form
     <Controller
-      name={fieldKey} // e.g., "questions"
+      name={fieldKey}
       control={control}
       rules={{
         required: fieldConfig.required
           ? `${fieldConfig.label} is required`
           : false,
-        // You can add min/max length validation for arrays here
-        // validate: value => value.length > 0 || 'At least one item is required'
       }}
       render={({ field }) => {
-        // field.value will be the array of selected IDs (e.g., ['id1', 'id2'])
         const selectedIds = field.value || [];
-
-        // Find the full "option" objects for the selected IDs
         const selectedOptions = options.filter((option) =>
           selectedIds.includes(option._id)
         );
 
-        // 3. Popover (the dropdown container)
-        return (
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                disabled={isSubmitting || isLoading}
-                className={cn(
-                  "w-full justify-between h-auto min-h-10 px-3 py-2 flex-wrap", // Allow badges to wrap
-                  hasError ? "border-red-500" : "border-gray-300",
-                  selectedIds.length === 0 ? "text-gray-500 font-normal" : ""
-                )}
-              >
-                {/* 4. Display selected items as Badges */}
-                <div className="flex gap-1.5 flex-wrap">
-                  {selectedOptions.length > 0
-                    ? selectedOptions.map((option) => (
-                        <Badge
-                          variant="secondary"
-                          key={option._id}
-                          className="rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        >
-                          {getDisplayValue(option)}
-                          <X
-                            className="ml-1.5 h-3.5 w-3.5 cursor-pointer opacity-70 hover:opacity-100"
-                            // 5. Handle removing an item (Deselect)
-                            onClick={(e) => {
-                              e.stopPropagation(); // Prevent Popover from closing
-                              const newSelectedIds = selectedIds.filter(
-                                (id) => id !== option._id
-                              );
-                              field.onChange(newSelectedIds); // Update react-hook-form state
-                            }}
-                          />
-                        </Badge>
-                      ))
-                    : // Placeholder text
-                      fieldConfig.placeholder || `Select ${fieldConfig.label}`}
-                </div>
+        const handleSelect = (optionId) => {
+          if (selectedIds.includes(optionId)) {
+            field.onChange(selectedIds.filter((id) => id !== optionId));
+          } else {
+            field.onChange([...selectedIds, optionId]);
+          }
+        };
 
-                {isLoading && (
-                  <Loader2 className="ml-auto h-4 w-4 shrink-0 animate-spin opacity-50" />
+        const removeSelected = (optionId, e) => {
+          e.stopPropagation();
+          field.onChange(selectedIds.filter((id) => id !== optionId));
+        };
+
+        return (
+          <div className="space-y-3">
+            {/* Selected Items Display */}
+            {selectedOptions.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-md border">
+                {selectedOptions.map((option) => (
+                  <div
+                    key={option._id}
+                    className="flex items-center gap-2 bg-white px-3 py-1 rounded-full border text-sm"
+                  >
+                    <span className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                      {getDisplayValue(option)}{" "}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => removeSelected(option._id, e)}
+                      className="text-gray-400 cursor-pointer hover:text-red-500 transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                      type="button"
+                      onClick={(e) => removeSelected(null, e) || field.onChange([])}
+                      className=" flex justify-center items-center gap-x-1 cursor-pointer hover:text-red-500 transition-colors"
+                    >
+                      <span>
+                        Clear All
+                      </span>
+                      <X className="h-4 w-4" />
+                    </button>
+              </div>
+            )}
+
+            {/* Custom Dropdown */}
+            <div className="relative ">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(!isOpen)}
+                className={cn(
+                  "w-full justify-between",
+                  hasError && "border-red-500",
+                  selectedIds.length === 0 && "text-muted-foreground"
                 )}
+                disabled={isSubmitting}
+              >
+                <span>
+                  {isLoading ? "Loading..." : `Select ${fieldConfig.label}...`}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-[--radix-popover-trigger-width] p-0"
-              align="start"
-              // This prevents the Popover from closing when an item is clicked
-              onEscapeKeyDown={() => setOpen(false)}
-              onPointerDownOutside={(e) => {
-                // Prevent closing if clicking on the trigger
-                if (e.target.closest('[role="combobox"]')) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              {/* 6. Searchable Command list */}
-              <Command>
-                <CommandInput placeholder="Search options..." />
-                <CommandList>
-                  <CommandEmpty>
-                    {isLoading ? "Loading..." : "No options found."}
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {options.map((option) => {
-                      const isSelected = selectedIds.includes(option._id);
-                      return (
-                        <CommandItem
-                          key={option._id}
-                          value={getDisplayValue(option)} // Search text
-                          // 7. Handle selecting an item
-                          onSelect={() => {
-                            if (isSelected) {
-                              field.onChange(
-                                selectedIds.filter((id) => id !== option._id)
-                              );
-                            } else {
-                              field.onChange([...selectedIds, option._id]);
-                            }
-                            setOpen(true); // Keep popover open for multi-select
-                          }}
-                        >
-                          <Check
+
+              {isOpen && (
+                <div className="absolute z-[100] w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-64 overflow-auto">
+                  {/* Search Input */}
+                  <div className="p-2 border-b">
+                    <div className="relative">
+                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder={`Search ${fieldConfig.label}...`}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-8"
+                      />
+                    </div>
+                   {
+                      searchTerm && ( <div className="absolute right-4 top-4">
+                      <X
+                        className="h-4 w-4 cursor-pointer hover:text-red-400"
+                        onClick={() => setSearchTerm("")}
+                      />
+                    </div>)
+                   }
+                  </div>
+
+                  {/* Options List */}
+                  <div className="p-1">
+                    {isLoading ? (
+                      <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Loading...
+                      </div>
+                    ) : filteredOptions.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">
+                        No {fieldConfig.label} found.
+                      </div>
+                    ) : (
+                      filteredOptions.map((option) => {
+                        const isSelected = selectedIds.includes(option._id);
+                        return (
+                          <div
+                            key={option._id}
+                            onClick={() => handleSelect(option._id)}
                             className={cn(
-                              "mr-2 h-4 w-4",
-                              isSelected ? "opacity-100" : "opacity-0"
+                              "flex items-center space-x-2 p-2 rounded-md cursor-pointer hover:bg-gray-100",
+                              isSelected && "bg-blue-50"
                             )}
-                          />
-                          <span className="flex-1">
-                            {getDisplayValue(option)}
-                          </span>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                          >
+                            <div
+                              className={cn(
+                                "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                isSelected
+                                  ? "bg-primary text-primary-foreground"
+                                  : "opacity-50"
+                              )}
+                            >
+                              <Check
+                                className={cn(
+                                  "h-4 w-4",
+                                  isSelected ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </div>
+                            <span className="flex-1 truncate">
+                              {getDisplayValue(option)}
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         );
       }}
     />

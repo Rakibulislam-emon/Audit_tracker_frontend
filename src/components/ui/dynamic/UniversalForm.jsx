@@ -220,14 +220,17 @@ export default function UniversalForm({
           "Rendering MultiSelectRelation for multi-select relation field"
         );
         return (
-          <MultiSelectRelation
-            fieldKey={fieldKey}
-            fieldConfig={fieldConfig}
-            control={control}
-            token={token}
-            isSubmitting={isSubmitting}
-            errors={errors}
-          />
+        <div className="w-full">
+            <MultiSelectRelation
+              fieldKey={fieldKey}
+              fieldConfig={fieldConfig}
+              control={control}
+              token={token}
+              isSubmitting={isSubmitting}
+              errors={errors}
+            />
+           
+        </div>
         );
       case "textarea":
         return (
@@ -383,3 +386,5 @@ export default function UniversalForm({
     </form>
   );
 }
+
+
