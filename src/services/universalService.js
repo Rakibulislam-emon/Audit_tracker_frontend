@@ -83,7 +83,7 @@ export const universalService = {
    */
   create: async (token, endpoint, data) => {
     try {
-      console.log(`🆕 Creating ${endpoint}:`, data);
+      console.log(`🆕 Creating from 86 line${endpoint}:`, data);
 
       const response = await fetch(
         `${baseUrl}/${endpoint}`,
@@ -96,7 +96,7 @@ export const universalService = {
           body: JSON.stringify(data),
         }
       );
-
+console.log(response,"from 99")
       if (!response.ok) {
         throw new Error(`HTTP ${response.status} - Failed to create ${endpoint}`);
       }

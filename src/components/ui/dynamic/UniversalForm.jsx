@@ -220,7 +220,7 @@ export default function UniversalForm({
           "Rendering MultiSelectRelation for multi-select relation field"
         );
         return (
-        <div className="w-full">
+          <div className="w-full">
             <MultiSelectRelation
               fieldKey={fieldKey}
               fieldConfig={fieldConfig}
@@ -229,8 +229,7 @@ export default function UniversalForm({
               isSubmitting={isSubmitting}
               errors={errors}
             />
-           
-        </div>
+          </div>
         );
       case "textarea":
         return (
@@ -300,7 +299,9 @@ export default function UniversalForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {visibleFields.map(([fieldKey, fieldConfig]) => {
           const isFullWidth =
-            fieldConfig.type === "textarea" || fieldConfig.type === "select-multi" || fieldConfig.fullWidth;
+            fieldConfig.type === "textarea" ||
+            fieldConfig.type === "select-multi" ||
+            fieldConfig.fullWidth;
 
           return (
             <div
@@ -386,5 +387,3 @@ export default function UniversalForm({
     </form>
   );
 }
-
-

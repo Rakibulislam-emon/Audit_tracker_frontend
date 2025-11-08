@@ -658,14 +658,14 @@ export const universalConfig = {
 
     // FIELD DEFINITIONS - Based on Question.js model
     fields: {
-      // section: {
-      //   type: "text",
-      //   label: "Section",
-      //   placeholder: "Enter section name (e.g., Fire Safety)",
-      //   required: true,
-      //   tableColumn: true,
-      //   filterable: true, // Allow filtering/searching if needed later
-      // },
+      section: {
+        type: "text",
+        label: "Section",
+        placeholder: "Enter section name (e.g., Fire Safety)",
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering/searching if needed later
+      },
       questionText: {
         type: "textarea", // Questions can be long
         label: "Question Text",
@@ -966,13 +966,13 @@ export const universalConfig = {
 
   programs: {
     // API Configuration
-    endpoint: "programs", // Matches backend route
+    endpoint: "programs",
 
     // UI Configuration
     title: "Program Management",
     description: "Manage audit programs and initiatives",
 
-    // FIELD DEFINITIONS - Based on Program.js model (with company relation)
+    // Field definitions map to the Program.js model
     fields: {
       name: {
         type: "text",
@@ -980,46 +980,83 @@ export const universalConfig = {
         placeholder: "Enter program name",
         required: true,
         tableColumn: true,
-        filterable: true, // For search
+        filterable: true,
       },
       description: {
         type: "textarea",
         label: "Description",
         placeholder: "Enter program details",
-        required: true,
+        required: false,
         tableColumn: true,
-        filterable: true, // For search
+        filterable: true,
         fullWidth: true,
       },
       company: {
-        // Assuming company relation is added
         type: "select",
         label: "Company",
         required: true,
-        relation: "companies",
+        relation: "companies", // Populates dropdown from 'companies' module
         tableColumn: true,
-        filterable: true, // For filtering
-        dataAccessor: "company.name", // Show company name
+        filterable: true,
+        dataAccessor: "company.name", // Displays 'company.name' in the table
+        placeholder: "Select Company",
+      },
+      // Field for Template relation
+      template: {
+        type: "select",
+        label: "Template",
+        required: true,
+        relation: "templates", // Populates dropdown from 'templates' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "template.title", // Displays 'template.title' in the table
+        placeholder: "Select Template",
+      },
+      // Field for Frequency
+      frequency: {
+        type: "select",
+        label: "Frequency",
+        required: true,
+        options: [
+          "one-time",
+          "daily",
+          "weekly",
+          "monthly",
+          "quarterly",
+          "yearly",
+        ],
+        default: "monthly",
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Select Frequency",
+      },
+      // Field for Responsible Dept
+      responsibleDept: {
+        type: "text",
+        label: "Responsible Dept.",
+        required: false,
+        placeholder: "e.g., Safety Department",
+        tableColumn: true,
+        filterable: true,
       },
       startDate: {
         type: "date",
         label: "Start Date",
-        required: true,
+        required: false,
         tableColumn: true,
         filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: true,
+        required: false,
         tableColumn: true,
         filterable: false,
       },
       programStatus: {
-        // Operational Status
         type: "select",
         label: "Program Status",
-        required: true, // Has default, but good to set in form
+        required: true,
         options: [
           "planning",
           "in-progress",
@@ -1029,21 +1066,19 @@ export const universalConfig = {
         ],
         default: "planning",
         tableColumn: true,
-        filterable: true, // For filtering
+        filterable: true,
       },
-      // ✅ commonFields.status field configuration
       status: {
-        // System Status (Active/Inactive)
         type: "select",
         label: "System Status",
-        required: true, // From commonFields default
+        required: true,
         options: ["active", "inactive"],
         default: "active",
-        tableColumn: true, // Show in table
-        filterable: true, // Allow filtering
-        editOnly: true, // Usually only editable
+        tableColumn: true,
+        filterable: true,
+        editOnly: true, // Field only appears on the 'Edit' form
       },
-      // Common fields
+      // Common fields (read-only, not shown in forms)
       createdBy: {
         type: "relation",
         label: "Created By",
@@ -1083,23 +1118,43 @@ export const universalConfig = {
       search: {
         type: "search",
         label: "Search Programs",
-        placeholder: "Search by name or description...",
+        placeholder: "Search name, description, or dept...",
         apiParam: "search",
+        fields: ["name", "description", "responsibleDept"],
       },
       company: {
-        // Assuming company relation
         type: "select",
         label: "Company",
         placeholder: "All Companies",
         apiParam: "company",
         relation: "companies",
       },
+      template: {
+        type: "select",
+        label: "Template",
+        placeholder: "All Templates",
+        apiParam: "template",
+        relation: "templates",
+      },
+      frequency: {
+        type: "select",
+        label: "Frequency",
+        placeholder: "All Frequencies",
+        apiParam: "frequency",
+        options: [
+          "one-time",
+          "daily",
+          "weekly",
+          "monthly",
+          "quarterly",
+          "yearly",
+        ],
+      },
       programStatus: {
-        // Filter by operational status
         type: "select",
         label: "Program Status",
         placeholder: "All Program Statuses",
-        apiParam: "programStatus", // Matches req.query.programStatus
+        apiParam: "programStatus",
         options: [
           "planning",
           "in-progress",
@@ -1108,19 +1163,16 @@ export const universalConfig = {
           "cancelled",
         ],
       },
-      // ✅ Filter for commonFields.status
       status: {
-        // Filter by system status
         type: "select",
         label: "System Status",
         placeholder: "All System Statuses",
-        apiParam: "status", // Matches req.query.status
+        apiParam: "status",
         options: ["active", "inactive"],
       },
-      // Date range filters could be added here if needed (requires custom UI)
     },
 
-    // PERMISSIONS (Match backend roles)
+    // PERMISSIONS
     permissions: {
       create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager"],
@@ -1135,9 +1187,9 @@ export const universalConfig = {
 
     // UI Configuration
     title: "Schedule Management",
-    description: "Manage audit schedules",
+    description: "Plan and assign all upcoming audit schedules",
 
-    // FIELD DEFINITIONS - Based on Schedule.js model
+    // FIELD DEFINITIONS - Based on your new Schedule.js
     fields: {
       title: {
         type: "text",
@@ -1145,7 +1197,7 @@ export const universalConfig = {
         placeholder: "Enter a title for the schedule",
         required: true,
         tableColumn: true,
-        filterable: true,
+        filterable: true, // For search
       },
       company: {
         type: "select",
@@ -1155,37 +1207,76 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true,
         dataAccessor: "company.name",
+        placeholder: "Select Company",
       },
       program: {
-        // Optional program link
         type: "select",
         label: "Program (Optional)",
         required: false,
         relation: "programs",
         tableColumn: true,
         filterable: true,
-        dataAccessor: "program.name", // Show program name
+        dataAccessor: "program.name",
         placeholder: "Select Program",
+      },
+      // ✅ NEW FIELD - Handling the Array
+      sites: {
+        type: "select-multi", // ❗ This is a NEW, custom component type
+        label: "Sites",
+        required: false, // Per your schema
+        relation: "sites", // Loads options from 'sites' module
+        tableColumn: true, // We can show multiple names
+        filterable: true,
+        dataAccessor: "sites", // Let the component handle rendering the array
+        placeholder: "Select Site(s)",
+        fullWidth: true,
+      },
+      // ✅ NEW FIELD - Handling the Array
+      assignedAuditors: {
+        type: "select-multi", // ❗ This is also a multi-select
+        label: "Assigned Auditors",
+        required: false, // Per your schema
+        relation: "users", // Loads options from 'users' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedAuditors",
+        placeholder: "Select Auditor(s)",
+        fullWidth: true,
       },
       startDate: {
         type: "date",
         label: "Start Date",
-        required: true,
+        // required: true,
         tableColumn: true,
-        filterable: false, // Usually filter by range
+        filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: true,
+        // required: true,
         tableColumn: true,
         filterable: false,
-        // Add frontend validation if desired (endDate > startDate)
+      },
+      // ✅ NEW FIELD - From your schema
+      scheduleStatus: {
+        type: "select",
+        label: "Schedule Status",
+        required: true,
+        options: [
+          "scheduled",
+          "in-progress",
+          "completed",
+          "postponed",
+          "cancelled",
+        ],
+        default: "scheduled",
+        tableColumn: true,
+        filterable: true,
       },
       status: {
         // commonFields.status
         type: "select",
-        label: "Status",
+        label: "System Status",
         required: true,
         options: ["active", "inactive"],
         default: "active",
@@ -1212,23 +1303,9 @@ export const universalConfig = {
         readOnly: true,
         dataAccessor: "updatedBy.name",
       },
-      createdAt: {
-        type: "date",
-        label: "Created At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Updated At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
     },
 
-    // FILTER CONFIGURATION
+    // FILTER CONFIGURATION - Now includes new fields
     filters: {
       search: {
         type: "search",
@@ -1248,21 +1325,48 @@ export const universalConfig = {
         label: "Program",
         placeholder: "All Programs",
         apiParam: "program",
-        relation: "programs", // Filter by program
+        relation: "programs",
+      },
+      // ✅ NEW FILTER
+      site: {
+        type: "select", // Filter by ONE site (e.g., "show all schedules that include this site")
+        label: "Site",
+        placeholder: "Filter by Site",
+        apiParam: "site", // Matches req.query.site in controller
+        relation: "sites",
+      },
+      // ✅ NEW FILTER
+      auditor: {
+        type: "select", // Filter by ONE auditor
+        label: "Auditor",
+        placeholder: "Filter by Auditor",
+        apiParam: "auditor", // Matches req.query.auditor in controller
+        relation: "users",
+      },
+      // ✅ NEW FILTER
+      scheduleStatus: {
+        type: "select",
+        label: "Schedule Status",
+        placeholder: "All Statuses",
+        apiParam: "scheduleStatus",
+        options: [
+          "scheduled",
+          "in-progress",
+          "completed",
+          "postponed",
+          "cancelled",
+        ],
       },
       status: {
         type: "select",
-        label: "Status",
+        label: "System Status",
         placeholder: "All Statuses",
         apiParam: "status",
         options: ["active", "inactive"],
       },
-      // Date range filters require custom UI components
-      // startDate: { type: 'dateRangeStart', apiParam: 'startDate', label: 'Start Date After' },
-      // endDate: { type: 'dateRangeEnd', apiParam: 'endDate', label: 'End Date Before' },
     },
 
-    // PERMISSIONS (Match backend roles)
+    // PERMISSIONS
     permissions: {
       create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager"],
