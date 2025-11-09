@@ -179,7 +179,7 @@ export default function UniversalCRUDManager({
                       res?.message || "Action completed successfully!"
                     );
                     // redirect
-                    window.location.href = `/dashboard/${user?.role}/auditSessions`;
+                    // window.location.href = `/dashboard/${user?.role}/auditSessions`;
                   },
                   onError: (error) => {
                     toast.error(error.message || "Action failed");
