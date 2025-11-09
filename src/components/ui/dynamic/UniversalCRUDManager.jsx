@@ -8,6 +8,7 @@ import Modal from "@/components/ui/modal";
 import { universalConfig } from "@/config/dynamicConfig";
 import {
   useCreateModule,
+  useCustomAction,
   useDeleteModule,
   useModuleData,
   useUpdateModule,
@@ -18,6 +19,7 @@ import { useSearchParams } from "next/navigation";
 // ✅ useCallback এবং useMemo ইম্পোর্ট
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+const url = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function UniversalCRUDManager({
   module,
@@ -51,7 +53,7 @@ export default function UniversalCRUDManager({
   // Data fetch
   const { data: response, isLoading } = useModuleData(module, token, filters);
   const items = response?.data || [];
-  const totalCount = response?.count || 0; // Get total count
+  const totalCount = response?.count ? response.count : 0; // Get total count
 
   // Mutations
   const { mutate: createItem, isPending: isCreating } = useCreateModule(
@@ -66,6 +68,14 @@ export default function UniversalCRUDManager({
     module,
     token
   );
+
+  // ✅ --- (2) NOTUN HOOK-TA BABOHAR (USE) KORUN ---
+  // Eti porishkar (clean) ebong reusable
+  const { mutate: customActionMutate } = useCustomAction(token, {
+    // Amader action-ta "schedules" table (status change) ebong
+    // "auditSessions" table (notun data) - duitakei refresh korbe.
+    modulesToInvalidate: ["schedules", "auditSessions"],
+  });
 
   // Modal handlers (Memoized)
   const openModal = useCallback((type, item = null) => {
@@ -136,6 +146,57 @@ export default function UniversalCRUDManager({
       },
     });
   }, [selectedItem, deleteItem, closeModal, module]);
+
+  const handleCustomAction = useCallback(
+    (action, item) => {
+      // 1. Full API endpoint-ta to-ri kori
+      // Amader hook-ta '/api' prefix-shohotoi endpoint expect kore
+      const endpoint = `${url}/${config.endpoint}${action.endpoint.replace(
+        ":id",
+        item._id
+      )}`;
+      console.log("endpoint:", endpoint);
+      // 2. User-ke confirmation-er jonno toast dekhai
+      toast.info(
+        `Are you sure you want to ${action.label} for "${
+          item.title || item.name
+        }"?`,
+        {
+          action: {
+            label: "Confirm",
+            onClick: () => {
+              // 3. "Confirm" click korle, 'customActionMutate'-ke call kori
+              customActionMutate(
+                {
+                  endpoint: endpoint, // Full API endpoint
+                  method: action.method, // "POST"
+                  body: {}, // Kono data pathacchi na
+                },
+                {
+                  // ✅ Ekhon onSuccess/onError ekhaneo deya jabe
+                  onSuccess: (res) => {
+                    toast.success(
+                      res?.message || "Action completed successfully!"
+                    );
+                    // redirect
+                    window.location.href = "/auditSessions";
+                  },
+                  onError: (error) => {
+                    toast.error(error.message || "Action failed");
+                  },
+                }
+              );
+            },
+          },
+          cancel: {
+            label: "Cancel",
+            onClick: () => toast.dismiss(),
+          },
+        }
+      );
+    },
+    [config, customActionMutate, token] // Dependencies
+  );
 
   // Generate Columns (Memoized)
   // const columns = useMemo(() => {
@@ -219,6 +280,8 @@ export default function UniversalCRUDManager({
           isLoading={isLoading}
           getRowCondition={getRowCondition}
           getPriorityLevel={getPriorityLevel}
+          moduleConfig={config}
+          onCustomAction={handleCustomAction} // Use memoized handleCustomAction
         />
       )}
       {/* Universal Modal */}
