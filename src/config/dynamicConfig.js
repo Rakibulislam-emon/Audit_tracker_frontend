@@ -658,14 +658,14 @@ export const universalConfig = {
 
     // FIELD DEFINITIONS - Based on Question.js model
     fields: {
-      section: {
-        type: "text",
-        label: "Section",
-        placeholder: "Enter section name (e.g., Fire Safety)",
-        required: true,
-        tableColumn: true,
-        filterable: true, // Allow filtering/searching if needed later
-      },
+      // section: {
+      //   type: "text",
+      //   label: "Section",
+      //   placeholder: "Enter section name (e.g., Fire Safety)",
+      //   required: true,
+      //   tableColumn: true,
+      //   filterable: true, // Allow filtering/searching if needed later
+      // },
       questionText: {
         type: "textarea", // Questions can be long
         label: "Question Text",
@@ -1372,23 +1372,41 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "audit_manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      start: ["admin", "sysadmin", "audit_manager"],
     },
+
+    // CUSTOM ACTIONS
+    customActions: [
+      {
+        label: "Start Audit",
+        action: "start",
+
+        endpoint: "/:id/start",
+
+        method: "POST",
+        showWhen: {
+          field: "scheduleStatus",
+          value: "scheduled",
+        },
+      },
+    ],
   },
 
   auditSessions: {
     endpoint: "auditSessions",
     title: "Audit Session Management",
     description: "Manage ongoing and completed audit sessions",
+    hasCustomActions: true, // To enable custom actions like "Start Audit", "Complete Audit"
     fields: {
-      title: {
-        // Optional title
-        type: "text",
-        label: "Session Title (Optional)",
-        placeholder: "Enter optional title",
-        required: false,
-        tableColumn: true,
-        filterable: true,
-      },
+      // title: {
+      //   // Optional title
+      //   type: "text",
+      //   label: "Session Title (Optional)",
+      //   placeholder: "Enter optional title",
+      //   required: false,
+      //   tableColumn: true,
+      //   filterable: true,
+      // },
       schedule: {
         type: "select",
         label: "Schedule",
@@ -1561,135 +1579,7 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
   },
-  teams: {
-    // API Configuration
-    endpoint: "teams", // Matches backend route
 
-    // UI Configuration
-    title: "Team Assignments", // More descriptive title
-    description: "Manage user assignments and roles within audit sessions",
-
-    // FIELD DEFINITIONS - Based on Team.js model
-    fields: {
-      auditSession: {
-        type: "select",
-        label: "Audit Session",
-        required: true,
-        relation: "auditSessions", // Link to auditSessions module (NEEDS TO BE CREATED LATER)
-        tableColumn: true,
-        filterable: true, // Allow filtering by session
-        dataAccessor: "auditSession.title", // Show session title in table
-        placeholder: "Select Audit Session", // Placeholder for form dropdown
-      },
-      user: {
-        type: "select",
-        label: "User",
-        required: true,
-        relation: "users", // Link to users module
-        tableColumn: true,
-        filterable: true, // Allow filtering by user
-        dataAccessor: "user.name", // Show user name in table
-        placeholder: "Select User", // Placeholder for form dropdown
-      },
-      roleInTeam: {
-        type: "select", // Changed to select assuming enum in schema
-        label: "Role in Team",
-        placeholder: "Select Role", // Placeholder for form dropdown
-        required: true,
-        tableColumn: true,
-        filterable: true, // Allow filtering by role
-        options: ["lead", "member", "observer", "specialist"], // Use the same enum values as schema
-      },
-      status: {
-        // commonFields.status
-        type: "select",
-        label: "Assignment Status", // More specific label
-        required: true,
-        options: ["active", "inactive"],
-        default: "active",
-        tableColumn: true,
-        filterable: true,
-        editOnly: true, // Typically changed after creation
-      },
-      // Common fields (read-only in table)
-      createdBy: {
-        type: "relation",
-        label: "Assigned By", // Changed label slightly
-        relation: "users",
-        tableColumn: true,
-        formField: false, // Not editable
-        readOnly: true,
-        dataAccessor: "createdBy.name",
-      },
-      updatedBy: {
-        type: "relation",
-        label: "Last Updated By", // Changed label slightly
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        dataAccessor: "updatedBy.name",
-      },
-      createdAt: {
-        type: "date",
-        label: "Assigned At", // Changed label slightly
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Last Updated At", // Changed label slightly
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-    },
-
-    // FILTER CONFIGURATION
-    filters: {
-      auditSession: {
-        type: "select",
-        label: "Audit Session",
-        placeholder: "All Sessions",
-        apiParam: "auditSession", // Matches req.query.auditSession
-        relation: "auditSessions", // Needs auditSessions module
-      },
-      user: {
-        // Allow filtering assignments for a specific user
-        type: "select",
-        label: "User",
-        placeholder: "All Users",
-        apiParam: "user", // Matches req.query.user
-        relation: "users",
-      },
-      roleInTeam: {
-        // Allow filtering by role using select
-        type: "select",
-        label: "Role in Team",
-        placeholder: "All Roles",
-        apiParam: "roleInTeam", // Matches req.query.roleInTeam
-        options: ["lead", "member", "observer", "specialist"], // Use enum values
-      },
-      status: {
-        // Filter by assignment status
-        type: "select",
-        label: "Assignment Status",
-        placeholder: "All Statuses",
-        apiParam: "status", // Matches req.query.status
-        options: ["active", "inactive"],
-      },
-      // Removed 'search' filter as specific filters are generally more useful here
-    },
-
-    // PERMISSIONS (Match roles in authorizeRoles middleware)
-    permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
-      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
-      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
-    },
-  },
   observations: {
     endpoint: "observations",
     title: "Observations Management",
@@ -1875,6 +1765,135 @@ export const universalConfig = {
     },
   },
 
+  teams: {
+    // API Configuration
+    endpoint: "teams", // Matches backend route
+
+    // UI Configuration
+    title: "Team Assignments", // More descriptive title
+    description: "Manage user assignments and roles within audit sessions",
+
+    // FIELD DEFINITIONS - Based on Team.js model
+    fields: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        required: true,
+        relation: "auditSessions", // Link to auditSessions module (NEEDS TO BE CREATED LATER)
+        tableColumn: true,
+        filterable: true, // Allow filtering by session
+        dataAccessor: "auditSession.title", // Show session title in table
+        placeholder: "Select Audit Session", // Placeholder for form dropdown
+      },
+      user: {
+        type: "select",
+        label: "User",
+        required: true,
+        relation: "users", // Link to users module
+        tableColumn: true,
+        filterable: true, // Allow filtering by user
+        dataAccessor: "user.name", // Show user name in table
+        placeholder: "Select User", // Placeholder for form dropdown
+      },
+      roleInTeam: {
+        type: "select", // Changed to select assuming enum in schema
+        label: "Role in Team",
+        placeholder: "Select Role", // Placeholder for form dropdown
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering by role
+        options: ["lead", "member", "observer", "specialist"], // Use the same enum values as schema
+      },
+      status: {
+        // commonFields.status
+        type: "select",
+        label: "Assignment Status", // More specific label
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true, // Typically changed after creation
+      },
+      // Common fields (read-only in table)
+      createdBy: {
+        type: "relation",
+        label: "Assigned By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false, // Not editable
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Last Updated By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Assigned At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        placeholder: "All Sessions",
+        apiParam: "auditSession", // Matches req.query.auditSession
+        relation: "auditSessions", // Needs auditSessions module
+      },
+      user: {
+        // Allow filtering assignments for a specific user
+        type: "select",
+        label: "User",
+        placeholder: "All Users",
+        apiParam: "user", // Matches req.query.user
+        relation: "users",
+      },
+      roleInTeam: {
+        // Allow filtering by role using select
+        type: "select",
+        label: "Role in Team",
+        placeholder: "All Roles",
+        apiParam: "roleInTeam", // Matches req.query.roleInTeam
+        options: ["lead", "member", "observer", "specialist"], // Use enum values
+      },
+      status: {
+        // Filter by assignment status
+        type: "select",
+        label: "Assignment Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+      // Removed 'search' filter as specific filters are generally more useful here
+    },
+
+    // PERMISSIONS (Match roles in authorizeRoles middleware)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
+      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
+    },
+  },
   problems: {
     endpoint: "problems",
     title: "Problem Management",
