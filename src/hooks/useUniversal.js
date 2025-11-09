@@ -242,3 +242,70 @@ export const useDeleteModule = (module, token) => {
 
   return useDeleteUniversal(token, config.endpoint);
 };
+
+/**
+ * HOOK 4.5: Universal Custom Action Mutator
+ *
+ * Eti C-U-D er baire je kono custom API call
+ * (e.g., POST /:id/start, POST /:id/cancel) handle korar jonno.
+ *
+ * @param {string} token - JWT token
+ * @param {object} options - Configuration object
+ * @param {string[]} options.modulesToInvalidate - Kon module-er cache refresh korte hobe
+ * @returns {object} - {mutate, isPending, error}
+ */
+export const useCustomAction = (
+  token,
+  { modulesToInvalidate = [] } = {} // Options object hishebe nilam
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    /**
+     * mutationFn: Ei function-ta amader component theke 3-ta jinish paabe:
+     * 1. endpoint: Full API endpoint (e.g., "/api/schedules/123/start")
+     * 2. method: "POST", "PATCH", etc.
+     * 3. body: Request-er shathe kono data pathale
+     */
+    mutationFn: async ({ endpoint, method, body }) => {
+      // Ekhon ar 'localhost:5000' hardcode korar dorkar nei
+      // Karon amader Step 1-er "Proxy" shob request handle korbe.
+      const res = await fetch(endpoint, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body || {}),
+      });
+      if (!res.ok) {
+        return res.json().then((err) => {
+          throw new Error(err.message || "Custom action failed");
+        });
+      }
+      return await res.json();
+    },
+
+    /**
+     * onSuccess: Action shofol (successful) hole ki hobe.
+     */
+    onSuccess: (data) => {
+      // Amra 'modulesToInvalidate' array-er upor loop korbo
+      modulesToInvalidate.forEach((moduleName) => {
+        const endpoint = universalConfig[moduleName]?.endpoint;
+        if (endpoint) {
+          // Oi endpoint-er shob cache data "invalidate" kori
+          // Er fole table automatically refresh hobe
+          queryClient.invalidateQueries({ queryKey: [endpoint] });
+          console.log(
+            `✅ Custom Action success - ${endpoint} cache invalidated`
+          );
+        }
+      });
+    },
+
+    onError: (error) => {
+      console.error(`❌ Custom Action failed:`, error);
+    },
+  });
+};

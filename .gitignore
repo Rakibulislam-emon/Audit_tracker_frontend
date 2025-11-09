@@ -34,7 +34,7 @@ yarn-error.log*
 .env*
 # env production
 .env.production
-
+# .git_disable
 
 # vercel
 .vercel
