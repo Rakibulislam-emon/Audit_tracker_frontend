@@ -45,10 +45,9 @@ export const navItems = {
       icon: Factory,
       href: "/dashboard/admin/sites",
     },
-
-    {
+       {
       id: "check-types",
-      label: "Check Types",
+      label: "Category (Check Types)",
       icon: ListChecks,
       href: "/dashboard/admin/check-types",
     },
@@ -59,17 +58,20 @@ export const navItems = {
       href: "/dashboard/admin/rules",
     },
     {
-      id: "templates",
-      label: "Templates",
-      icon: ClipboardList,
-      href: "/dashboard/admin/templates",
-    },
-    {
       id: "questions",
       label: "Questions",
       icon: ClipboardCheck,
       href: "/dashboard/admin/questions",
     },
+ 
+
+    {
+      id: "templates",
+      label: "Templates",
+      icon: ClipboardList,
+      href: "/dashboard/admin/templates",
+    },
+
     {
       id: "programs",
       label: "Programs",

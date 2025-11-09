@@ -1,29 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
 
-
-export default function UniversalActions({ 
-  item, 
-  onEdit,
-  onDelete 
-}) {
+export default function UniversalActions({ item, onEdit, onDelete }) {
   return (
     <>
       {/* DESKTOP: Simple Buttons */}
       <div className="hidden md:flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onEdit(item)}
-        >
+        <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
           <Edit className="h-4 w-4" />
           Edit
         </Button>
@@ -52,7 +43,7 @@ export default function UniversalActions({
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onDelete(item)}
               className="text-red-600"
             >

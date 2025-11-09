@@ -540,6 +540,25 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true, // For search
       },
+      ruleCode: {
+        type: "text",
+        label: "Rule Code",
+        placeholder: "e.g., SAF-001",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      checkType: {
+        type: "select",
+        label: "Category (Check Type)",
+        required: true,
+        relation: "checkTypes", // Links to 'checkTypes' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "checkType.name", // Display checkType name
+        placeholder: "Select a Check Type",
+      },
+
       description: {
         type: "textarea",
         label: "Description",
@@ -549,18 +568,6 @@ export const universalConfig = {
         filterable: true, // For search
         fullWidth: true,
       },
-      // --- Missing CheckType Relation ---
-      // If you add checkType to the model:
-      // checkType: {
-      //   type: "select",
-      //   label: "Check Type",
-      //   required: true, // Or false, depending on logic
-      //   relation: "checkTypes", // Link to checkTypes module
-      //   tableColumn: true,
-      //   filterable: true,
-      // dataAccessor: "checkType.name",
-      // },
-      // --- End Missing CheckType ---
       status: {
         type: "select",
         label: "Status",
@@ -613,16 +620,15 @@ export const universalConfig = {
         placeholder: "Search by name or description...",
         apiParam: "search", // Matches req.query.search
       },
-      // --- Missing CheckType Filter ---
-      // If you add checkType relation:
-      // checkType: {
-      //   type: "select",
-      //   label: "Check Type",
-      //   placeholder: "All Check Types",
-      //   apiParam: "checkType",
-      //   relation: "checkTypes",
-      // },
-      // --- End Missing CheckType Filter ---
+
+      checkType: {
+        type: "select",
+        label: "Check Type",
+        placeholder: "All Check Types",
+        apiParam: "checkType", // Matches req.query.checkType
+        relation: "checkTypes", // Load options from checkTypes
+      },
+
       status: {
         type: "select",
         label: "Status",
@@ -641,6 +647,173 @@ export const universalConfig = {
     },
   },
 
+  questions: {
+    // API Configuration
+    endpoint: "questions", // Matches backend route
+
+    // UI Configuration
+    title: "Question Bank", // Title changed to reflect it's a collection
+    description:
+      "Manage all individual audit questions, linked to rules and check types",
+
+    // FIELD DEFINITIONS - Based on Question.js model
+    fields: {
+      section: {
+        type: "text",
+        label: "Section",
+        placeholder: "Enter section name (e.g., Fire Safety)",
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering/searching if needed later
+      },
+      questionText: {
+        type: "textarea", // Questions can be long
+        label: "Question Text",
+        placeholder: "Enter the audit question",
+        required: true,
+        tableColumn: true,
+        filterable: true, // For search
+        fullWidth: true, // Use full width in form
+      },
+      rule: {
+        type: "select",
+        label: "Rule",
+        required: false, // Optional
+        relation: "rules", // Links to 'rules' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "rule.name", // Display rule name/description
+        placeholder: "Select a Rule (Optional)",
+      },
+
+      checkType: {
+        type: "select",
+        label: "Check Type",
+        required: false, // Optional
+        relation: "checkTypes", // Links to 'checkTypes' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "checkType.name", // Display checkType name
+        placeholder: "Select a Check Type (Optional)",
+      },
+      responseType: {
+        type: "select",
+        label: "Response Type",
+        required: true,
+        options: ["yes/no", "text", "number", "rating", "dropdown"], // From schema enum
+        tableColumn: true,
+        filterable: true, // Allow filtering by type
+      },
+      severityDefault: {
+        type: "select", // Or select if you have predefined severities
+        label: "Default Severity",
+        placeholder: "e.g., High, Medium, Low (optional)",
+        options: ["high", "medium", "low"],
+        required: true,
+        tableColumn: true,
+        filterable: true,
+      },
+      weight: {
+        type: "number",
+        label: "Weight",
+        placeholder: "Enter weight (0.1-10)",
+        required: true, // Has default in schema
+        tableColumn: true,
+        filterable: false,
+        // Add min/max validation if needed in frontend form
+      },
+
+      status: {
+        type: "select",
+        label: "Status",
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true, // For filtering
+      },
+      // Common fields
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        // dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Questions",
+        placeholder: "Search by text or section...",
+        apiParam: "search", // Matches req.query.search
+      },
+      rule: {
+        type: "select",
+        label: "Rule",
+        placeholder: "All Rules",
+        apiParam: "rule",
+        relation: "rules",
+      },
+      checkType: {
+        type: "select",
+        label: "Check Type",
+        placeholder: "All Check Types",
+        apiParam: "checkType",
+        relation: "checkTypes",
+      },
+      responseType: {
+        // Added filter for response type
+        type: "select",
+        label: "Response Type",
+        placeholder: "All Types",
+        apiParam: "responseType", // Matches req.query.responseType
+        options: ["yes/no", "text", "number", "rating", "dropdown"],
+      },
+      status: {
+        type: "select",
+        label: "Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+    },
+
+    // PERMISSIONS (Match these with your backend roles in authorizeRoles)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+    },
+  },
   templates: {
     // API Configuration
     endpoint: "templates", // Matches backend route
@@ -685,6 +858,27 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true, // For filtering
         dataAccessor: "company.name", // Show company name in table
+      },
+      checkType: {
+        type: "select",
+        label: "Check Type (Category)",
+        required: true,
+        relation: "checkTypes",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "checkType.name",
+        placeholder: "Select a Check Type",
+      },
+      questions: {
+        type: "select-multi", // ❗ This is a NEW type, needs a custom component
+        label: "Questions",
+        required: false, // Can be empty
+        relation: "questions", // Links to 'questions' module
+        tableColumn: false, // Don't show array in table
+        filterable: false,
+        placeholder: "Select questions for this template",
+        formField: true,
+        fullWidth: true,
       },
       status: {
         type: "select",
@@ -745,6 +939,13 @@ export const universalConfig = {
         apiParam: "company", // Matches req.query.company
         relation: "companies", // Load options from companies
       },
+      checkType: {
+        type: "select",
+        label: "Check Type",
+        placeholder: "All Check Types",
+        apiParam: "checkType",
+        relation: "checkTypes",
+      },
       status: {
         type: "select",
         label: "Status",
@@ -763,162 +964,15 @@ export const universalConfig = {
     },
   },
 
-  questions: {
-    // API Configuration
-    endpoint: "questions", // Matches backend route
-
-    // UI Configuration
-    title: "Question Management",
-    description: "Manage audit questions within templates",
-
-    // FIELD DEFINITIONS - Based on Question.js model
-    fields: {
-      section: {
-        type: "text",
-        label: "Section",
-        placeholder: "Enter section name (optional)",
-        required: true,
-        tableColumn: true,
-        filterable: true, // Allow filtering/searching if needed later
-      },
-      questionText: {
-        type: "textarea", // Questions can be long
-        label: "Question Text",
-        placeholder: "Enter the audit question",
-        required: true,
-        tableColumn: true,
-        filterable: true, // For search
-        fullWidth: true, // Use full width in form
-      },
-      responseType: {
-        type: "select",
-        label: "Response Type",
-        required: true,
-        options: ["yes/no", "text", "number", "rating", "dropdown"], // From schema enum
-        tableColumn: true,
-        filterable: true, // Allow filtering by type
-      },
-      severityDefault: {
-        type: "select", // Or select if you have predefined severities
-        label: "Default Severity",
-        placeholder: "e.g., High, Medium, Low (optional)",
-        options: ["high", "medium", "low"],
-        required: true,
-        tableColumn: true,
-        filterable: true,
-      },
-      weight: {
-        type: "number",
-        label: "Weight",
-        placeholder: "Enter weight (0.1-10)",
-        required: true, // Has default in schema
-        tableColumn: true,
-        filterable: false,
-        // Add min/max validation if needed in frontend form
-      },
-      template: {
-        type: "select",
-        label: "Template",
-        required: true,
-        relation: "templates", // Link to templates module
-        tableColumn: true,
-        filterable: true, // Allow filtering by template
-        dataAccessor: "template.title", // Show template title in table
-      },
-      status: {
-        type: "select",
-        label: "Status",
-        required: true,
-        options: ["active", "inactive"],
-        default: "active",
-        tableColumn: true,
-        filterable: true, // For filtering
-      },
-      // Common fields
-      createdBy: {
-        type: "relation",
-        label: "Created By",
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        // dataAccessor: "createdBy.name",
-      },
-      updatedBy: {
-        type: "relation",
-        label: "Updated By",
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        // dataAccessor: "updatedBy.name",
-      },
-      createdAt: {
-        type: "date",
-        label: "Created At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Updated At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-    },
-
-    // FILTER CONFIGURATION
-    filters: {
-      search: {
-        type: "search",
-        label: "Search Questions",
-        placeholder: "Search by text or section...",
-        apiParam: "search", // Matches req.query.search
-      },
-      template: {
-        type: "select",
-        label: "Template",
-        placeholder: "All Templates",
-        apiParam: "template", // Matches req.query.template
-        relation: "templates", // Load options from templates
-      },
-      responseType: {
-        // Added filter for response type
-        type: "select",
-        label: "Response Type",
-        placeholder: "All Types",
-        apiParam: "responseType", // Matches req.query.responseType
-        options: ["yes/no", "text", "number", "rating", "dropdown"],
-      },
-      status: {
-        type: "select",
-        label: "Status",
-        placeholder: "All Statuses",
-        apiParam: "status", // Matches req.query.status
-        options: ["active", "inactive"],
-      },
-    },
-
-    // PERMISSIONS (Match these with your backend roles in authorizeRoles)
-    permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
-    },
-  },
-
   programs: {
     // API Configuration
-    endpoint: "programs", // Matches backend route
+    endpoint: "programs",
 
     // UI Configuration
     title: "Program Management",
     description: "Manage audit programs and initiatives",
 
-    // FIELD DEFINITIONS - Based on Program.js model (with company relation)
+    // Field definitions map to the Program.js model
     fields: {
       name: {
         type: "text",
@@ -926,46 +980,83 @@ export const universalConfig = {
         placeholder: "Enter program name",
         required: true,
         tableColumn: true,
-        filterable: true, // For search
+        filterable: true,
       },
       description: {
         type: "textarea",
         label: "Description",
         placeholder: "Enter program details",
-        required: true,
+        required: false,
         tableColumn: true,
-        filterable: true, // For search
+        filterable: true,
         fullWidth: true,
       },
       company: {
-        // Assuming company relation is added
         type: "select",
         label: "Company",
         required: true,
-        relation: "companies",
+        relation: "companies", // Populates dropdown from 'companies' module
         tableColumn: true,
-        filterable: true, // For filtering
-        dataAccessor: "company.name", // Show company name
+        filterable: true,
+        dataAccessor: "company.name", // Displays 'company.name' in the table
+        placeholder: "Select Company",
+      },
+      // Field for Template relation
+      template: {
+        type: "select",
+        label: "Template",
+        required: true,
+        relation: "templates", // Populates dropdown from 'templates' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "template.title", // Displays 'template.title' in the table
+        placeholder: "Select Template",
+      },
+      // Field for Frequency
+      frequency: {
+        type: "select",
+        label: "Frequency",
+        required: true,
+        options: [
+          "one-time",
+          "daily",
+          "weekly",
+          "monthly",
+          "quarterly",
+          "yearly",
+        ],
+        default: "monthly",
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Select Frequency",
+      },
+      // Field for Responsible Dept
+      responsibleDept: {
+        type: "text",
+        label: "Responsible Dept.",
+        required: false,
+        placeholder: "e.g., Safety Department",
+        tableColumn: true,
+        filterable: true,
       },
       startDate: {
         type: "date",
         label: "Start Date",
-        required: true,
+        required: false,
         tableColumn: true,
         filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: true,
+        required: false,
         tableColumn: true,
         filterable: false,
       },
       programStatus: {
-        // Operational Status
         type: "select",
         label: "Program Status",
-        required: true, // Has default, but good to set in form
+        required: true,
         options: [
           "planning",
           "in-progress",
@@ -975,21 +1066,19 @@ export const universalConfig = {
         ],
         default: "planning",
         tableColumn: true,
-        filterable: true, // For filtering
+        filterable: true,
       },
-      // ✅ commonFields.status field configuration
       status: {
-        // System Status (Active/Inactive)
         type: "select",
         label: "System Status",
-        required: true, // From commonFields default
+        required: true,
         options: ["active", "inactive"],
         default: "active",
-        tableColumn: true, // Show in table
-        filterable: true, // Allow filtering
-        editOnly: true, // Usually only editable
+        tableColumn: true,
+        filterable: true,
+        editOnly: true, // Field only appears on the 'Edit' form
       },
-      // Common fields
+      // Common fields (read-only, not shown in forms)
       createdBy: {
         type: "relation",
         label: "Created By",
@@ -1029,23 +1118,43 @@ export const universalConfig = {
       search: {
         type: "search",
         label: "Search Programs",
-        placeholder: "Search by name or description...",
+        placeholder: "Search name, description, or dept...",
         apiParam: "search",
+        fields: ["name", "description", "responsibleDept"],
       },
       company: {
-        // Assuming company relation
         type: "select",
         label: "Company",
         placeholder: "All Companies",
         apiParam: "company",
         relation: "companies",
       },
+      template: {
+        type: "select",
+        label: "Template",
+        placeholder: "All Templates",
+        apiParam: "template",
+        relation: "templates",
+      },
+      frequency: {
+        type: "select",
+        label: "Frequency",
+        placeholder: "All Frequencies",
+        apiParam: "frequency",
+        options: [
+          "one-time",
+          "daily",
+          "weekly",
+          "monthly",
+          "quarterly",
+          "yearly",
+        ],
+      },
       programStatus: {
-        // Filter by operational status
         type: "select",
         label: "Program Status",
         placeholder: "All Program Statuses",
-        apiParam: "programStatus", // Matches req.query.programStatus
+        apiParam: "programStatus",
         options: [
           "planning",
           "in-progress",
@@ -1054,19 +1163,16 @@ export const universalConfig = {
           "cancelled",
         ],
       },
-      // ✅ Filter for commonFields.status
       status: {
-        // Filter by system status
         type: "select",
         label: "System Status",
         placeholder: "All System Statuses",
-        apiParam: "status", // Matches req.query.status
+        apiParam: "status",
         options: ["active", "inactive"],
       },
-      // Date range filters could be added here if needed (requires custom UI)
     },
 
-    // PERMISSIONS (Match backend roles)
+    // PERMISSIONS
     permissions: {
       create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager"],
@@ -1081,9 +1187,9 @@ export const universalConfig = {
 
     // UI Configuration
     title: "Schedule Management",
-    description: "Manage audit schedules",
+    description: "Plan and assign all upcoming audit schedules",
 
-    // FIELD DEFINITIONS - Based on Schedule.js model
+    // FIELD DEFINITIONS - Based on your new Schedule.js
     fields: {
       title: {
         type: "text",
@@ -1091,7 +1197,7 @@ export const universalConfig = {
         placeholder: "Enter a title for the schedule",
         required: true,
         tableColumn: true,
-        filterable: true,
+        filterable: true, // For search
       },
       company: {
         type: "select",
@@ -1101,37 +1207,76 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true,
         dataAccessor: "company.name",
+        placeholder: "Select Company",
       },
       program: {
-        // Optional program link
         type: "select",
         label: "Program (Optional)",
         required: false,
         relation: "programs",
         tableColumn: true,
         filterable: true,
-        dataAccessor: "program.name", // Show program name
+        dataAccessor: "program.name",
         placeholder: "Select Program",
+      },
+      // ✅ NEW FIELD - Handling the Array
+      sites: {
+        type: "select-multi", // ❗ This is a NEW, custom component type
+        label: "Sites",
+        required: false, // Per your schema
+        relation: "sites", // Loads options from 'sites' module
+        tableColumn: true, // We can show multiple names
+        filterable: true,
+        dataAccessor: "sites", // Let the component handle rendering the array
+        placeholder: "Select Site(s)",
+        fullWidth: true,
+      },
+      // ✅ NEW FIELD - Handling the Array
+      assignedAuditors: {
+        type: "select-multi", // ❗ This is also a multi-select
+        label: "Assigned Auditors",
+        required: false, // Per your schema
+        relation: "users", // Loads options from 'users' module
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedAuditors",
+        placeholder: "Select Auditor(s)",
+        fullWidth: true,
       },
       startDate: {
         type: "date",
         label: "Start Date",
-        required: true,
+        // required: true,
         tableColumn: true,
-        filterable: false, // Usually filter by range
+        filterable: false,
       },
       endDate: {
         type: "date",
         label: "End Date",
-        required: true,
+        // required: true,
         tableColumn: true,
         filterable: false,
-        // Add frontend validation if desired (endDate > startDate)
+      },
+      // ✅ NEW FIELD - From your schema
+      scheduleStatus: {
+        type: "select",
+        label: "Schedule Status",
+        required: true,
+        options: [
+          "scheduled",
+          "in-progress",
+          "completed",
+          "postponed",
+          "cancelled",
+        ],
+        default: "scheduled",
+        tableColumn: true,
+        filterable: true,
       },
       status: {
         // commonFields.status
         type: "select",
-        label: "Status",
+        label: "System Status",
         required: true,
         options: ["active", "inactive"],
         default: "active",
@@ -1158,23 +1303,9 @@ export const universalConfig = {
         readOnly: true,
         dataAccessor: "updatedBy.name",
       },
-      createdAt: {
-        type: "date",
-        label: "Created At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Updated At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
     },
 
-    // FILTER CONFIGURATION
+    // FILTER CONFIGURATION - Now includes new fields
     filters: {
       search: {
         type: "search",
@@ -1194,156 +1325,53 @@ export const universalConfig = {
         label: "Program",
         placeholder: "All Programs",
         apiParam: "program",
-        relation: "programs", // Filter by program
+        relation: "programs",
+      },
+      // ✅ NEW FILTER
+      site: {
+        type: "select", // Filter by ONE site (e.g., "show all schedules that include this site")
+        label: "Site",
+        placeholder: "Filter by Site",
+        apiParam: "site", // Matches req.query.site in controller
+        relation: "sites",
+      },
+      // ✅ NEW FILTER
+      auditor: {
+        type: "select", // Filter by ONE auditor
+        label: "Auditor",
+        placeholder: "Filter by Auditor",
+        apiParam: "auditor", // Matches req.query.auditor in controller
+        relation: "users",
+      },
+      // ✅ NEW FILTER
+      scheduleStatus: {
+        type: "select",
+        label: "Schedule Status",
+        placeholder: "All Statuses",
+        apiParam: "scheduleStatus",
+        options: [
+          "scheduled",
+          "in-progress",
+          "completed",
+          "postponed",
+          "cancelled",
+        ],
       },
       status: {
         type: "select",
-        label: "Status",
+        label: "System Status",
         placeholder: "All Statuses",
         apiParam: "status",
         options: ["active", "inactive"],
       },
-      // Date range filters require custom UI components
-      // startDate: { type: 'dateRangeStart', apiParam: 'startDate', label: 'Start Date After' },
-      // endDate: { type: 'dateRangeEnd', apiParam: 'endDate', label: 'End Date Before' },
     },
 
-    // PERMISSIONS (Match backend roles)
+    // PERMISSIONS
     permissions: {
       create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
-    },
-  },
-
-  teams: {
-    // API Configuration
-    endpoint: "teams", // Matches backend route
-
-    // UI Configuration
-    title: "Team Assignments", // More descriptive title
-    description: "Manage user assignments and roles within audit sessions",
-
-    // FIELD DEFINITIONS - Based on Team.js model
-    fields: {
-      auditSession: {
-        type: "select",
-        label: "Audit Session",
-        required: true,
-        relation: "auditSessions", // Link to auditSessions module (NEEDS TO BE CREATED LATER)
-        tableColumn: true,
-        filterable: true, // Allow filtering by session
-        dataAccessor: "auditSession.title", // Show session title in table
-        placeholder: "Select Audit Session", // Placeholder for form dropdown
-      },
-      user: {
-        type: "select",
-        label: "User",
-        required: true,
-        relation: "users", // Link to users module
-        tableColumn: true,
-        filterable: true, // Allow filtering by user
-        dataAccessor: "user.name", // Show user name in table
-        placeholder: "Select User", // Placeholder for form dropdown
-      },
-      roleInTeam: {
-        type: "select", // Changed to select assuming enum in schema
-        label: "Role in Team",
-        placeholder: "Select Role", // Placeholder for form dropdown
-        required: true,
-        tableColumn: true,
-        filterable: true, // Allow filtering by role
-        options: ["lead", "member", "observer", "specialist"], // Use the same enum values as schema
-      },
-      status: {
-        // commonFields.status
-        type: "select",
-        label: "Assignment Status", // More specific label
-        required: true,
-        options: ["active", "inactive"],
-        default: "active",
-        tableColumn: true,
-        filterable: true,
-        editOnly: true, // Typically changed after creation
-      },
-      // Common fields (read-only in table)
-      createdBy: {
-        type: "relation",
-        label: "Assigned By", // Changed label slightly
-        relation: "users",
-        tableColumn: true,
-        formField: false, // Not editable
-        readOnly: true,
-        dataAccessor: "createdBy.name",
-      },
-      updatedBy: {
-        type: "relation",
-        label: "Last Updated By", // Changed label slightly
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        dataAccessor: "updatedBy.name",
-      },
-      createdAt: {
-        type: "date",
-        label: "Assigned At", // Changed label slightly
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Last Updated At", // Changed label slightly
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-    },
-
-    // FILTER CONFIGURATION
-    filters: {
-      auditSession: {
-        type: "select",
-        label: "Audit Session",
-        placeholder: "All Sessions",
-        apiParam: "auditSession", // Matches req.query.auditSession
-        relation: "auditSessions", // Needs auditSessions module
-      },
-      user: {
-        // Allow filtering assignments for a specific user
-        type: "select",
-        label: "User",
-        placeholder: "All Users",
-        apiParam: "user", // Matches req.query.user
-        relation: "users",
-      },
-      roleInTeam: {
-        // Allow filtering by role using select
-        type: "select",
-        label: "Role in Team",
-        placeholder: "All Roles",
-        apiParam: "roleInTeam", // Matches req.query.roleInTeam
-        options: ["lead", "member", "observer", "specialist"], // Use enum values
-      },
-      status: {
-        // Filter by assignment status
-        type: "select",
-        label: "Assignment Status",
-        placeholder: "All Statuses",
-        apiParam: "status", // Matches req.query.status
-        options: ["active", "inactive"],
-      },
-      // Removed 'search' filter as specific filters are generally more useful here
-    },
-
-    // PERMISSIONS (Match roles in authorizeRoles middleware)
-    permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
-      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
-      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
     },
   },
 
@@ -1533,7 +1561,135 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
   },
+  teams: {
+    // API Configuration
+    endpoint: "teams", // Matches backend route
 
+    // UI Configuration
+    title: "Team Assignments", // More descriptive title
+    description: "Manage user assignments and roles within audit sessions",
+
+    // FIELD DEFINITIONS - Based on Team.js model
+    fields: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        required: true,
+        relation: "auditSessions", // Link to auditSessions module (NEEDS TO BE CREATED LATER)
+        tableColumn: true,
+        filterable: true, // Allow filtering by session
+        dataAccessor: "auditSession.title", // Show session title in table
+        placeholder: "Select Audit Session", // Placeholder for form dropdown
+      },
+      user: {
+        type: "select",
+        label: "User",
+        required: true,
+        relation: "users", // Link to users module
+        tableColumn: true,
+        filterable: true, // Allow filtering by user
+        dataAccessor: "user.name", // Show user name in table
+        placeholder: "Select User", // Placeholder for form dropdown
+      },
+      roleInTeam: {
+        type: "select", // Changed to select assuming enum in schema
+        label: "Role in Team",
+        placeholder: "Select Role", // Placeholder for form dropdown
+        required: true,
+        tableColumn: true,
+        filterable: true, // Allow filtering by role
+        options: ["lead", "member", "observer", "specialist"], // Use the same enum values as schema
+      },
+      status: {
+        // commonFields.status
+        type: "select",
+        label: "Assignment Status", // More specific label
+        required: true,
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        editOnly: true, // Typically changed after creation
+      },
+      // Common fields (read-only in table)
+      createdBy: {
+        type: "relation",
+        label: "Assigned By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false, // Not editable
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Last Updated By", // Changed label slightly
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Assigned At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+
+    // FILTER CONFIGURATION
+    filters: {
+      auditSession: {
+        type: "select",
+        label: "Audit Session",
+        placeholder: "All Sessions",
+        apiParam: "auditSession", // Matches req.query.auditSession
+        relation: "auditSessions", // Needs auditSessions module
+      },
+      user: {
+        // Allow filtering assignments for a specific user
+        type: "select",
+        label: "User",
+        placeholder: "All Users",
+        apiParam: "user", // Matches req.query.user
+        relation: "users",
+      },
+      roleInTeam: {
+        // Allow filtering by role using select
+        type: "select",
+        label: "Role in Team",
+        placeholder: "All Roles",
+        apiParam: "roleInTeam", // Matches req.query.roleInTeam
+        options: ["lead", "member", "observer", "specialist"], // Use enum values
+      },
+      status: {
+        // Filter by assignment status
+        type: "select",
+        label: "Assignment Status",
+        placeholder: "All Statuses",
+        apiParam: "status", // Matches req.query.status
+        options: ["active", "inactive"],
+      },
+      // Removed 'search' filter as specific filters are generally more useful here
+    },
+
+    // PERMISSIONS (Match roles in authorizeRoles middleware)
+    permissions: {
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
+      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
+    },
+  },
   observations: {
     endpoint: "observations",
     title: "Observations Management",
@@ -2622,6 +2778,292 @@ export const universalConfig = {
       ],
       // ✅ Custom permission for generate button
       generate: ["admin", "sysadmin", "audit_manager"],
+    },
+  },
+
+  approvals: {
+    endpoint: "approvals",
+    title: "Approval Requests",
+    description:
+      "Manage and review all approval requests in the system (Admin View)",
+
+    // ✅ This module CANNOT be created via UniversalForm
+    hasCustomCreate: true,
+    // Edit form will only update specific, non-workflow fields
+
+    fields: {
+      // Core Info
+      title: {
+        type: "text",
+        label: "Title",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        formField: true, // Allow editing title
+        editOnly: true, // Only in edit mode
+      },
+      entityType: {
+        type: "select",
+        label: "Entity Type",
+        required: true,
+        options: [
+          "Report",
+          "Problem",
+          "FixAction",
+          "AuditSession",
+          "Template",
+          "Schedule",
+        ],
+        tableColumn: true,
+        filterable: true,
+        formField: false, // Cannot be edited
+        readOnly: true,
+      },
+      entityId: {
+        // Link to the actual item
+        type: "relation",
+        label: "Related Item",
+        // relationPath: "entityType", // Dynamic refPath is complex for UniversalForm
+        // We'll just show the ID or title if populated
+        tableColumn: true,
+        filterable: false,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "entityId.title", // Try to get title, fallback handled by column
+      },
+      approvalStatus: {
+        type: "select",
+        label: "Approval Status",
+        options: [
+          "pending",
+          "in-review",
+          "approved",
+          "rejected",
+          "cancelled",
+          "escalated",
+        ],
+        tableColumn: true,
+        filterable: true,
+        formField: true, // Allow manual status override by admin?
+        editOnly: true,
+      },
+      priority: {
+        type: "select",
+        label: "Priority",
+        options: ["low", "medium", "high", "critical"],
+        default: "medium",
+        tableColumn: true,
+        filterable: true,
+        formField: true,
+        editOnly: true,
+      },
+
+      // User Links
+      approver: {
+        type: "select",
+        label: "Current Approver",
+        required: true,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "approver.name",
+        formField: true, // Allow changing approver (escalation?)
+        editOnly: true,
+        placeholder: "Select Approver",
+      },
+      requestedBy: {
+        type: "relation",
+        label: "Requested By",
+        required: true,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "requestedBy.name",
+        formField: false,
+        readOnly: true,
+      },
+
+      // Timeline (Read-only in table)
+      "timeline.deadline": {
+        // Use dot notation for nested path
+        type: "date",
+        label: "Deadline",
+        tableColumn: true,
+        filterable: false,
+        formField: true, // Allow editing deadline
+        editOnly: true,
+      },
+      "timeline.requestedAt": {
+        type: "date",
+        label: "Requested At",
+        tableColumn: true,
+        filterable: false,
+        formField: false,
+      },
+      "decision.decisionAt": {
+        type: "date",
+        label: "Decision At",
+        tableColumn: false,
+        filterable: false,
+        formField: false,
+      },
+      "decision.comments": {
+        type: "textarea",
+        label: "Decision Comments",
+        tableColumn: false,
+        formField: true,
+        editOnly: true, // Allow editing/adding notes?
+        fullWidth: true,
+      },
+
+      // Complex fields (Hidden from table/form)
+      description: {
+        type: "textarea",
+        label: "Description",
+        required: true,
+        formField: true,
+        editOnly: true,
+        fullWidth: true,
+        tableColumn: false,
+      },
+      requirements: {
+        label: "Requirements",
+        tableColumn: false,
+        formField: false,
+      },
+      reviewHistory: { label: "History", tableColumn: false, formField: false },
+      notifications: {
+        label: "Notifications",
+        tableColumn: false,
+        formField: false,
+      },
+
+      // Common fields
+      status: {
+        // System Status
+        type: "select",
+        label: "System Status",
+        options: ["active", "inactive"],
+        default: "active",
+        tableColumn: true,
+        filterable: true,
+        formField: true,
+        editOnly: true,
+      },
+      // ✅ common fields added as requested
+      createdBy: {
+        type: "relation",
+        label: "Created By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "createdBy.name",
+      },
+      updatedBy: {
+        type: "relation",
+        label: "Updated By",
+        relation: "users",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "updatedBy.name",
+      },
+      createdAt: {
+        type: "date",
+        label: "Created At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      updatedAt: {
+        type: "date",
+        label: "Updated At",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+    },
+    filters: {
+      search: {
+        type: "search",
+        label: "Search Approvals",
+        placeholder: "Search title/description...",
+        apiParam: "search",
+      },
+      approvalStatus: {
+        type: "select",
+        label: "Approval Status",
+        placeholder: "All Approval Statuses",
+        apiParam: "approvalStatus",
+        options: [
+          "pending",
+          "in-review",
+          "approved",
+          "rejected",
+          "cancelled",
+          "escalated",
+        ],
+      },
+      priority: {
+        type: "select",
+        label: "Priority",
+        placeholder: "All Priorities",
+        apiParam: "priority",
+        options: ["low", "medium", "high", "critical"],
+      },
+      entityType: {
+        type: "select",
+        label: "Entity Type",
+        placeholder: "All Types",
+        apiParam: "entityType",
+        options: [
+          "Report",
+          "Problem",
+          "FixAction",
+          "AuditSession",
+          "Template",
+          "Schedule",
+        ],
+      },
+      approver: {
+        type: "select",
+        label: "Approver",
+        placeholder: "All Approvers",
+        apiParam: "approver",
+        relation: "users",
+      },
+      requestedBy: {
+        type: "select",
+        label: "Requested By",
+        placeholder: "All Requesters",
+        apiParam: "requestedBy",
+        relation: "users",
+      },
+      status: {
+        type: "select",
+        label: "System Status",
+        placeholder: "All System Statuses",
+        apiParam: "status",
+        options: ["active", "inactive"],
+      },
+    },
+    permissions: {
+      // Match backend roles
+      create: ["admin", "sysadmin", "audit_manager"], // Manual create (hidden by hasCustomCreate)
+      edit: ["admin", "sysadmin", "audit_manager"], // Admin/Manager edit of basic fields
+      delete: ["admin", "sysadmin"], // Admin delete
+      view: ["admin", "sysadmin", "audit_manager"], // Admin/Manager view of *all* requests
+
+      // Custom permissions for workflow actions
+      canApprove: ["admin", "sysadmin", "audit_manager", "auditor"], // Who can *ever* be an approver
+      canComment: [
+        "admin",
+        "sysadmin",
+        "audit_manager",
+        "auditor",
+        "compliance_officer",
+      ], // Who can comment
     },
   },
 };
