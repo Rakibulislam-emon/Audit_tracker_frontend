@@ -700,7 +700,7 @@ export const universalConfig = {
         type: "select",
         label: "Response Type",
         required: true,
-        options: ["yes/no", "text", "number", "rating", "dropdown"], // From schema enum
+        options: ["yes/no", "text", "number"], // From schema enum
         tableColumn: true,
         filterable: true, // Allow filtering by type
       },
@@ -795,7 +795,7 @@ export const universalConfig = {
         label: "Response Type",
         placeholder: "All Types",
         apiParam: "responseType", // Matches req.query.responseType
-        options: ["yes/no", "text", "number", "rating", "dropdown"],
+        options: ["yes/no", "text", "number"],
       },
       status: {
         type: "select",
