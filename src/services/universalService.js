@@ -71,6 +71,55 @@ export const universalService = {
     }
   },
 
+
+  /**
+   * GET SINGLE ITEM BY ID
+   *
+   * @param {string} token - JWT auth token
+   * @param {string} endpoint - API endpoint like "users", "groups"
+   * @param {string} id - The _id of the item to fetch
+   * @returns {Promise} - Standardized response {success, data}
+   */
+  getById: async (token, endpoint, id) => {
+    try {
+      console.log(`🔍 Fetching ${endpoint} by ID: ${id}`);
+
+      // 1. CONSTRUCT URL
+      const url = `${baseUrl}/${endpoint}/${id}`;
+      console.log(`🌐 API Call: ${url}`);
+
+      // 2. MAKE HTTP REQUEST
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        credentials: "include",
+      });
+
+      // 3. HANDLE HTTP ERRORS
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP ${response.status} - Failed to fetch ${endpoint}/${id}: ${errorText}`
+        );
+      }
+
+      // 4. PARSE SUCCESSFUL RESPONSE
+      const result = await response.json();
+      if (!result || typeof result !== "object" || !result.data) {
+        throw new Error(`Invalid response format from ${endpoint}/${id}`);
+      }
+
+      console.log(`✅ Successfully fetched ${endpoint} ${id}`);
+      return result.data; // ✅ Shudhu "data" object-ta pathai
+    } catch (error) {
+      console.error(`❌ API Error for ${endpoint}/${id}:`, error);
+      throw error;
+    }
+  },
+
   /**
    * CREATE NEW ITEM
    * 

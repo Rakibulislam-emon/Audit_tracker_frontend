@@ -16,6 +16,7 @@ import RelationSelect from "./UniversalRelationSelect";
 
 // Config
 import { universalConfig } from "@/config/dynamicConfig";
+import UniversalStaticSelect from "./UniversalStaticSelect";
 
 // =============================================================================
 // CONSTANTS & CONFIGURATION
@@ -202,93 +203,93 @@ const TextareaFieldRenderer = ({
   );
 };
 
-const StaticSelectRenderer = ({
-  fieldKey,
-  fieldConfig,
-  register,
-  errors,
-  isSubmitting,
-  watch,
-}) => {
-  const hasError = errors[fieldKey];
-  const errorClass = hasError
-    ? "border-red-500 focus:ring-red-500"
-    : "border-gray-300";
-  const currentValue = watch(fieldKey);
-  const options = fieldConfig.options || [];
+// const StaticSelectRenderer = ({
+//   fieldKey,
+//   fieldConfig,
+//   register,
+//   errors,
+//   isSubmitting,
+//   watch,
+// }) => {
+//   const hasError = errors[fieldKey];
+//   const errorClass = hasError
+//     ? "border-red-500 focus:ring-red-500"
+//     : "border-gray-300";
+//   const currentValue = watch(fieldKey);
+//   const options = fieldConfig.options || [];
 
-  const formatOptionLabel = (option) => {
-    if (fieldKey === "isActive") {
-      return option === "active" || option === true ? "Active" : "Inactive";
-    }
+//   const formatOptionLabel = (option) => {
+//     if (fieldKey === "isActive") {
+//       return option === "active" || option === true ? "Active" : "Inactive";
+//     }
 
-    if (typeof option === "string" && option.includes("_")) {
-      return option
-        .split("_")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-    }
+//     if (typeof option === "string" && option.includes("_")) {
+//       return option
+//         .split("_")
+//         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+//         .join(" ");
+//     }
 
-    return option.charAt(0).toUpperCase() + option.slice(1);
-  };
+//     return option.charAt(0).toUpperCase() + option.slice(1);
+//   };
 
-  return (
-    <div className="relative">
-      <select
-        disabled={isSubmitting}
-        className={`
-          flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm 
-          ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
-          disabled:cursor-not-allowed disabled:opacity-50 appearance-none transition-colors
-          ${errorClass}
-          ${
-            !currentValue || currentValue === ""
-              ? "text-gray-400"
-              : "text-gray-900"
-          }
-        `}
-        {...register(fieldKey, {
-          required: fieldConfig.required
-            ? `${fieldConfig.label} is required`
-            : false,
-          validate: (value) => {
-            if (fieldConfig.required && (!value || value === "")) {
-              return `${fieldConfig.label} is required`;
-            }
-            return true;
-          },
-        })}
-      >
-        <option value="" className="text-gray-400">
-          {fieldConfig.placeholder || `Select ${fieldConfig.label}`}
-        </option>
-        {options.map((option, index) => (
-          <option key={index} value={option} className="text-gray-900">
-            {formatOptionLabel(option)}
-          </option>
-        ))}
-      </select>
+//   return (
+//     <div className="relative">
+//       <select
+//         disabled={isSubmitting}
+//         className={`
+//           flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm 
+//           ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+//           disabled:cursor-not-allowed disabled:opacity-50 appearance-none transition-colors
+//           ${errorClass}
+//           ${
+//             !currentValue || currentValue === ""
+//               ? "text-gray-400"
+//               : "text-gray-900"
+//           }
+//         `}
+//         {...register(fieldKey, {
+//           required: fieldConfig.required
+//             ? `${fieldConfig.label} is required`
+//             : false,
+//           validate: (value) => {
+//             if (fieldConfig.required && (!value || value === "")) {
+//               return `${fieldConfig.label} is required`;
+//             }
+//             return true;
+//           },
+//         })}
+//       >
+//         <option value="" className="text-gray-400">
+//           {fieldConfig.placeholder || `Select ${fieldConfig.label}`}
+//         </option>
+//         {options.map((option, index) => (
+//           <option key={index} value={option} className="text-gray-900">
+//             {formatOptionLabel(option)}
+//           </option>
+//         ))}
+//       </select>
 
-      {/* Custom dropdown arrow */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 15 15"
-          fill="none"
-          className="h-4 w-4 opacity-50"
-        >
-          <path
-            d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z"
-            fill="currentColor"
-            fillRule="evenodd"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-};
+//       {/* Custom dropdown arrow */}
+//       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+//         <svg
+//           width="15"
+//           height="15"
+//           viewBox="0 0 15 15"
+//           fill="none"
+//           className="h-4 w-4 opacity-50"
+//         >
+//           <path
+//             d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z"
+//             fill="currentColor"
+//             fillRule="evenodd"
+//             clipRule="evenodd"
+//           />
+//         </svg>
+//       </div>
+//     </div>
+//   );
+// };
 
 // =============================================================================
 // MAIN COMPONENT
@@ -339,6 +340,8 @@ export default function UniversalForm({
       register,
       errors,
       isSubmitting,
+      control,
+      token
     };
 
     switch (fieldConfig.type) {
@@ -356,7 +359,7 @@ export default function UniversalForm({
             <RelationSelect {...commonProps} control={control} token={token} />
           );
         }
-        return <StaticSelectRenderer {...commonProps} watch={watch} />;
+        return <UniversalStaticSelect {...commonProps} watch={watch} />;
 
       case FIELD_TYPES.SELECT_MULTI:
         return (

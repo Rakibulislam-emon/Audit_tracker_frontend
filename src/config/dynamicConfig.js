@@ -1577,7 +1577,16 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Auditor might update status/dates
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "audit_manager", "auditor"],
     },
+    customActions: [
+      {
+        label: "Manage",
+        action: "viewDetails", // Permission-er shathe match korbe
+        type: "link", // ✅ Notun property: Eti ekta "command" na, eti ekta "link"
+        href: "/dashboard/admin/auditsessions/:id" // ✅ Notun property: Kothay jabe
+      }
+    ]
   },
 
   observations: {

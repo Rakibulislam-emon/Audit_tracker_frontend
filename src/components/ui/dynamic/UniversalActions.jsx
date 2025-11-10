@@ -1,6 +1,9 @@
 "use client";
 
-import { navItems } from "@/app/dashboard/constants/NavItems";
+import { Ban, Edit, Eye, MoreVertical, Play, Trash2 } from "lucide-react";
+import Link from "next/link";
+
+// Components
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,166 +12,320 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { Ban, Edit, MoreVertical, Play, Trash2 } from "lucide-react";
-import React from "react";
 
-// --- Icon Map ---
-// Config-er 'action' name-ke icon-er shathe map kore
-// Eti config-take simple JSON rakhe
-const actionIcons = {
-  start: <Play className="h-4 w-4" />,
-  cancel: <Ban className="h-4 w-4" />,
-  // Ekhane notun action add kora jabe
+// Stores
+import { useAuthStore } from "@/stores/useAuthStore";
+
+// =============================================================================
+// CONSTANTS & CONFIGURATION
+// =============================================================================
+
+const ACTION_ICONS = {
+  start: Play,
+  cancel: Ban,
+  viewDetails: Eye,
+  edit: Edit,
+  delete: Trash2,
 };
 
-const defaultIcon = <Play className="h-4 w-4" />; // Default fallback icon
+const DEFAULT_ICON = Play;
+
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
 
 /**
- * Renders all available actions (Edit, Delete, Custom) for a table row.
- * Ekhon 'moduleConfig' porey dynamically custom action render kore.
+ * Check if user has permission for a specific action
  */
-export default function UniversalActions({
+const hasPermission = (action, moduleConfig, userRole) => {
+  if (!action.action || !moduleConfig.permissions[action.action]) {
+    return true; // No specific permission required
+  }
+
+  return moduleConfig.permissions[action.action].includes(userRole);
+};
+
+/**
+ * Check if action should be shown based on conditions
+ */
+const shouldShowAction = (action, item) => {
+  if (!action.showWhen) return true;
+
+  const { field, value } = action.showWhen;
+  const fieldValue = item[field];
+
+  return fieldValue === value;
+};
+
+/**
+ * Get filtered custom actions based on permissions and conditions
+ */
+const getFilteredCustomActions = (moduleConfig, userRole, item) => {
+  if (!moduleConfig.customActions) return [];
+
+  return moduleConfig.customActions.filter(
+    (action) =>
+      hasPermission(action, moduleConfig, userRole) &&
+      shouldShowAction(action, item)
+  );
+};
+
+/**
+ * Get icon component for an action
+ */
+const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
+  const IconComponent = ACTION_ICONS[actionType] || DEFAULT_ICON;
+  return <IconComponent className={className} />;
+};
+
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * Individual action button for desktop view
+ */
+const DesktopActionButton = ({ action, item, onCustomAction }) => {
+  const icon = getActionIcon(action.action);
+
+  if (action.type === "link") {
+    const href = action.href.replace(":id", item._id);
+
+    return (
+      <Button asChild variant="outline" size="sm" key={action.action}>
+        <Link href={href}>
+          {icon}
+          {action.label}
+        </Link>
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      key={action.action}
+      variant="outline"
+      size="sm"
+      onClick={() => onCustomAction(action, item)}
+    >
+      {icon}
+      {action.label}
+    </Button>
+  );
+};
+
+/**
+ * Individual dropdown menu item for mobile view
+ */
+const MobileDropdownItem = ({ action, item, onCustomAction }) => {
+  const icon = getActionIcon(action.action);
+
+  if (action.type === "link") {
+    const href = action.href.replace(":id", item._id);
+
+    return (
+      <DropdownMenuItem asChild key={action.action}>
+        <Link href={href}>
+          {icon}
+          {action.label}
+        </Link>
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <DropdownMenuItem
+      key={action.action}
+      onClick={() => onCustomAction(action, item)}
+    >
+      {icon}
+      {action.label}
+    </DropdownMenuItem>
+  );
+};
+
+/**
+ * Standard edit button component
+ */
+const EditButton = ({ onEdit, item }) => (
+  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+    <Edit className="h-4 w-4 mr-2" />
+    Edit
+  </Button>
+);
+
+/**
+ * Standard delete button component
+ */
+const DeleteButton = ({ onDelete, item }) => (
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => onDelete(item)}
+    className="text-red-600 hover:bg-red-50"
+  >
+    <Trash2 className="h-4 w-4 mr-2" />
+    Delete
+  </Button>
+);
+
+/**
+ * Mobile dropdown menu trigger
+ */
+const MobileDropdownTrigger = () => (
+  <Button variant="ghost" size="sm">
+    <MoreVertical className="h-4 w-4" />
+  </Button>
+);
+
+// =============================================================================
+// MAIN COMPONENT SECTIONS
+// =============================================================================
+
+/**
+ * Desktop actions view - shows all buttons inline
+ */
+const DesktopActionsView = ({
+  canEdit,
+  canDelete,
+  customActions,
   item,
-  moduleConfig, // ✅ Prop grohon (receive) korche
   onEdit,
   onDelete,
-  onCustomAction, // ✅ Prop grohon (receive) korche
-}) {
-  const { user } = useAuthStore();
-  const userRole = user?.role; // e.g., 'admin' (String)
+  onCustomAction,
+}) => (
+  <div className="hidden md:flex items-center gap-2">
+    {/* Edit Button */}
+    {canEdit && <EditButton onEdit={onEdit} item={item} />}
 
-  // --- 1. Standard Permission Check ---
-  // ✅ Logic update kora hoyeche 'user.role' (string)-er jonno
+    {/* Custom Action Buttons */}
+    {customActions.map((action) => (
+      <DesktopActionButton
+        key={action.action}
+        action={action}
+        item={item}
+        onCustomAction={onCustomAction}
+      />
+    ))}
+
+    {/* Delete Button */}
+    {canDelete && <DeleteButton onDelete={onDelete} item={item} />}
+  </div>
+);
+
+/**
+ * Mobile actions view - shows dropdown menu
+ */
+const MobileActionsView = ({
+  canEdit,
+  canDelete,
+  customActions,
+  item,
+  onEdit,
+  onDelete,
+  onCustomAction,
+}) => (
+  <div className="md:hidden">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <MobileDropdownTrigger />
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end">
+        {/* Edit Option */}
+        {canEdit && (
+          <DropdownMenuItem onClick={() => onEdit(item)}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </DropdownMenuItem>
+        )}
+
+        {/* Custom Actions */}
+        {customActions.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            {customActions.map((action) => (
+              <MobileDropdownItem
+                key={action.action}
+                action={action}
+                item={item}
+                onCustomAction={onCustomAction}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Delete Option */}
+        {canDelete && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => onDelete(item)}
+              className="text-red-600"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+);
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+export default function UniversalActions({
+  item,
+  moduleConfig,
+  onEdit,
+  onDelete,
+  onCustomAction,
+}) {
+  // ===========================================================================
+  // HOOKS & PERMISSIONS
+  // ===========================================================================
+
+  const { user } = useAuthStore();
+  const userRole = user?.role;
+
+  // ===========================================================================
+  // PERMISSION CHECKS
+  // ===========================================================================
+
   const canEdit = moduleConfig.permissions.edit?.includes(userRole) ?? false;
   const canDelete =
     moduleConfig.permissions.delete?.includes(userRole) ?? false;
 
-  // --- 2. Custom Action-er List To-ri ---
-  const customActionsToRender =
-    moduleConfig.customActions
-      ?.map((action) => {
-        // 2a. Permission check
-        const hasPermission =
-          action.action && moduleConfig.permissions[action.action]
-            ? moduleConfig.permissions[action.action].includes(userRole)
-            : true; // Jodi permission set na thake, show koro
+  const customActions = getFilteredCustomActions(moduleConfig, userRole, item);
 
-        if (!hasPermission) return null;
-
-        // 2b. Condition check (e.g., shudhu "scheduled" holei "Start" button dekhabe)
-        if (action.showWhen) {
-          const { field, value } = action.showWhen;
-          const fieldValue = item[field]; // item theke status check
-
-          if (fieldValue !== value) {
-            return null; // Condition match koreni, button dekha-be na
-          }
-        }
-
-        return action; // Ei action-ta render kora jabe
-      })
-      .filter(Boolean) ?? []; // Shob null bad diye final list
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
 
   return (
     <>
-      {/* --- DESKTOP: Full Buttons --- */}
-      <div className="hidden md:flex items-center gap-2">
-        {/* Edit Button */}
-        {canEdit && (
-          <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-        )}
+      <DesktopActionsView
+        canEdit={canEdit}
+        canDelete={canDelete}
+        customActions={customActions}
+        item={item}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onCustomAction={onCustomAction}
+      />
 
-        {/* ✅ NOTUN: Custom Action Button Render */}
-        {customActionsToRender.map((action) => (
-
-          <Button
-            key={action.action}
-            variant="outline"
-            size="sm"
-            onClick={() => onCustomAction(action, item)} // Event pass kore parent-ke
-          >
-            {console.log(
-              "action and items ",action,item
-            )}
-            {React.cloneElement(actionIcons[action.action] || defaultIcon, {
-              className: "h-4 w-4 mr-2",
-            })}
-            {action.label}
-          </Button>
-        ))}
-
-        {/* Delete Button */}
-        {canDelete && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(item)}
-            className="text-red-600 hover:bg-red-50"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-        )}
-      </div>
-
-      {/* --- MOBILE: Dropdown Menu --- */}
-      <div className="md:hidden">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {/* Edit Item */}
-            {canEdit && (
-              <DropdownMenuItem onClick={() => onEdit(item)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-            )}
-
-            {/* ✅ NOTUN: Custom Action Menu Item Render */}
-            {customActionsToRender.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
-                {customActionsToRender.map((action) => (
-                  <DropdownMenuItem
-                    key={action.action}
-                    onClick={() => onCustomAction(action, item)}
-                  >
-                    {React.cloneElement(
-                      actionIcons[action.action] || defaultIcon,
-                      {
-                        className: "h-4 w-4 mr-2",
-                      }
-                    )}
-                    {action.label}
-                  </DropdownMenuItem>
-                ))}
-              </>
-            )}
-
-            {/* Delete Item */}
-            {canDelete && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => onDelete(item)}
-                  className="text-red-600"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <MobileActionsView
+        canEdit={canEdit}
+        canDelete={canDelete}
+        customActions={customActions}
+        item={item}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onCustomAction={onCustomAction}
+      />
     </>
   );
 }
