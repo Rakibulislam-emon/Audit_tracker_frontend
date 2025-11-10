@@ -309,3 +309,46 @@ export const useCustomAction = (
     },
   });
 };
+
+
+/**
+ * HOOK 1.5: Universal Data Fetcher (Single Item)
+ *
+ * @param {string} token - JWT auth token
+ * @param {string} endpoint - Raw API endpoint
+ * @param {string} id - The _id of the item to fetch
+ * @returns {object} - {data, isLoading, error, refetch}
+ */
+export const useGetByIdUniversal = (token, endpoint, id) => {
+  return useQuery({
+    // Cache key-te oboshshoi ID thakte hobe
+    queryKey: [endpoint, id],
+    // 'id' thaklei shudhu function-ta cholbe
+    queryFn: () => universalService.getById(token, endpoint, id),
+    enabled: !!token && !!id, // Must have token AND id
+    staleTime: 5 * 60 * 1000,
+    retry: (failureCount, error) => {
+      if (error?.message?.includes("40")) return false; // Don't retry 404s
+      return failureCount < 3;
+    },
+  });
+};
+
+
+
+/**
+ * HOOK 5.5: Module-Based Data Fetcher (Single Item) (RECOMMENDED)
+ *
+ * @param {string} module - Module name from config: "users", "auditSessions"
+ * @param {string} token - JWT token
+ * @param {string} id - The _id of the item to fetch
+ * @returns {object} - {data, isLoading, error, refetch}
+ */
+export const useModuleDataById = (module, token, id) => {
+  const config = universalConfig[module];
+  if (!config) {
+    throw new Error(`Module configuration not found: ${module}`);
+  }
+  // Amader notun core hook-take call kore
+  return useGetByIdUniversal(token, config.endpoint, id);
+};
