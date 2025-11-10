@@ -1573,7 +1573,7 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin", "audit_manager"],
+      // create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Auditor might update status/dates
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "audit_manager", "auditor"],
