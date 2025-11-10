@@ -84,7 +84,7 @@ const SelectedItemsDisplay = ({ selectedOptions, onRemove, onClearAll }) => {
   return (
     <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-md border">
       {selectedOptions.map((option) => (
-        <SelectedTag key={option._id} option={option} onRemove={onRemove} />
+        <SelectedTag key={option?._id} option={option} onRemove={onRemove} />
       ))}
       <ClearAllButton onClearAll={onClearAll} />
     </div>
