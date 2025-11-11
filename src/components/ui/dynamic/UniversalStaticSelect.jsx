@@ -98,11 +98,11 @@ const SelectContentWithOptions = ({
     className={`z-[${SELECT_CONFIG.zIndex}]`}
   >
     {/* Optional placeholder option for non-required fields */}
-    {!hasRequiredOption && (
+    {/* {!hasRequiredOption && (
       <SelectItem value="" className="text-gray-400">
         {getPlaceholderText(fieldConfig)}
       </SelectItem>
-    )}
+    )} */}
 
     {/* Main options list */}
     {options.map((option, index) => (

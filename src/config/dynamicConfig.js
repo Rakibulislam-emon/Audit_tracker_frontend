@@ -1398,15 +1398,15 @@ export const universalConfig = {
     description: "Manage ongoing and completed audit sessions",
     hasCustomActions: true, // To enable custom actions like "Start Audit", "Complete Audit"
     fields: {
-      // title: {
-      //   // Optional title
-      //   type: "text",
-      //   label: "Session Title (Optional)",
-      //   placeholder: "Enter optional title",
-      //   required: false,
-      //   tableColumn: true,
-      //   filterable: true,
-      // },
+      title: {
+        // Optional title
+        type: "text",
+        label: "Session Title (Optional)",
+        placeholder: "Enter optional title",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+      },
       schedule: {
         type: "select",
         label: "Schedule",
@@ -1903,6 +1903,8 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
     },
   },
+
+
   problems: {
     endpoint: "problems",
     title: "Problem Management",
@@ -1934,7 +1936,7 @@ export const universalConfig = {
         relation: "observations",
         tableColumn: true,
         filterable: true,
-        dataAccessor: "observation._id", // Show Obs ID or maybe severity?
+        dataAccessor: "observation.response", // Show Obs ID or maybe severity?
         placeholder: "Link Observation",
         formField: true, // Allow linking on create/edit
       },

@@ -243,6 +243,9 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
 
     case "sites":
       return item.name;
+ 
+
+      
 
     default:
       return item.name || item.title || "Unknown";

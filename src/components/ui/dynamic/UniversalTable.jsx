@@ -288,6 +288,7 @@ export default function UniversalTable({
     ...options,
   });
 
+  console.log("[UniversalTable] data:", data);
   // Handle empty state
   if (!data || data.length === 0) {
     return <EmptyState module={module} />;
