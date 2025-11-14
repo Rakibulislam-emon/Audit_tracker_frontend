@@ -22,7 +22,8 @@ export default function ObservationManager({ session, onProblemCreated }) {
     isLoading: isLoadingQuestions,
     error: questionsError,
   } = useModuleData("questions", token, {
-    template: session.template?._id, // Template ID diye filter kori
+    template: session.template?._id, 
+    site: session.site?._id, // Add site filter based on session's site
     limit: 1000, // Shob proshno ani
   });
 

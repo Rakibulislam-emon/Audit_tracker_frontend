@@ -224,7 +224,9 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
 };
 
 const getRelationDisplayValue = (item, relationModule, fieldKey) => {
+  console.log('item:', item)
   switch (relationModule) {
+
     case "users":
       if (
         fieldKey === "createdBy" ||
@@ -243,9 +245,11 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
 
     case "sites":
       return item.name;
- 
 
-      
+    
+    case "observations":
+      return `Obs#${item._id} - ${item.severity || "No Severity"}`;
+      // return item.response
 
     default:
       return item.name || item.title || "Unknown";
@@ -288,6 +292,7 @@ export const generateUniversalColumns = (module) => {
           // Handle relation fields
           if (fieldConfig.relation && value) {
             const items = Array.isArray(value) ? value : [value];
+            
 
             if (items.length > 0 && items[0] !== null) {
               return (
