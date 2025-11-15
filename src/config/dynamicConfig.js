@@ -1398,15 +1398,15 @@ export const universalConfig = {
     description: "Manage ongoing and completed audit sessions",
     hasCustomActions: true, // To enable custom actions like "Start Audit", "Complete Audit"
     fields: {
-      // title: {
-      //   // Optional title
-      //   type: "text",
-      //   label: "Session Title (Optional)",
-      //   placeholder: "Enter optional title",
-      //   required: false,
-      //   tableColumn: true,
-      //   filterable: true,
-      // },
+      title: {
+        // Optional title
+        type: "text",
+        label: "Session Title (Optional)",
+        placeholder: "Enter optional title",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+      },
       schedule: {
         type: "select",
         label: "Schedule",
@@ -1611,7 +1611,7 @@ export const universalConfig = {
         label: "Related Question (Optional)",
         required: false,
         relation: "questions",
-        tableColumn: true,
+        tableColumn: false,
         filterable: true,
         dataAccessor: "question.questionText", // Show question text
         placeholder: "Select Related Question",
@@ -1665,7 +1665,7 @@ export const universalConfig = {
         label: "Linked Problem",
         required: false,
         relation: "problems", // Needs problems module
-        tableColumn: true,
+        tableColumn: false,
         filterable: true, // Filter by linked problem?
         dataAccessor: "problem.problemId", // Show problem ID or title
         formField: false, // Usually linked via workflow, not direct edit
@@ -1903,6 +1903,8 @@ export const universalConfig = {
       view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
     },
   },
+
+
   problems: {
     endpoint: "problems",
     title: "Problem Management",
@@ -1928,14 +1930,17 @@ export const universalConfig = {
       },
       observation: {
         // Optional link
-        type: "select",
-        label: "Originating Observation (Optional)",
+        type: "number",
+        label: " Observation Severity",
         required: false,
         relation: "observations",
         tableColumn: true,
         filterable: true,
-        dataAccessor: "observation._id", // Show Obs ID or maybe severity?
-        placeholder: "Link Observation",
+       dataAccessor: (item) => {
+          if (!item.observation) return "N/A (Manual)";
+          return `${item.observation.response} (Severity: ${item.observation.severity})`;
+        },
+        placeholder: "Enter Observation Severity",
         formField: true, // Allow linking on create/edit
       },
       question: {
@@ -1996,14 +2001,14 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true,
       },
-      methodology: {
-        type: "textarea",
-        label: "Methodology (Optional)",
-        required: false,
-        tableColumn: false,
-        filterable: false, // Hide from table maybe?
-        placeholder: "How was this identified?",
-      },
+      // methodology: {
+      //   type: "textarea",
+      //   label: "Methodology (Optional)",
+      //   required: false,
+      //   tableColumn: false,
+      //   filterable: false, // Hide from table maybe?
+      //   placeholder: "How was this identified?",
+      // },
       fixActions: {
         // TODO: Needs multi-select/tag component for Form
         type: "text", // Placeholder type for table display
@@ -2117,7 +2122,7 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin", "audit_manager", "auditor"],
+      // create: ["admin", "sysadmin", "audit_manager", "auditor"],
       edit: ["admin", "sysadmin", "audit_manager"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
       view: [

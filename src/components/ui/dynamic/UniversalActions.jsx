@@ -172,11 +172,11 @@ const DeleteButton = ({ onDelete, item }) => (
 /**
  * Mobile dropdown menu trigger
  */
-const MobileDropdownTrigger = () => (
-  <Button variant="ghost" size="sm">
-    <MoreVertical className="h-4 w-4" />
-  </Button>
-);
+// const MobileDropdownTrigger = () => (
+//   <Button variant="ghost" size="sm">
+//     <MoreVertical className="h-4 w-4" />
+//   </Button>
+// );
 
 // =============================================================================
 // MAIN COMPONENT SECTIONS
@@ -228,7 +228,10 @@ const MobileActionsView = ({
   <div className="md:hidden">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <MobileDropdownTrigger />
+        {/* <MobileDropdownTrigger /> */}
+        <Button variant="ghost" size="sm">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">

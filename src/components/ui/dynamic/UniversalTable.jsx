@@ -157,8 +157,8 @@ const TableRow = ({
   getRowCondition,
 }) => (
   <tr
-    className={`
-      border-l-4 transition-colors duration-150
+    className={` 
+      border-l-4 transition-colors duration-150 
       ${getPriorityBorder(row.original, getPriorityLevel)}
       ${getRowBackground(row.original, getRowCondition)}
     `}
@@ -288,6 +288,7 @@ export default function UniversalTable({
     ...options,
   });
 
+  console.log("[UniversalTable] data:", data);
   // Handle empty state
   if (!data || data.length === 0) {
     return <EmptyState module={module} />;
@@ -308,7 +309,7 @@ export default function UniversalTable({
         {/* Desktop View (1024px+) */}
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-200 ">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableHeader
                   key={headerGroup.id}
