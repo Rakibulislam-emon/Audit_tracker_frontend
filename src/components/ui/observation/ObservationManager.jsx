@@ -12,7 +12,7 @@ import ObservationCard from "./ObservationCard";
  * 2. Ei Session-er shob saved Observation load kore.
  * 3. Dui-ta-ke merge kore ekta list dekhay.
  */
-export default function ObservationManager({ session }) {
+export default function ObservationManager({ session, onProblemCreated }) {
   const { token } = useAuthStore();
 
   // --- 1. Shob Proshno (Questions) Load Kori ---
@@ -22,7 +22,8 @@ export default function ObservationManager({ session }) {
     isLoading: isLoadingQuestions,
     error: questionsError,
   } = useModuleData("questions", token, {
-    template: session.template?._id, // Template ID diye filter kori
+    template: session.template?._id, 
+    site: session.site?._id, // Add site filter based on session's site
     limit: 1000, // Shob proshno ani
   });
 
@@ -96,8 +97,20 @@ export default function ObservationManager({ session }) {
             // Jokhon-i kono card save hobe, amra shob observation abar load korbo
             refetchObservations();
           }}
+          onProblemCreated={onProblemCreated} // Parent theke function pass kori
         />
       ))}
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
