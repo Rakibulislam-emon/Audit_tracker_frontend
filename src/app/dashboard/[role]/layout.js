@@ -48,7 +48,7 @@ export default function RoleLayout({ children }) {
 
   return (
     // default bg gray-50
-    <div className="flex min-h-screen bg-gray-500">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar - Fixed positioning */}
       <div
         className={`fixed bg-gray-500 inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
