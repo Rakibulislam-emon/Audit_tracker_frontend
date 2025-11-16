@@ -230,7 +230,8 @@ export default function AuditSessionDetailsPage() {
           >
             Observations
           </TabsTrigger>
-       
+          <TabsTrigger value={TAB_VALUES.PROBLEMS}>Problems</TabsTrigger>{" "}
+        
         </TabsList>
         {/* Tab Contents */}
         <TeamTabContent sessionId={session._id} />
