@@ -1232,15 +1232,15 @@ export const universalConfig = {
         fullWidth: true,
       },
       // ✅ NEW FIELD - Handling the Array
-      assignedAuditors: {
-        type: "select-multi", // ❗ This is also a multi-select
-        label: "Assigned Auditors",
-        required: false, // Per your schema
-        relation: "users", // Loads options from 'users' module
+      assignedUser: {
+        type: "select",
+        label: "Assigned Auditor",
+        required: false,
+        relation: "users",
         tableColumn: true,
         filterable: true,
-        dataAccessor: "assignedAuditors",
-        placeholder: "Select Auditor(s)",
+        dataAccessor: "assignedUser.name", // ✅ CORRECT
+        placeholder: "Select Auditor",
         fullWidth: true,
       },
       startDate: {
@@ -1336,11 +1336,11 @@ export const universalConfig = {
         relation: "sites",
       },
       // ✅ NEW FILTER
-      auditor: {
-        type: "select", // Filter by ONE auditor
+    auditor: {
+        type: "select", 
         label: "Auditor",
         placeholder: "Filter by Auditor",
-        apiParam: "auditor", // Matches req.query.auditor in controller
+        apiParam: "assignedUser", // ✅ CORRECT - matches backend query
         relation: "users",
       },
       // ✅ NEW FILTER
@@ -1584,9 +1584,9 @@ export const universalConfig = {
         label: "Manage",
         action: "viewDetails", // Permission-er shathe match korbe
         type: "link", // ✅ Notun property: Eti ekta "command" na, eti ekta "link"
-        href: "/dashboard/admin/auditsessions/:id" // ✅ Notun property: Kothay jabe
-      }
-    ]
+        href: "/dashboard/admin/auditsessions/:id", // ✅ Notun property: Kothay jabe
+      },
+    ],
   },
 
   observations: {
@@ -1781,7 +1781,7 @@ export const universalConfig = {
     // UI Configuration
     title: "Team Assignments", // More descriptive title
     description: "Manage user assignments and roles within audit sessions",
-
+//  hasCustomCreate: true,
     // FIELD DEFINITIONS - Based on Team.js model
     fields: {
       auditSession: {
@@ -1904,7 +1904,6 @@ export const universalConfig = {
     },
   },
 
-
   problems: {
     endpoint: "problems",
     title: "Problem Management",
@@ -1936,7 +1935,7 @@ export const universalConfig = {
         relation: "observations",
         tableColumn: true,
         filterable: true,
-       dataAccessor: (item) => {
+        dataAccessor: (item) => {
           if (!item.observation) return "N/A (Manual)";
           return `${item.observation.response} (Severity: ${item.observation.severity})`;
         },
