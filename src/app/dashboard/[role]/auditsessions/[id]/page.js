@@ -230,7 +230,7 @@ export default function AuditSessionDetailsPage() {
           >
             Observations
           </TabsTrigger>
-          <TabsTrigger value={TAB_VALUES.PROBLEMS}>Problems</TabsTrigger>{" "}
+          <TabsTrigger className={"cursor-pointer"} value={TAB_VALUES.PROBLEMS}>Problems</TabsTrigger>{" "}
         
         </TabsList>
         {/* Tab Contents */}

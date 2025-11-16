@@ -1781,7 +1781,7 @@ export const universalConfig = {
     // UI Configuration
     title: "Team Assignments", // More descriptive title
     description: "Manage user assignments and roles within audit sessions",
-
+//  hasCustomCreate: true,
     // FIELD DEFINITIONS - Based on Team.js model
     fields: {
       auditSession: {
