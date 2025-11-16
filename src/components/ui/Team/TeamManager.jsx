@@ -1,22 +1,23 @@
 "use client";
 
-import * as React from "react";
-import { useForm } from "react-hook-form";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { AlertCircle, Loader2, Trash2, UserPlus } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Loader2, Trash2, UserPlus, AlertCircle } from "lucide-react";
 
 // Components
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import RelationSelect from "../dynamic/UniversalRelationSelect";
 import UniversalStaticSelect from "../dynamic/UniversalStaticSelect";
 
 // Hooks & Config
 import { universalConfig } from "@/config/dynamicConfig";
 import {
-  useModuleData,
   useCreateModule,
   useDeleteModule,
+  useModuleData,
 } from "@/hooks/useUniversal";
 
 // =============================================================================
@@ -33,16 +34,10 @@ const DEFAULT_FORM_VALUES = {
 // HELPER FUNCTIONS
 // =============================================================================
 
-/**
- * Checks if user is already in the team
- */
 const isUserAlreadyInTeam = (currentTeam, userId) => {
   return currentTeam.some((member) => member.user?._id === userId);
 };
 
-/**
- * Shows confirmation toast for removal
- */
 const showRemoveConfirmation = (onConfirm) => {
   toast.warning("Are you sure you want to remove this member?", {
     action: {
@@ -59,135 +54,142 @@ const showRemoveConfirmation = (onConfirm) => {
 // SUB-COMPONENTS
 // =============================================================================
 
-/**
- * Loading state for team list
- */
 const TeamLoadingState = () => (
-  <div className="p-4 text-center text-gray-500">
-    <Loader2 className="h-4 w-4 animate-spin inline-block mr-2" />
-    Loading team members...
+  <div className="flex items-center justify-center p-8 text-muted-foreground">
+    <Loader2 className="h-5 w-5 animate-spin mr-3" />
+    <span className="text-sm">Loading team members...</span>
   </div>
 );
 
-/**
- * Empty state for team list
- */
 const TeamEmptyState = () => (
-  <div className="p-4 text-center text-gray-500">
-    <AlertCircle className="h-4 w-4 inline-block mr-2" />
-    No team members assigned yet.
+  <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
+    <AlertCircle className="h-8 w-8 mb-2" />
+    <p className="text-sm font-medium">No team members assigned</p>
+    <p className="text-xs mt-1">Add team members to get started</p>
   </div>
 );
 
-/**
- * Individual team member row
- */
 const TeamMemberRow = ({ teamMember, onRemove, isDeleting }) => (
-  <div className="flex items-center justify-between p-4 hover:bg-gray-50">
-    <div>
-      <div className="font-medium">{teamMember.user?.name}</div>
-      <div className="text-sm text-gray-500">
-        {teamMember.user?.email}
+  <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">
+            {teamMember.user?.name}
+          </p>
+          <p className="text-xs text-muted-foreground truncate">
+            {teamMember.user?.email}
+          </p>
+        </div>
       </div>
     </div>
-    <div className="flex items-center gap-4">
-      <span className="text-sm font-medium bg-gray-100 px-2 py-1 rounded">
+    <div className="flex items-center gap-3">
+      <Badge variant="secondary" className="text-xs font-medium">
         {teamMember.roleInTeam}
-      </span>
+      </Badge>
       <Button
         variant="outline"
         size="icon"
         onClick={() => onRemove(teamMember._id)}
         disabled={isDeleting}
-        className="text-red-500 hover:text-red-600"
+        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
       >
-        <Trash2 className="h-4 w-4" />
+        {isDeleting ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Trash2 className="h-3 w-3" />
+        )}
       </Button>
     </div>
   </div>
 );
 
-/**
- * Add member form component
- */
-const AddMemberForm = ({ 
-  control, 
-  errors, 
-  isCreating, 
-  onSubmit, 
-  token 
-}) => {
+const AddMemberForm = ({ control, errors, isCreating, onSubmit, token }) => {
   const userFieldConfig = universalConfig.teams.fields.user;
   const roleFieldConfig = universalConfig.teams.fields.roleInTeam;
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg bg-white"
-    >
-      {/* User Select ComboBox */}
-      <div className="md:col-span-1">
-        <RelationSelect
-          fieldKey="user"
-          fieldConfig={userFieldConfig}
-          control={control}
-          token={token}
-          errors={errors}
-          isSubmitting={isCreating}
-        />
-      </div>
-
-      {/* Role Select Dropdown */}
-      <div className="md:col-span-1">
-        <UniversalStaticSelect
-          fieldKey="roleInTeam"
-          fieldConfig={roleFieldConfig}
-          control={control}
-          errors={errors}
-          isSubmitting={isCreating}
-        />
-      </div>
-
-      {/* Add Button */}
-      <div className="md:col-span-1">
-        <Button type="submit" disabled={isCreating} className="w-full">
-          {isCreating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <UserPlus className="h-4 w-4 mr-2" />
-          )}
-          Add Member
-        </Button>
-      </div>
-    </form>
+    <Card>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg font-semibold">Add Team Member</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <RelationSelect
+                fieldKey="user"
+                fieldConfig={userFieldConfig}
+                control={control}
+                token={token}
+                errors={errors}
+                isSubmitting={isCreating}
+              />
+            </div>
+            <div>
+              <UniversalStaticSelect
+                fieldKey="roleInTeam"
+                fieldConfig={roleFieldConfig}
+                control={control}
+                errors={errors}
+                isSubmitting={isCreating}
+              />
+            </div>
+          </div>
+          <Button
+            type="submit"
+            disabled={isCreating}
+            className="w-full md:w-auto"
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Add Team Member
+              </>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
-/**
- * Team members list component
- */
-const TeamMembersList = ({ 
-  currentTeam, 
-  isLoadingTeam, 
-  onRemoveMember, 
-  isDeleting 
+const TeamMembersList = ({
+  currentTeam,
+  isLoadingTeam,
+  onRemoveMember,
+  isDeleting,
 }) => (
-  <div className="border rounded-lg bg-white overflow-hidden">
-    <div className="divide-y">
+  <Card>
+    <CardHeader className="pb-4">
+      <CardTitle className="text-lg font-semibold">
+        Team Members ({currentTeam.length})
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="p-0">
       {isLoadingTeam && <TeamLoadingState />}
-      
+
       {!isLoadingTeam && currentTeam.length === 0 && <TeamEmptyState />}
-      
-      {currentTeam.map((teamMember) => (
-        <TeamMemberRow
-          key={teamMember._id}
-          teamMember={teamMember}
-          onRemove={onRemoveMember}
-          isDeleting={isDeleting}
-        />
-      ))}
-    </div>
-  </div>
+
+      {!isLoadingTeam && currentTeam.length > 0 && (
+        <div className="divide-y">
+          {currentTeam.map((teamMember) => (
+            <TeamMemberRow
+              key={teamMember._id}
+              teamMember={teamMember}
+              onRemove={onRemoveMember}
+              isDeleting={isDeleting}
+            />
+          ))}
+        </div>
+      )}
+    </CardContent>
+  </Card>
 );
 
 // =============================================================================
@@ -198,9 +200,9 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
   // HOOKS & STATE
   // ===========================================================================
-  
+
   const { token } = useAuthStore();
-  
+
   const {
     control,
     handleSubmit,
@@ -213,7 +215,7 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
   // DATA FETCHING
   // ===========================================================================
-  
+
   const {
     data: teamData,
     isLoading: isLoadingTeam,
@@ -227,12 +229,12 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
   // MUTATIONS
   // ===========================================================================
-  
+
   const { mutate: createTeamMember, isPending: isCreating } = useCreateModule(
     MODULE_NAME,
     token
   );
-  
+
   const { mutate: deleteTeamMember, isPending: isDeleting } = useDeleteModule(
     MODULE_NAME,
     token
@@ -241,7 +243,7 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
   // EVENT HANDLERS
   // ===========================================================================
-  
+
   const handleAddMember = (formData) => {
     if (isUserAlreadyInTeam(currentTeam, formData.user)) {
       toast.error("This user is already in the team.");
@@ -255,7 +257,7 @@ export default function TeamManager({ auditSessionId }) {
       },
       {
         onSuccess: () => {
-          toast.success("Team member added!");
+          toast.success("Team member added successfully");
           refetch();
           reset();
         },
@@ -268,7 +270,7 @@ export default function TeamManager({ auditSessionId }) {
     showRemoveConfirmation(() => {
       deleteTeamMember(teamDocumentId, {
         onSuccess: () => {
-          toast.success("Team member removed!");
+          toast.success("Team member removed successfully");
           refetch();
         },
         onError: (error) => toast.error(error.message),
@@ -279,7 +281,7 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
   // RENDER
   // ===========================================================================
-  
+
   return (
     <div className="space-y-6">
       {/* Add Member Form */}
