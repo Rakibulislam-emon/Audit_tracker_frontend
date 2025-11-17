@@ -16,7 +16,6 @@ export const uploadProofApi = async (formData, token) => {
   console.log("📤 Uploading Proof data:", Object.fromEntries(formData)); // Log form data (excluding file content)
   const url = `${baseUrl}/${endpoint}`;
   console.log(`🌐 API Call: POST ${url}`);
-
   try {
     const response = await fetch(url, {
       method: "POST",
