@@ -38,7 +38,94 @@ const FULL_WIDTH_FIELD_TYPES = [FIELD_TYPES.TEXTAREA, FIELD_TYPES.SELECT_MULTI];
 // =============================================================================
 // HELPER COMPONENTS
 // =============================================================================
+// =============================================================================
+// DATA NORMALIZATION FUNCTIONS
+// =============================================================================
 
+/**
+ * Normalizes API data for form usage
+ * Extracts IDs from relation objects and handles nested fields
+ */
+// =============================================================================
+// DATA NORMALIZATION FUNCTIONS - ✅ IMPROVED VERSION
+// =============================================================================
+
+/**
+ * Normalizes API data for form usage
+ * Extracts IDs from relation objects - handles nested objects
+ */
+const normalizeFormData = (data, config) => {
+  if (!data || typeof data !== "object") return {};
+
+  const normalized = JSON.parse(JSON.stringify(data)); // Deep clone to avoid mutations
+
+  console.log("🔍 Starting data normalization:", { rawData: data });
+
+  Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
+    const currentValue = normalized[fieldKey];
+
+    // Skip if no value or not a relation field
+    if (!currentValue || !fieldConfig.relation) return;
+
+    // Handle object values for relation fields
+    if (typeof currentValue === "object" && currentValue !== null) {
+      console.log(`🔍 Processing ${fieldKey}:`, {
+        type: typeof currentValue,
+        value: currentValue,
+        hasId: !!currentValue._id,
+      });
+
+      // Extract ID from relation object
+      if (currentValue._id) {
+        normalized[fieldKey] = currentValue._id;
+        console.log(`✅ Normalized ${fieldKey}: ${currentValue._id}`);
+      } else {
+        // If no _id but it's an object, keep it as is (might be a nested structure)
+        console.log(`⚠️ ${fieldKey} is object but no _id found:`, currentValue);
+      }
+    }
+  });
+
+  console.log("🔍 Final normalized data:", normalized);
+  return normalized;
+};
+
+/**
+ * Prepares form data for API submission
+ * Ensures only necessary fields are sent
+ */
+const prepareSubmissionData = (data, config, mode) => {
+  const submissionData = { ...data };
+
+  Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
+    // Remove fields that shouldn't be submitted in edit mode
+    if (mode === "edit" && fieldConfig.formField === false) {
+      delete submissionData[fieldKey];
+    }
+
+    // Remove read-only fields
+    if (fieldConfig.readOnly) {
+      delete submissionData[fieldKey];
+    }
+
+    // Handle nested field submission
+    if (fieldKey.includes(".")) {
+      const parts = fieldKey.split(".");
+      const parentKey = parts[0];
+      const childKey = parts[1];
+
+      if (!submissionData[parentKey]) {
+        submissionData[parentKey] = {};
+      }
+
+      // Move the value to the nested structure
+      submissionData[parentKey][childKey] = submissionData[fieldKey];
+      delete submissionData[fieldKey];
+    }
+  });
+
+  return submissionData;
+};
 const ErrorDisplay = ({ error }) => (
   <div className="flex items-start gap-1.5 text-red-600 text-sm mt-1">
     <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -238,8 +325,8 @@ const TextareaFieldRenderer = ({
 //       <select
 //         disabled={isSubmitting}
 //         className={`
-//           flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm 
-//           ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+//           flex h-10 w-full items-center justify-between rounded-md border bg-white px-3 py-2 text-sm
+//           ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
 //           disabled:cursor-not-allowed disabled:opacity-50 appearance-none transition-colors
 //           ${errorClass}
 //           ${
@@ -308,6 +395,23 @@ export default function UniversalForm({
   // ===========================================================================
 
   const config = universalConfig[module];
+
+  // Normalize initial data to extract IDs from objects
+  const normalizedInitialData = normalizeFormData(initialData, config);
+
+  console.log("🔍 UniversalForm Debug:", {
+    rawInitialData: initialData,
+    normalizedInitialData,
+    entityId: {
+      raw: initialData?.entityId,
+      normalized: normalizedInitialData?.entityId,
+    },
+    approver: {
+      raw: initialData?.approver,
+      normalized: normalizedInitialData?.approver,
+    },
+  });
+
   const {
     register,
     handleSubmit,
@@ -315,7 +419,7 @@ export default function UniversalForm({
     control,
     formState: { errors, isDirty },
   } = useForm({
-    defaultValues: initialData,
+    defaultValues: normalizedInitialData,
   });
 
   // ===========================================================================
@@ -341,7 +445,7 @@ export default function UniversalForm({
       errors,
       isSubmitting,
       control,
-      token
+      token,
     };
 
     switch (fieldConfig.type) {

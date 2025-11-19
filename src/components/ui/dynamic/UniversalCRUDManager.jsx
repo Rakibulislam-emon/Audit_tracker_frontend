@@ -349,7 +349,7 @@ export default function UniversalCRUDManager({
 
       {/* Filter and Action Section */}
       {isAvailable && (
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 ">
           {/* Filters */}
           {hasFilters && (
             <div className="w-full flex-grow max-w-7xl">
