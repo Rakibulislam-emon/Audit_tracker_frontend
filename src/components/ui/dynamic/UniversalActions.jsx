@@ -1,10 +1,21 @@
+// components/ui/dynamic/UniversalActions.jsx
 "use client";
 
-import { Ban, Edit, Eye, MoreVertical, Play, Trash2 } from "lucide-react";
+import { CheckCircle, Edit, MoreVertical, Trash2, XCircle } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 
 // Components
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,57 +23,214 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
+import { RequirementsButton } from "../approvals/RequirementsButton";
 
 // Stores
 import { useAuthStore } from "@/stores/useAuthStore";
 
+// Services
+import { approvalService } from "@/services/approvalService";
+import { useQueryClient } from "@tanstack/react-query";
+
 // =============================================================================
-// CONSTANTS & CONFIGURATION
+// SIMPLE APPROVAL ACTIONS
 // =============================================================================
 
-const ACTION_ICONS = {
-  start: Play,
-  cancel: Ban,
-  viewDetails: Eye,
-  edit: Edit,
-  delete: Trash2,
+const SimpleApprovalActions = ({ approval }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [actionType, setActionType] = useState(null);
+  const { token, user } = useAuthStore();
+  const queryClient = useQueryClient(); // ✅ ADD THIS
+
+  const isAssignedApprover =
+    user?._id === approval.approver?._id || user?.id === approval.approver?._id;
+  const requirements = approval.requirements || [];
+  const unmetRequirements = requirements.filter((req) => !req.completed);
+  const canApprove = unmetRequirements.length === 0;
+
+  // Show status if not assigned approver or already decided
+  if (!isAssignedApprover || approval.approvalStatus !== "pending") {
+    return (
+      <span
+        className={`px-2 py-1 rounded text-xs font-medium ${
+          approval.approvalStatus === "approved"
+            ? "bg-green-100 text-green-800"
+            : approval.approvalStatus === "rejected"
+            ? "bg-red-100 text-red-800"
+            : "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {approval.approvalStatus}
+      </span>
+    );
+  }
+
+  const handleAction = (type) => {
+    if (type === "approve" && !canApprove) {
+      toast.error("Complete all requirements first");
+      return;
+    }
+    setActionType(type);
+    setShowDialog(true);
+  };
+
+  const handleSubmit = async (comments = "") => {
+    if (actionType === "reject" && !comments.trim()) {
+      toast.error("Comments required for rejection");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result =
+        actionType === "approve"
+          ? await approvalService.approve(approval._id, comments, token)
+          : await approvalService.reject(approval._id, comments, token);
+
+      toast.success(
+        `${actionType === "approve" ? "Approved" : "Rejected"} successfully`
+      );
+
+      queryClient.invalidateQueries({ queryKey: ["approvals"] });
+      setShowDialog(false);
+    } catch (error) {
+      toast.error(`Failed to ${actionType}: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+      setShowDialog(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        {/* Requirements Button */}
+        {requirements.length > 0 && <RequirementsButton approval={approval} />}
+
+        {/* Approve Button */}
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
+          onClick={() => handleAction("approve")}
+          disabled={isLoading || !canApprove}
+          title={
+            !canApprove
+              ? "Complete all requirements first"
+              : "Approve this request"
+          }
+        >
+          <CheckCircle className="h-4 w-4 mr-1" />
+          Approve
+        </Button>
+
+        {/* Reject Button */}
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+          onClick={() => handleAction("reject")}
+          disabled={isLoading}
+        >
+          <XCircle className="h-4 w-4 mr-1" />
+          Reject
+        </Button>
+      </div>
+
+      {/* Comments Dialog */}
+      <Dialog open={showDialog} onOpenChange={() => setShowDialog(false)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === "approve" ? "Approve" : "Reject"} Request
+            </DialogTitle>
+            <DialogDescription>
+              {actionType === "approve"
+                ? "Optional comments"
+                : "Required comments for rejection"}
+            </DialogDescription>
+          </DialogHeader>
+
+          <CommentsForm
+            actionType={actionType}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
 
-const DEFAULT_ICON = Play;
+const CommentsForm = ({ actionType, onSubmit, isLoading }) => {
+  const [comments, setComments] = useState("");
+
+  const handleSubmit = () => {
+    onSubmit(comments);
+    setComments("");
+  };
+
+  return (
+    <>
+      <div className="py-4">
+        <Textarea
+          placeholder={
+            actionType === "approve"
+              ? "Optional comments..."
+              : "Reason for rejection..."
+          }
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          className="min-h-[80px]"
+        />
+      </div>
+
+      <DialogFooter>
+        <Button
+          variant="outline"
+          onClick={() => setShowDialog(false)}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading || (actionType === "reject" && !comments.trim())}
+          className={
+            actionType === "approve"
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-red-600 hover:bg-red-700"
+          }
+        >
+          {isLoading ? "Processing..." : actionType}
+        </Button>
+      </DialogFooter>
+    </>
+  );
+};
 
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
-/**
- * Check if user has permission for a specific action
- */
 const hasPermission = (action, moduleConfig, userRole) => {
   if (!action.action || !moduleConfig.permissions[action.action]) {
-    return true; // No specific permission required
+    return true;
   }
-
   return moduleConfig.permissions[action.action].includes(userRole);
 };
 
-/**
- * Check if action should be shown based on conditions
- */
 const shouldShowAction = (action, item) => {
   if (!action.showWhen) return true;
-
   const { field, value } = action.showWhen;
   const fieldValue = item[field];
-
   return fieldValue === value;
 };
 
-/**
- * Get filtered custom actions based on permissions and conditions
- */
 const getFilteredCustomActions = (moduleConfig, userRole, item) => {
   if (!moduleConfig.customActions) return [];
-
   return moduleConfig.customActions.filter(
     (action) =>
       hasPermission(action, moduleConfig, userRole) &&
@@ -70,11 +238,17 @@ const getFilteredCustomActions = (moduleConfig, userRole, item) => {
   );
 };
 
-/**
- * Get icon component for an action
- */
 const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
-  const IconComponent = ACTION_ICONS[actionType] || DEFAULT_ICON;
+  const ACTION_ICONS = {
+    start: Play,
+    cancel: Ban,
+    viewDetails: Eye,
+    edit: Edit,
+    delete: Trash2,
+    approve: CheckCircle,
+    reject: XCircle,
+  };
+  const IconComponent = ACTION_ICONS[actionType] || Play;
   return <IconComponent className={className} />;
 };
 
@@ -82,15 +256,10 @@ const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
 // SUB-COMPONENTS
 // =============================================================================
 
-/**
- * Individual action button for desktop view
- */
 const DesktopActionButton = ({ action, item, onCustomAction }) => {
   const icon = getActionIcon(action.action);
-
   if (action.type === "link") {
     const href = action.href.replace(":id", item._id);
-
     return (
       <Button asChild variant="outline" size="sm" key={action.action}>
         <Link href={href}>
@@ -100,7 +269,6 @@ const DesktopActionButton = ({ action, item, onCustomAction }) => {
       </Button>
     );
   }
-
   return (
     <Button
       key={action.action}
@@ -114,15 +282,10 @@ const DesktopActionButton = ({ action, item, onCustomAction }) => {
   );
 };
 
-/**
- * Individual dropdown menu item for mobile view
- */
 const MobileDropdownItem = ({ action, item, onCustomAction }) => {
   const icon = getActionIcon(action.action);
-
   if (action.type === "link") {
     const href = action.href.replace(":id", item._id);
-
     return (
       <DropdownMenuItem asChild key={action.action}>
         <Link href={href}>
@@ -132,7 +295,6 @@ const MobileDropdownItem = ({ action, item, onCustomAction }) => {
       </DropdownMenuItem>
     );
   }
-
   return (
     <DropdownMenuItem
       key={action.action}
@@ -144,9 +306,6 @@ const MobileDropdownItem = ({ action, item, onCustomAction }) => {
   );
 };
 
-/**
- * Standard edit button component
- */
 const EditButton = ({ onEdit, item }) => (
   <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
     <Edit className="h-4 w-4 mr-2" />
@@ -154,9 +313,6 @@ const EditButton = ({ onEdit, item }) => (
   </Button>
 );
 
-/**
- * Standard delete button component
- */
 const DeleteButton = ({ onDelete, item }) => (
   <Button
     variant="outline"
@@ -169,22 +325,10 @@ const DeleteButton = ({ onDelete, item }) => (
   </Button>
 );
 
-/**
- * Mobile dropdown menu trigger
- */
-// const MobileDropdownTrigger = () => (
-//   <Button variant="ghost" size="sm">
-//     <MoreVertical className="h-4 w-4" />
-//   </Button>
-// );
-
 // =============================================================================
 // MAIN COMPONENT SECTIONS
 // =============================================================================
 
-/**
- * Desktop actions view - shows all buttons inline
- */
 const DesktopActionsView = ({
   canEdit,
   canDelete,
@@ -193,29 +337,29 @@ const DesktopActionsView = ({
   onEdit,
   onDelete,
   onCustomAction,
-}) => (
-  <div className="hidden md:flex items-center gap-2">
-    {/* Edit Button */}
-    {canEdit && <EditButton onEdit={onEdit} item={item} />}
+  moduleConfig,
+  userRole,
+}) => {
+  if (moduleConfig.endpoint === "approvals" && item.approvalStatus) {
+    return <SimpleApprovalActions approval={item} />;
+  }
 
-    {/* Custom Action Buttons */}
-    {customActions.map((action) => (
-      <DesktopActionButton
-        key={action.action}
-        action={action}
-        item={item}
-        onCustomAction={onCustomAction}
-      />
-    ))}
+  return (
+    <div className="hidden md:flex items-center gap-2">
+      {canEdit && <EditButton onEdit={onEdit} item={item} />}
+      {customActions.map((action) => (
+        <DesktopActionButton
+          key={action.action}
+          action={action}
+          item={item}
+          onCustomAction={onCustomAction}
+        />
+      ))}
+      {canDelete && <DeleteButton onDelete={onDelete} item={item} />}
+    </div>
+  );
+};
 
-    {/* Delete Button */}
-    {canDelete && <DeleteButton onDelete={onDelete} item={item} />}
-  </div>
-);
-
-/**
- * Mobile actions view - shows dropdown menu
- */
 const MobileActionsView = ({
   canEdit,
   canDelete,
@@ -224,57 +368,62 @@ const MobileActionsView = ({
   onEdit,
   onDelete,
   onCustomAction,
-}) => (
-  <div className="md:hidden">
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {/* <MobileDropdownTrigger /> */}
-        <Button variant="ghost" size="sm">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+  moduleConfig,
+  userRole,
+}) => {
+  if (moduleConfig.endpoint === "approvals" && item.approvalStatus) {
+    return (
+      <div className="md:hidden">
+        <SimpleApprovalActions approval={item} />
+      </div>
+    );
+  }
 
-      <DropdownMenuContent align="end">
-        {/* Edit Option */}
-        {canEdit && (
-          <DropdownMenuItem onClick={() => onEdit(item)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </DropdownMenuItem>
-        )}
-
-        {/* Custom Actions */}
-        {customActions.length > 0 && (
-          <>
-            <DropdownMenuSeparator />
-            {customActions.map((action) => (
-              <MobileDropdownItem
-                key={action.action}
-                action={action}
-                item={item}
-                onCustomAction={onCustomAction}
-              />
-            ))}
-          </>
-        )}
-
-        {/* Delete Option */}
-        {canDelete && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onDelete(item)}
-              className="text-red-600"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+  return (
+    <div className="md:hidden">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {canEdit && (
+            <DropdownMenuItem onClick={() => onEdit(item)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
             </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  </div>
-);
+          )}
+          {customActions.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              {customActions.map((action) => (
+                <MobileDropdownItem
+                  key={action.action}
+                  action={action}
+                  item={item}
+                  onCustomAction={onCustomAction}
+                />
+              ))}
+            </>
+          )}
+          {canDelete && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onDelete(item)}
+                className="text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+};
 
 // =============================================================================
 // MAIN COMPONENT
@@ -287,26 +436,13 @@ export default function UniversalActions({
   onDelete,
   onCustomAction,
 }) {
-  // ===========================================================================
-  // HOOKS & PERMISSIONS
-  // ===========================================================================
-
   const { user } = useAuthStore();
   const userRole = user?.role;
-
-  // ===========================================================================
-  // PERMISSION CHECKS
-  // ===========================================================================
 
   const canEdit = moduleConfig.permissions.edit?.includes(userRole) ?? false;
   const canDelete =
     moduleConfig.permissions.delete?.includes(userRole) ?? false;
-
   const customActions = getFilteredCustomActions(moduleConfig, userRole, item);
-
-  // ===========================================================================
-  // RENDER
-  // ===========================================================================
 
   return (
     <>
@@ -318,6 +454,8 @@ export default function UniversalActions({
         onEdit={onEdit}
         onDelete={onDelete}
         onCustomAction={onCustomAction}
+        moduleConfig={moduleConfig}
+        userRole={userRole}
       />
 
       <MobileActionsView
@@ -328,6 +466,8 @@ export default function UniversalActions({
         onEdit={onEdit}
         onDelete={onDelete}
         onCustomAction={onCustomAction}
+        moduleConfig={moduleConfig}
+        userRole={userRole}
       />
     </>
   );

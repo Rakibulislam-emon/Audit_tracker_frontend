@@ -1336,8 +1336,8 @@ export const universalConfig = {
         relation: "sites",
       },
       // ✅ NEW FILTER
-    auditor: {
-        type: "select", 
+      auditor: {
+        type: "select",
         label: "Auditor",
         placeholder: "Filter by Auditor",
         apiParam: "assignedUser", // ✅ CORRECT - matches backend query
@@ -1781,7 +1781,7 @@ export const universalConfig = {
     // UI Configuration
     title: "Team Assignments", // More descriptive title
     description: "Manage user assignments and roles within audit sessions",
-//  hasCustomCreate: true,
+    //  hasCustomCreate: true,
     // FIELD DEFINITIONS - Based on Team.js model
     fields: {
       auditSession: {
@@ -2813,27 +2813,32 @@ export const universalConfig = {
     },
   },
 
+  // src/config/dynamicConfig.js - approvals section
   approvals: {
     endpoint: "approvals",
-    title: "Approval Requests",
-    description:
-      "Manage and review all approval requests in the system (Admin View)",
-
-    // ✅ This module CANNOT be created via UniversalForm
-    hasCustomCreate: true,
-    // Edit form will only update specific, non-workflow fields
+    title: "Approval Management",
+    description: "Manage and track approval requests across the system",
 
     fields: {
-      // Core Info
+      // --- Core Approval Info ---
       title: {
         type: "text",
-        label: "Title",
+        label: "Approval Title",
         required: true,
         tableColumn: true,
         filterable: true,
-        formField: true, // Allow editing title
-        editOnly: true, // Only in edit mode
+        formField: true,
       },
+      description: {
+        type: "textarea",
+        label: "Description",
+        required: true,
+        tableColumn: true,
+        filterable: true,
+        formField: true,
+      },
+
+      // --- Entity Relation ---
       entityType: {
         type: "select",
         label: "Entity Type",
@@ -2848,24 +2853,23 @@ export const universalConfig = {
         ],
         tableColumn: true,
         filterable: true,
-        formField: false, // Cannot be edited
-        readOnly: true,
+        formField: true,
       },
       entityId: {
-        // Link to the actual item
         type: "relation",
-        label: "Related Item",
-        // relationPath: "entityType", // Dynamic refPath is complex for UniversalForm
-        // We'll just show the ID or title if populated
-        tableColumn: true,
-        filterable: false,
-        formField: false,
-        readOnly: true,
-        dataAccessor: "entityId.title", // Try to get title, fallback handled by column
+        label: "Related Entity",
+        tableColumn: true, // ✅ Shows in table
+        formField: false, // ✅ Shows in form but read-only
+
+        relation: "reports",
+        dataAccessor: "entityId.title",
       },
+
+      // --- Approval Workflow ---
       approvalStatus: {
         type: "select",
-        label: "Approval Status",
+        label: "Status",
+        required: true,
         options: [
           "pending",
           "in-review",
@@ -2876,120 +2880,79 @@ export const universalConfig = {
         ],
         tableColumn: true,
         filterable: true,
-        formField: true, // Allow manual status override by admin?
-        editOnly: true,
+        formField: true,
       },
       priority: {
         type: "select",
         label: "Priority",
+        required: true,
         options: ["low", "medium", "high", "critical"],
-        default: "medium",
         tableColumn: true,
         filterable: true,
         formField: true,
-        editOnly: true,
       },
 
-      // User Links
+      // --- People ---
       approver: {
-        type: "select",
-        label: "Current Approver",
-        required: true,
+        type: "relation",
+        label: "Approver",
         relation: "users",
+        required: true,
         tableColumn: true,
         filterable: true,
+        formField: true,
         dataAccessor: "approver.name",
-        formField: true, // Allow changing approver (escalation?)
-        editOnly: true,
-        placeholder: "Select Approver",
       },
       requestedBy: {
         type: "relation",
         label: "Requested By",
-        required: true,
         relation: "users",
         tableColumn: true,
-        filterable: true,
+        formField: false, // Auto-set, not editable
         dataAccessor: "requestedBy.name",
-        formField: false,
-        readOnly: true,
       },
 
-      // Timeline (Read-only in table)
-      "timeline.deadline": {
-        // Use dot notation for nested path
-        type: "date",
-        label: "Deadline",
-        tableColumn: true,
-        filterable: false,
-        formField: true, // Allow editing deadline
-        editOnly: true,
-      },
+      // --- Timeline ---
       "timeline.requestedAt": {
         type: "date",
         label: "Requested At",
         tableColumn: true,
-        filterable: false,
         formField: false,
+        readOnly: true,
       },
-      "decision.decisionAt": {
+      "timeline.deadline": {
         type: "date",
-        label: "Decision At",
-        tableColumn: false,
-        filterable: false,
-        formField: false,
+        label: "Deadline",
+        tableColumn: true,
+        filterable: true,
+        formField: true,
       },
+
+      // --- Decision ---
       "decision.comments": {
         type: "textarea",
         label: "Decision Comments",
         tableColumn: false,
         formField: true,
-        editOnly: true, // Allow editing/adding notes?
-        fullWidth: true,
       },
 
-      // Complex fields (Hidden from table/form)
-      description: {
-        type: "textarea",
-        label: "Description",
-        required: true,
-        formField: true,
-        editOnly: true,
-        fullWidth: true,
-        tableColumn: false,
-      },
-      requirements: {
-        label: "Requirements",
-        tableColumn: false,
-        formField: false,
-      },
-      reviewHistory: { label: "History", tableColumn: false, formField: false },
-      notifications: {
-        label: "Notifications",
-        tableColumn: false,
-        formField: false,
-      },
-
-      // Common fields
+      // --- Common Fields ---
       status: {
-        // System Status
         type: "select",
         label: "System Status",
+        required: true,
         options: ["active", "inactive"],
         default: "active",
         tableColumn: true,
         filterable: true,
         formField: true,
-        editOnly: true,
       },
-      // ✅ common fields added as requested
       createdBy: {
         type: "relation",
         label: "Created By",
         relation: "users",
         tableColumn: true,
         formField: false,
-        readOnly: true,
         dataAccessor: "createdBy.name",
       },
       updatedBy: {
@@ -2998,7 +2961,6 @@ export const universalConfig = {
         relation: "users",
         tableColumn: true,
         formField: false,
-        readOnly: true,
         dataAccessor: "updatedBy.name",
       },
       createdAt: {
@@ -3006,27 +2968,26 @@ export const universalConfig = {
         label: "Created At",
         tableColumn: true,
         formField: false,
-        readOnly: true,
       },
       updatedAt: {
         type: "date",
         label: "Updated At",
         tableColumn: true,
         formField: false,
-        readOnly: true,
       },
     },
+
     filters: {
       search: {
         type: "search",
         label: "Search Approvals",
-        placeholder: "Search title/description...",
+        placeholder: "Search by title or description...",
         apiParam: "search",
       },
       approvalStatus: {
         type: "select",
-        label: "Approval Status",
-        placeholder: "All Approval Statuses",
+        label: "Status",
+        placeholder: "All Statuses",
         apiParam: "approvalStatus",
         options: [
           "pending",
@@ -3065,37 +3026,39 @@ export const universalConfig = {
         apiParam: "approver",
         relation: "users",
       },
-      requestedBy: {
-        type: "select",
-        label: "Requested By",
-        placeholder: "All Requesters",
-        apiParam: "requestedBy",
-        relation: "users",
-      },
-      status: {
-        type: "select",
-        label: "System Status",
-        placeholder: "All System Statuses",
-        apiParam: "status",
-        options: ["active", "inactive"],
-      },
     },
-    permissions: {
-      // Match backend roles
-      create: ["admin", "sysadmin", "audit_manager"], // Manual create (hidden by hasCustomCreate)
-      edit: ["admin", "sysadmin", "audit_manager"], // Admin/Manager edit of basic fields
-      delete: ["admin", "sysadmin"], // Admin delete
-      view: ["admin", "sysadmin", "audit_manager"], // Admin/Manager view of *all* requests
 
-      // Custom permissions for workflow actions
-      canApprove: ["admin", "sysadmin", "audit_manager", "auditor"], // Who can *ever* be an approver
-      canComment: [
-        "admin",
-        "sysadmin",
-        "audit_manager",
-        "auditor",
-        "compliance_officer",
-      ], // Who can comment
+    // In dynamicConfig.js - approvals permissions
+    permissions: {
+      view: ["admin", "sysadmin", "audit_manager", "approver"],
+      create: ["admin", "sysadmin", "audit_manager"],
+      edit: ["admin", "sysadmin", "audit_manager"],
+      delete: ["admin", "sysadmin"],
+      approve: ["admin", "sysadmin", "audit_manager", "approver"], // ✅ ADD THIS
     },
+    // customActions: [
+    //   {
+    //     action: "approve",
+    //     label: "Approve",
+    //     method: "POST",
+    //     endpoint: "/:id/approve",
+    //     showWhen: {
+    //       field: "approvalStatus",
+    //       value: "pending",
+    //     },
+    //   },
+    //   {
+    //     action: "reject",
+    //     label: "Reject",
+    //     method: "POST",
+    //     endpoint: "/:id/reject",
+    //     showWhen: {
+    //       field: "approvalStatus",
+    //       value: "pending",
+    //     },
+    //   },
+    // ],
+    // ✅ Hide "Add New" - approvals created automatically
+    hasCustomCreate: true,
   },
 };

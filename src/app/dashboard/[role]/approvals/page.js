@@ -1,18 +1,47 @@
-// src/app/dashboard/[role]/approvals/page.js
+// src/app/dashboard/[role]/approvals/page.js - WITH SAFE PROPS
 
 "use client";
 import UniversalCRUDManager from "@/components/ui/dynamic/UniversalCRUDManager";
 import { universalConfig } from "@/config/dynamicConfig";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { toast } from "sonner"; // Import toast
+import { toast } from "sonner";
+
+// ✅ SAFE WRAPPER: Ensures all props are React-safe
+const SafeUniversalCRUDManager = ({ module, token, title, description, userRole }) => {
+  // Convert all props to safe strings
+  const safeTitle = typeof title === 'string' ? title : String(title || 'Approval Management');
+  const safeDescription = typeof description === 'string' ? description : String(description || 'Manage approval requests');
+  
+  console.log("🔍 SafeUniversalCRUDManager props:", {
+    safeTitle,
+    safeDescription,
+    module,
+    userRole
+  });
+
+  return (
+    <UniversalCRUDManager
+      module={module}
+      token={token}
+      title={safeTitle}
+      description={safeDescription}
+      userRole={userRole}
+    />
+  );
+};
 
 export default function ApprovalsPage() {
   const { token, user } = useAuthStore();
   const moduleName = "approvals";
   const config = universalConfig[moduleName];
 
-  // Note: This page implements the "Admin View" (list of all approvals)
-  // A separate "My Approvals" page (using /my-approvals route) would be needed for the user inbox workflow.
+  // Debug the config to find the problematic object
+  console.log("🔍 ApprovalsPage Config Debug:", {
+    configTitle: config?.title,
+    configTitleType: typeof config?.title,
+    configDescription: config?.description, 
+    configDescriptionType: typeof config?.description
+  });
 
   if (!config) {
     return (
@@ -21,12 +50,9 @@ export default function ApprovalsPage() {
       </div>
     );
   }
-  const { title, description } = config;
 
-  // Check view permission for this admin page
   const canView = user && config.permissions?.view?.includes(user.role);
   if (!canView) {
-    // You can return null, a redirect, or an error message
     toast.error("Access Denied: You do not have permission to view this page.");
     return (
       <div className="container mx-auto p-4 md:p-6 text-center">
@@ -40,17 +66,12 @@ export default function ApprovalsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      {/* UniversalCRUDManager handles List, Edit (basic fields), Delete.
-        The "Add" button is hidden by 'hasCustomCreate: true' in config.
-        The complex approval/rejection logic must be handled
-        on a separate, custom "My Approvals" page or a detailed view page.
-      */}
-      <UniversalCRUDManager
+      {/* ✅ USING SAFE WRAPPER INSTEAD OF DIRECT COMPONENT */}
+      <SafeUniversalCRUDManager
         module={moduleName}
         token={token}
-        title={title || "Approval Requests"}
-        description={description || "Manage all approval requests (Admin View)"}
-        // No customHeaderActions needed for this admin list view
+        title={config.title}
+        description={config.description}
         userRole={user?.role}
       />
     </div>
