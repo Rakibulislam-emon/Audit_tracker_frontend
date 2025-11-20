@@ -224,15 +224,30 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
 };
 
 const getRelationDisplayValue = (item, relationModule, fieldKey) => {
-  console.log('item:', item)
-  switch (relationModule) {
+  console.log("🔍 getRelationDisplayValue:", { relationModule, fieldKey, item });
+  
+  // ✅ FIXACTION - ALL POSSIBLE CASES
+  if (relationModule === "fixActions" || 
+      relationModule === "fixAction" || 
+      relationModule === "fix-Action" ||
+      fieldKey === "fixAction") {
+    
+    console.log("✅ FixAction logic executing for:", relationModule);
+    if (item.actionText && item.problem?.title) {
+      return `${item.problem.title} - ${item.actionText}`;
+    }
+    return item.actionText || `Fix#${item._id}`;
+  }
 
+  // ✅ PROBLEMS CASE যোগ করুন
+  if (relationModule === "problems" || fieldKey === "problem") {
+    console.log("✅ Problems logic executing");
+    return item.title || `Problem#${item._id}`;
+  }
+
+  switch (relationModule) {
     case "users":
-      if (
-        fieldKey === "createdBy" ||
-        fieldKey === "updatedBy" ||
-        fieldKey === "assignedAuditors"
-      ) {
+      if (fieldKey === "createdBy" || fieldKey === "updatedBy" || fieldKey === "assignedAuditors") {
         return `${item.name} (${item.email})`;
       }
       return item.name || item.email;
@@ -246,13 +261,12 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
     case "sites":
       return item.name;
 
-    
     case "observations":
       return `Obs#${item._id} - ${item.severity || "No Severity"}`;
-      // return item.response
 
     default:
-      return item.name || item.title || "Unknown";
+      console.log("❌ DEFAULT case for:", relationModule);
+      return item.name || item.title ||  "Unknown";
   }
 };
 
@@ -288,11 +302,11 @@ export const generateUniversalColumns = (module) => {
         header: fieldConfig.label,
         cell: (info) => {
           const value = info.getValue();
+          console.log("value:", value);
 
           // Handle relation fields
           if (fieldConfig.relation && value) {
             const items = Array.isArray(value) ? value : [value];
-            
 
             if (items.length > 0 && items[0] !== null) {
               return (

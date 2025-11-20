@@ -1,3 +1,4 @@
+// FILE: audit-frontend/src/components/ui/fix-action/FixActionManager.jsx
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -6,15 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Modal from "@/components/ui/modal";
 import { useDeleteModule, useModuleData } from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { AlertCircle, Edit, Loader2, Plus, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  Edit,
+  FileText,
+  Loader2,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import ProofUploader from "../proof/ProofUploader"; // ✅ NEW IMPORT
 import FixActionForm from "./FixActionForm";
 
 // =============================================================================
 // CONSTANTS
 // =============================================================================
-
 const MODULE_NAME = "fixActions";
 
 // =============================================================================
@@ -45,7 +53,13 @@ const FixActionsEmptyState = () => (
 /**
  * Individual fix action row component
  */
-const FixActionRow = ({ fixAction, onEdit, onDelete, isDeleting }) => {
+const FixActionRow = ({
+  fixAction,
+  onEdit,
+  onDelete,
+  isDeleting,
+  onAddProof,
+}) => {
   const getStatusBadgeVariant = (status) => {
     switch (status) {
       case "Completed":
@@ -93,6 +107,17 @@ const FixActionRow = ({ fixAction, onEdit, onDelete, isDeleting }) => {
       </div>
 
       <div className="flex items-center gap-2">
+        {/* ✅ NEW: Add Proof Button */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onAddProof(fixAction)}
+          className="h-8 w-8"
+          title="Add Proof"
+        >
+          <FileText className="h-3 w-3" />
+        </Button>
+
         <Button
           variant="outline"
           size="icon"
@@ -127,6 +152,7 @@ const FixActionsList = ({
   isLoading,
   onEditFixAction,
   onDeleteFixAction,
+  onAddProof,
   isDeleting,
 }) => (
   <Card>
@@ -148,6 +174,7 @@ const FixActionsList = ({
               fixAction={fixAction}
               onEdit={onEditFixAction}
               onDelete={onDeleteFixAction}
+              onAddProof={onAddProof} // ✅ NEW PROP
               isDeleting={isDeleting}
             />
           ))}
@@ -165,16 +192,19 @@ export default function FixActionManager({ problem, onClose }) {
   // ===========================================================================
   // STATE MANAGEMENT
   // ===========================================================================
-
   const { token } = useAuthStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedFixAction, setSelectedFixAction] = useState(null);
 
+  // ✅ NEW STATES FOR PROOF MANAGEMENT
+  const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+  const [selectedFixActionForProof, setSelectedFixActionForProof] =
+    useState(null);
+
   // ===========================================================================
   // DATA FETCHING
   // ===========================================================================
-
   const {
     data: fixActionsData,
     isLoading,
@@ -188,7 +218,6 @@ export default function FixActionManager({ problem, onClose }) {
   // ===========================================================================
   // MUTATIONS
   // ===========================================================================
-
   const { mutate: deleteFixAction, isPending: isDeleting } = useDeleteModule(
     MODULE_NAME,
     token
@@ -228,6 +257,14 @@ export default function FixActionManager({ problem, onClose }) {
   };
 
   /**
+   * ✅ NEW: Handles adding proof to a fix action
+   */
+  const handleAddProof = (fixAction) => {
+    setSelectedFixActionForProof(fixAction);
+    setIsProofModalOpen(true);
+  };
+
+  /**
    * Handles successful form submission
    */
   const handleSuccess = () => {
@@ -243,10 +280,17 @@ export default function FixActionManager({ problem, onClose }) {
     setSelectedFixAction(null);
   };
 
+  /**
+   * ✅ NEW: Handles proof modal close
+   */
+  const handleProofModalClose = () => {
+    setIsProofModalOpen(false);
+    setSelectedFixActionForProof(null);
+  };
+
   // ===========================================================================
   // RENDER
   // ===========================================================================
-
   return (
     <div className="space-y-6">
       {/* 🎯 Header Card with Create Button */}
@@ -271,6 +315,7 @@ export default function FixActionManager({ problem, onClose }) {
         isLoading={isLoading}
         onEditFixAction={handleEditFixAction}
         onDeleteFixAction={handleDeleteFixAction}
+        onAddProof={handleAddProof} // ✅ NEW PROP
         isDeleting={isDeleting}
       />
 
@@ -312,6 +357,34 @@ export default function FixActionManager({ problem, onClose }) {
                 handleSuccess();
               }}
               onCancel={() => setIsEditModalOpen(false)}
+            />
+          </div>
+        </Modal>
+      )}
+
+      {/* ✅ NEW: Proof Upload Modal */}
+      {isProofModalOpen && selectedFixActionForProof && (
+        <Modal
+          isOpen={isProofModalOpen}
+          onClose={handleProofModalClose}
+          size="md"
+        >
+          <div className="p-6">
+            <h3 className="text-lg font-semibold mb-4">
+              Add Proof for Fix Action
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Upload evidence for:{" "}
+              <strong>"{selectedFixActionForProof.actionText}"</strong>
+            </p>
+            <ProofUploader
+              fixActionId={selectedFixActionForProof._id}
+              onSuccess={() => {
+                handleProofModalClose();
+                toast.success("Proof uploaded successfully");
+                // Optionally refresh data if needed
+              }}
+              onCancel={handleProofModalClose}
             />
           </div>
         </Modal>

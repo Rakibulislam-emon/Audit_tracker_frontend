@@ -2389,26 +2389,26 @@ export const universalConfig = {
       // --- Relation fields (Read-only in table, not on form) ---
       problem: {
         type: "select",
-        label: "Related Problem",
+        label: "Problem",
         relation: "problems",
         tableColumn: true,
         filterable: true,
         dataAccessor: "problem.title",
         formField: false, // ✅ ফর্মে দেখাবে না
       },
-      observation: {
-        type: "select",
-        label: "Related Observation",
-        relation: "observations",
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "observation._id",
-        formField: false, // ✅ ফর্মে দেখাবে না
-      },
+      // observation: {
+      //   type: "select",
+      //   label: "Related Observation",
+      //   relation: "observations",
+      //   tableColumn: true,
+      //   filterable: true,
+      //   dataAccessor: "observation._id",
+      //   formField: false, // ✅ ফর্মে দেখাবে না
+      // },
       fixAction: {
         type: "select",
-        label: "Related Fix Action",
-        relation: "FixAction",
+        label: " Action",
+        relation: "fix-action",
         tableColumn: true,
         filterable: true,
         dataAccessor: "fixAction.actionText",

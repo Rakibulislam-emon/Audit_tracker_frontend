@@ -183,6 +183,7 @@ export default function UniversalCRUDManager({
   const items = response?.data || [];
   const totalCount = response?.count || items.length;
 
+  console.log("🚀 ~ file: UniversalCRUDManager.jsx:236 ~ items:", items);
   // ===========================================================================
   // MUTATIONS
   // ===========================================================================
