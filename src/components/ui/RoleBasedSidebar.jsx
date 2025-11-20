@@ -4,7 +4,7 @@ import { navItems } from "@/app/dashboard/constants/NavItems";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -50,7 +50,7 @@ function SidebarContent({ role, items, pathname }) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex h-16 items-center px-6 border-b">
+      <div className="flex h-16 items-center px-6 border-b shrink-0">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">
@@ -66,44 +66,44 @@ function SidebarContent({ role, items, pathname }) {
         </div>
       </div>
 
-      {/* Navigation */}
-      <ScrollArea className="flex-1 px-3">
-        <nav className="grid gap-1 p-2">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+      {/* Navigation with Proper Scroll Area */}
+      <ScrollArea className="flex-1 overflow-y-auto scroll-smooth">
+        <div className="px-3 py-2">
+          <nav className="grid gap-1">
+            {items.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
 
-            return (
-              <TooltipProvider key={item.id} delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href={item.href}>
-                      <Button
-                        variant={isActive ? "secondary" : "ghost"}
-                        className={cn(
-                          "w-full justify-start gap-3 font-normal h-11",
-                          isActive && "bg-accent"
-                        )}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span className="text-sm">{item.label}</span>
-                      </Button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    {item.label}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
-        </nav>
+              return (
+                <TooltipProvider key={item.id} delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={item.href}>
+                        <Button
+                          variant={isActive ? "secondary" : "ghost"}
+                          className={cn(
+                            "w-full justify-start gap-3 font-normal h-11",
+                            isActive && "bg-accent"
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="text-sm">{item.label}</span>
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{item.label}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
+          </nav>
+        </div>
       </ScrollArea>
 
       <Separator />
 
-      {/* Help Section */}
-      <div className="p-4">
+      {/* Help Section - Fixed at Bottom */}
+      <div className="p-4 shrink-0">
         <div className="rounded-lg bg-muted/50 p-3">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
