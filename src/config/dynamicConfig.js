@@ -2860,7 +2860,7 @@ export const universalConfig = {
         label: "Related Entity",
         tableColumn: true, // ✅ Shows in table
         formField: false, // ✅ Shows in form but read-only
-       
+
         relation: "reports",
         dataAccessor: "entityId.title",
       },
@@ -3028,13 +3028,36 @@ export const universalConfig = {
       },
     },
 
+    // In dynamicConfig.js - approvals permissions
     permissions: {
-      view: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "audit_manager", "approver"],
       create: ["admin", "sysadmin", "audit_manager"],
       edit: ["admin", "sysadmin", "audit_manager"],
       delete: ["admin", "sysadmin"],
+      approve: ["admin", "sysadmin", "audit_manager", "approver"], // ✅ ADD THIS
     },
-
+    // customActions: [
+    //   {
+    //     action: "approve",
+    //     label: "Approve",
+    //     method: "POST",
+    //     endpoint: "/:id/approve",
+    //     showWhen: {
+    //       field: "approvalStatus",
+    //       value: "pending",
+    //     },
+    //   },
+    //   {
+    //     action: "reject",
+    //     label: "Reject",
+    //     method: "POST",
+    //     endpoint: "/:id/reject",
+    //     showWhen: {
+    //       field: "approvalStatus",
+    //       value: "pending",
+    //     },
+    //   },
+    // ],
     // ✅ Hide "Add New" - approvals created automatically
     hasCustomCreate: true,
   },
