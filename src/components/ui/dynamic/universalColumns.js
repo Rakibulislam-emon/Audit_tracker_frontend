@@ -205,6 +205,10 @@ const RELATION_COLORS = {
   fixActions: {
     fixActions: "bg-lime-50 text-lime-700 border border-lime-200",
   },
+  approvals: {
+    approver: "bg-blue-50 text-blue-700 border border-blue-200",
+    requestedBy: "bg-green-50 text-green-700 border border-green-200",
+  },
 };
 
 const DEFAULT_COLOR = "bg-gray-50 text-gray-600 border border-gray-200";
@@ -224,9 +228,46 @@ const getRelationBadgeColor = (fieldKey, relationModule) => {
 };
 
 const getRelationDisplayValue = (item, relationModule, fieldKey) => {
-  console.log('item:', item)
-  switch (relationModule) {
+  // console.log("🔍 getRelationDisplayValue:", {
+  //   relationModule,
+  //   fieldKey,
+  //   item,
+  // });
+  // ✅ Handle cases where item is an object but we need a string
+  if (typeof item === "object" && item !== null) {
+    // If it's a user object
+    if (item.name || item.email) {
+      return item.name || item.email;
+    }
+    // If it's a report/entity object
+    if (item.title) {
+      return item.title;
+    }
+    // Fallback to ID
+    return `ID: ${item._id}`;
+  }
 
+  // ✅ FIXACTION - ALL POSSIBLE CASES
+  if (
+    relationModule === "fixActions" ||
+    relationModule === "fixAction" ||
+    relationModule === "fix-Action" ||
+    fieldKey === "fixAction"
+  ) {
+    // console.log("✅ FixAction logic executing for:", relationModule);
+    if (item.actionText && item.problem?.title) {
+      return `${item.problem.title} - ${item.actionText}`;
+    }
+    return item.actionText || `Fix#${item._id}`;
+  }
+
+  // ✅ PROBLEMS CASE যোগ করুন
+  if (relationModule === "problems" || fieldKey === "problem") {
+    // console.log("✅ Problems logic executing");
+    return item.title || `Problem#${item._id}`;
+  }
+
+  switch (relationModule) {
     case "users":
       if (
         fieldKey === "createdBy" ||
@@ -246,12 +287,14 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
     case "sites":
       return item.name;
 
-    
     case "observations":
       return `Obs#${item._id} - ${item.severity || "No Severity"}`;
-      // return item.response
+
+    case "approvals":
+      return item.title || `Approval#${item._id}`;
 
     default:
+      // console.log("❌ DEFAULT case for:", relationModule);
       return item.name || item.title || "Unknown";
   }
 };
@@ -288,11 +331,53 @@ export const generateUniversalColumns = (module) => {
         header: fieldConfig.label,
         cell: (info) => {
           const value = info.getValue();
+          // console.log("value:", value);
+
+          // universal fix: handle any object value safely
+          if (typeof value === "object" && value !== null) {
+            // For relation fields that return objects
+            if (fieldConfig.relation && value) {
+              const items = Array.isArray(value) ? value : [value];
+
+              if (items.length > 0 && items[0] !== null) {
+                return (
+                  <div className="flex flex-wrap gap-1">
+                    {items.map((item, index) => (
+                      <span
+                        key={index}
+                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getRelationBadgeColor(
+                          fieldKey,
+                          fieldConfig.relation
+                        )}`}
+                      >
+                        {getRelationDisplayValue(
+                          item,
+                          fieldConfig.relation,
+                          fieldKey
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                );
+              }
+              return (
+                <span className="text-gray-400 text-sm">Not assigned</span>
+              );
+            }
+            // ✅ CRITICAL FIX: Handle objects in NON-relation fields
+            // This catches fields that should be relations but aren't marked as such
+            const displayValue =
+              value.title || value.name || value.email || `ID: ${value._id}`;
+            return (
+              <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                {displayValue}
+              </span>
+            );
+          }
 
           // Handle relation fields
           if (fieldConfig.relation && value) {
             const items = Array.isArray(value) ? value : [value];
-            
 
             if (items.length > 0 && items[0] !== null) {
               return (

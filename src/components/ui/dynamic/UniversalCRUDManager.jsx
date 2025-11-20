@@ -183,6 +183,7 @@ export default function UniversalCRUDManager({
   const items = response?.data || [];
   const totalCount = response?.count || items.length;
 
+  console.log("🚀 ~ file: UniversalCRUDManager.jsx:236 ~ items:", items);
   // ===========================================================================
   // MUTATIONS
   // ===========================================================================
@@ -348,7 +349,7 @@ export default function UniversalCRUDManager({
 
       {/* Filter and Action Section */}
       {isAvailable && (
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 ">
           {/* Filters */}
           {hasFilters && (
             <div className="w-full flex-grow max-w-7xl">

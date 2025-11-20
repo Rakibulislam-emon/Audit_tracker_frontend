@@ -139,18 +139,18 @@ export const navItems = {
       icon: FileText,
       href: "/dashboard/admin/approvals",
     },
-    {
-      id: "metrics",
-      label: "Metrics",
-      icon: LayoutDashboard,
-      href: "/dashboard/admin/metrics",
-    },
-    {
-      id: "question-rule-links",
-      label: "Question Rule Links",
-      icon: Layers,
-      href: "/dashboard/admin/question-rule-links",
-    },
+    // {
+    //   id: "metrics",
+    //   label: "Metrics",
+    //   icon: LayoutDashboard,
+    //   href: "/dashboard/admin/metrics",
+    // },
+    // {
+    //   id: "question-rule-links",
+    //   label: "Question Rule Links",
+    //   icon: Layers,
+    //   href: "/dashboard/admin/question-rule-links",
+    // },
     {
       id: "settings",
       label: "Settings",

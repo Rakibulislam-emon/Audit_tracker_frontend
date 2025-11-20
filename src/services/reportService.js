@@ -60,4 +60,56 @@ export const generateReportApi = async (auditSessionId, token) => {
   }
 };
 
-// আপনি চাইলে অন্যান্য রিপোর্ট-নির্দিষ্ট API কল (যেমন updateReportStatusApi) এখানে যোগ করতে পারেন
+// Add to services/reportService.js - AFTER your existing functions
+
+/**
+ * Submit report for approval
+ * Follows your exact service pattern with consistent error handling
+ */
+export const submitReportForApprovalApi = async (reportId, token) => {
+  console.log(`🚀 Submitting Report for Approval ID: ${reportId}`);
+  const url = `${baseUrl}/${endpoint}/${reportId}/submit`; // POST /api/reports/:id/submit
+  console.log(`🌐 API Call: POST ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { message: response.statusText };
+      }
+      console.error(
+        `❌ HTTP Error ${response.status} during report submission:`,
+        errorData
+      );
+      throw new Error(
+        errorData.message || `Submission failed with status ${response.status}`
+      );
+    }
+
+    const result = await response.json();
+    console.log("✅ Report submission response:", result);
+
+    if (!result || !result.success) {
+      throw new Error(
+        result.message || "Backend reported an error during submission."
+      );
+    }
+    return result;
+  } catch (error) {
+    console.error(
+      "❌ Network or Parsing Error during report submission:",
+      error
+    );
+    throw new Error(error.message || "Report submission failed.");
+  }
+};

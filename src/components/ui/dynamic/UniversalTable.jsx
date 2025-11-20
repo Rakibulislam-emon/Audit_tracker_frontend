@@ -246,7 +246,7 @@ export default function UniversalTable({
   options = {},
   getPriorityLevel = null,
   getRowCondition = null,
-  moduleConfig ,
+  moduleConfig,
   onCustomAction,
 }) {
   const [sorting, setSorting] = useState([]);
@@ -266,7 +266,6 @@ export default function UniversalTable({
               module={module}
               onEdit={onEdit}
               onDelete={onDelete}
-
               moduleConfig={moduleConfig}
               onCustomAction={onCustomAction}
             />
