@@ -158,6 +158,14 @@ export const navItems = {
       href: "/dashboard/admin/settings",
     },
   ],
+  audit_manager:[
+      {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      href: "/dashboard/audit_manager",
+    },
+  ]
 };
 
 // export { navItems };
