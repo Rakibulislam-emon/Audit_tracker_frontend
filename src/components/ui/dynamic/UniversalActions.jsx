@@ -1,16 +1,7 @@
 // components/ui/dynamic/UniversalActions.jsx
 "use client";
 
-import {
-  Ban,
-  CheckCircle,
-  Edit,
-  Eye,
-  MoreVertical,
-  Play,
-  Trash2,
-  XCircle,
-} from "lucide-react";
+import { CheckCircle, Edit, MoreVertical, Trash2, XCircle,Play,Ban, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -308,7 +299,7 @@ const getFilteredCustomActions = (moduleConfig, userRole, item) => {
 const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
   const ACTION_ICONS = {
     start: Play,
-    cancel: Ban,
+    cancel: Ban, Eye,
     viewDetails: Eye,
     edit: Edit,
     delete: Trash2,
