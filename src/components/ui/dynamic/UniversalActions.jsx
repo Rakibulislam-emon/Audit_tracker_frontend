@@ -1,7 +1,16 @@
 // components/ui/dynamic/UniversalActions.jsx
 "use client";
 
-import { CheckCircle, Edit, MoreVertical, Trash2, XCircle } from "lucide-react";
+import {
+  Ban,
+  CheckCircle,
+  Edit,
+  Eye,
+  MoreVertical,
+  Play,
+  Trash2,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,36 +43,119 @@ import { approvalService } from "@/services/approvalService";
 import { useQueryClient } from "@tanstack/react-query";
 
 // =============================================================================
+// COMMENTS FORM COMPONENT (MOVED UP)
+// =============================================================================
+
+const CommentsForm = ({ actionType, onSubmit, isLoading, onCancel }) => {
+  const [comments, setComments] = useState("");
+
+  const handleSubmit = () => {
+    onSubmit(comments);
+    setComments("");
+  };
+
+  return (
+    <>
+      <div className="py-4">
+        <Textarea
+          placeholder={
+            actionType === "approve"
+              ? "Optional comments..."
+              : "Reason for rejection..."
+          }
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          className="min-h-[80px]"
+        />
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading || (actionType === "reject" && !comments.trim())}
+          className={
+            actionType === "approve"
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-red-600 hover:bg-red-700"
+          }
+        >
+          {isLoading
+            ? "Processing..."
+            : actionType === "approve"
+            ? "Approve"
+            : "Reject"}
+        </Button>
+      </DialogFooter>
+    </>
+  );
+};
+
+// =============================================================================
 // SIMPLE APPROVAL ACTIONS
 // =============================================================================
 
-const SimpleApprovalActions = ({ approval }) => {
+const SimpleApprovalActions = ({
+  approval,
+  showDeleteButton = false,
+  onDelete,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState(null);
   const { token, user } = useAuthStore();
-  const queryClient = useQueryClient(); // ✅ ADD THIS
+  const queryClient = useQueryClient();
 
+  // FIXED: Better user ID comparison
   const isAssignedApprover =
-    user?._id === approval.approver?._id || user?.id === approval.approver?._id;
+    user?._id === approval.approver?._id ||
+    user?.id === approval.approver?._id ||
+    user?._id === approval.approver?.id ||
+    user?.id === approval.approver?.id;
+
   const requirements = approval.requirements || [];
   const unmetRequirements = requirements.filter((req) => !req.completed);
   const canApprove = unmetRequirements.length === 0;
 
+  console.log("Approval Debug:", {
+    approvalId: approval._id,
+    user: user?._id || user?.id,
+    approver: approval.approver?._id || approval.approver?.id,
+    isAssignedApprover,
+    approvalStatus: approval.approvalStatus,
+    canApprove,
+    unmetRequirements: unmetRequirements.length,
+  });
+
   // Show status if not assigned approver or already decided
   if (!isAssignedApprover || approval.approvalStatus !== "pending") {
     return (
-      <span
-        className={`px-2 py-1 rounded text-xs font-medium ${
-          approval.approvalStatus === "approved"
-            ? "bg-green-100 text-green-800"
-            : approval.approvalStatus === "rejected"
-            ? "bg-red-100 text-red-800"
-            : "bg-gray-100 text-gray-800"
-        }`}
-      >
-        {approval.approvalStatus}
-      </span>
+      <div className="flex items-center gap-2">
+        <span
+          className={`px-2 py-1 rounded text-xs font-medium ${
+            approval.approvalStatus === "approved"
+              ? "bg-green-100 text-green-800"
+              : approval.approvalStatus === "rejected"
+              ? "bg-red-100 text-red-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {approval.approvalStatus}
+        </span>
+        {/* ✅ ADD: Delete button for admins even for non-pending approvals */}
+        {showDeleteButton && onDelete && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDelete(approval)}
+            className="text-red-600 hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
     );
   }
 
@@ -93,7 +185,11 @@ const SimpleApprovalActions = ({ approval }) => {
         `${actionType === "approve" ? "Approved" : "Rejected"} successfully`
       );
 
+      // FIXED: Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ["approvals"] });
+      queryClient.invalidateQueries({ queryKey: ["my-approvals"] });
+      queryClient.invalidateQueries({ queryKey: ["approval", approval._id] });
+
       setShowDialog(false);
     } catch (error) {
       toast.error(`Failed to ${actionType}: ${error.message}`);
@@ -101,6 +197,11 @@ const SimpleApprovalActions = ({ approval }) => {
       setIsLoading(false);
       setShowDialog(false);
     }
+  };
+
+  const handleCancel = () => {
+    setShowDialog(false);
+    setActionType(null);
   };
 
   return (
@@ -137,10 +238,22 @@ const SimpleApprovalActions = ({ approval }) => {
           <XCircle className="h-4 w-4 mr-1" />
           Reject
         </Button>
+
+        {/* ✅ ADD: Delete button for admins */}
+        {showDeleteButton && onDelete && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDelete(approval)}
+            className="text-red-600 hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Comments Dialog */}
-      <Dialog open={showDialog} onOpenChange={() => setShowDialog(false)}>
+      <Dialog open={showDialog} onOpenChange={handleCancel}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -157,56 +270,10 @@ const SimpleApprovalActions = ({ approval }) => {
             actionType={actionType}
             onSubmit={handleSubmit}
             isLoading={isLoading}
+            onCancel={handleCancel}
           />
         </DialogContent>
       </Dialog>
-    </>
-  );
-};
-
-const CommentsForm = ({ actionType, onSubmit, isLoading }) => {
-  const [comments, setComments] = useState("");
-
-  const handleSubmit = () => {
-    onSubmit(comments);
-    setComments("");
-  };
-
-  return (
-    <>
-      <div className="py-4">
-        <Textarea
-          placeholder={
-            actionType === "approve"
-              ? "Optional comments..."
-              : "Reason for rejection..."
-          }
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          className="min-h-[80px]"
-        />
-      </div>
-
-      <DialogFooter>
-        <Button
-          variant="outline"
-          onClick={() => setShowDialog(false)}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={isLoading || (actionType === "reject" && !comments.trim())}
-          className={
-            actionType === "approve"
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
-          }
-        >
-          {isLoading ? "Processing..." : actionType}
-        </Button>
-      </DialogFooter>
     </>
   );
 };
@@ -341,7 +408,13 @@ const DesktopActionsView = ({
   userRole,
 }) => {
   if (moduleConfig.endpoint === "approvals" && item.approvalStatus) {
-    return <SimpleApprovalActions approval={item} />;
+    return (
+      <SimpleApprovalActions
+        approval={item}
+        showDeleteButton={["admin", "sysadmin"].includes(userRole) && canDelete}
+        onDelete={onDelete}
+      />
+    );
   }
 
   return (
@@ -374,7 +447,13 @@ const MobileActionsView = ({
   if (moduleConfig.endpoint === "approvals" && item.approvalStatus) {
     return (
       <div className="md:hidden">
-        <SimpleApprovalActions approval={item} />
+        <SimpleApprovalActions
+          approval={item}
+          showDeleteButton={
+            ["admin", "sysadmin"].includes(userRole) && canDelete
+          }
+          onDelete={onDelete}
+        />
       </div>
     );
   }
