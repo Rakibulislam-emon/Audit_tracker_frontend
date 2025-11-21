@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import RelationSelect from "@/components/ui/dynamic/UniversalRelationSelect";
 import { Label } from "@/components/ui/label";
 import { universalConfig } from "@/config/dynamicConfig";
-import {
-  generateReportApi,
-  submitReportForApprovalApi,
-} from "@/services/reportService";
+import { generateReportApi } from "@/services/reportService";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertCircle,
   CheckCircle,
@@ -28,6 +26,7 @@ export default function ReportGenerateForm({
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false);
   const [generatedReport, setGeneratedReport] = useState(null);
   const [formError, setFormError] = useState("");
+  const queryClient = useQueryClient(); // ✅ ADD THIS LINE
 
   // Debug: Log when generatedReport changes
   useEffect(() => {
@@ -78,11 +77,11 @@ export default function ReportGenerateForm({
           toast.success(result.message || "Report generated successfully!", {
             id: toastId,
           });
-          
+
           // ✅ CRITICAL FIX: Set the generated report but DON'T call onGenerateSuccess
           // This keeps the modal open and shows the approval section
           setGeneratedReport(reportData);
-          
+
           // ❌ REMOVED: onGenerateSuccess() was closing the modal prematurely
           // if (onGenerateSuccess && typeof onGenerateSuccess === "function") {
           //   onGenerateSuccess();
@@ -90,7 +89,8 @@ export default function ReportGenerateForm({
         } else {
           console.error("❌ Unexpected response structure:", result);
           throw new Error(
-            result.message || "Failed to generate report: Invalid response structure"
+            result.message ||
+              "Failed to generate report: Invalid response structure"
           );
         }
       } catch (error) {
@@ -120,7 +120,7 @@ export default function ReportGenerateForm({
         "🔄 Starting approval submission with report ID:",
         generatedReport._id
       );
-      
+
       // ✅ FIX: Call the submitReportForApproval endpoint directly
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/reports/${generatedReport._id}/submit`,
@@ -145,7 +145,8 @@ export default function ReportGenerateForm({
           errorData
         );
         throw new Error(
-          errorData.message || `Submission failed with status ${response.status}`
+          errorData.message ||
+            `Submission failed with status ${response.status}`
         );
       }
 
@@ -158,14 +159,22 @@ export default function ReportGenerateForm({
           { id: toastId }
         );
 
+        // ✅ CRITICAL FIX: Invalidate queries to refresh approvals data
+        queryClient.invalidateQueries({ queryKey: ["approvals"] });
+        queryClient.invalidateQueries({ queryKey: ["my-approvals"] });
+        queryClient.invalidateQueries({ queryKey: ["reports"] });
+        console.log(
+          "✅ Cache invalidated - approvals will refresh automatically"
+        );
+
         // ✅ Now reset and close the modal after successful approval submission
         reset();
         setGeneratedReport(null);
         setFormError("");
-        
+
         // Call onClose to close the modal
         if (onClose) onClose();
-        
+
         // Optional: Call onGenerateSuccess if needed for parent component
         if (onGenerateSuccess && typeof onGenerateSuccess === "function") {
           onGenerateSuccess();
@@ -176,7 +185,8 @@ export default function ReportGenerateForm({
       }
     } catch (error) {
       console.error("❌ Approval submission failed:", error);
-      const errorMessage = error.message || "Failed to submit report for approval.";
+      const errorMessage =
+        error.message || "Failed to submit report for approval.";
       setFormError(errorMessage);
       toast.error(errorMessage, { id: toastId });
     } finally {
