@@ -28,17 +28,20 @@ const DENSITY_CONFIG = {
 };
 
 const PRIORITY_COLORS = {
-  critical: "border-l-red-500",
-  high: "border-l-orange-500",
-  medium: "border-l-yellow-500",
-  low: "border-l-green-500",
+  critical: "border-l-red-500 dark:border-l-red-400",
+  high: "border-l-orange-500 dark:border-l-orange-400",
+  medium: "border-l-yellow-500 dark:border-l-yellow-400",
+  low: "border-l-green-500 dark:border-l-green-400",
 };
 
 const ROW_CONDITION_BACKGROUNDS = {
-  overdue: "bg-red-50 hover:bg-red-100",
-  pending: "bg-yellow-50 hover:bg-yellow-100",
-  attention: "bg-orange-50 hover:bg-orange-100",
-  normal: "hover:bg-gray-50",
+  overdue:
+    "bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50",
+  pending:
+    "bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/50",
+  attention:
+    "bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/30 dark:hover:bg-orange-950/50",
+  normal: "hover:bg-gray-50 dark:hover:bg-muted/50",
 };
 
 // =============================================================================
@@ -52,7 +55,7 @@ const getPriorityBorder = (row, getPriorityLevel) => {
 };
 
 const getRowBackground = (row, getRowCondition) => {
-  if (!getRowCondition) return "hover:bg-gray-50";
+  if (!getRowCondition) return "hover:bg-gray-50 ";
   const condition = getRowCondition(row);
   return ROW_CONDITION_BACKGROUNDS[condition] || "hover:bg-gray-50";
 };
@@ -61,7 +64,9 @@ const getSortIcon = (column) => {
   if (!column.getCanSort()) return null;
 
   const sortState = column.getIsSorted();
-  const iconProps = { className: "w-4 h-4 text-gray-400" };
+  const iconProps = {
+    className: "w-4 h-4 text-gray-400 dark:text-muted-foreground",
+  };
 
   switch (sortState) {
     case "asc":
@@ -78,10 +83,10 @@ const getSortIcon = (column) => {
 // =============================================================================
 
 const EmptyState = ({ module }) => (
-  <div className="text-center py-12 border border-gray-200 rounded-lg bg-gray-50">
-    <LayoutGrid className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-    <p className="text-gray-600 font-medium">No {module} found</p>
-    <p className="text-sm text-gray-400 mt-1">
+  <div className="text-center py-12 border border-border rounded-lg bg-muted/30 dark:bg-muted/20">
+    <LayoutGrid className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
+    <p className="text-foreground font-medium">No {module} found</p>
+    <p className="text-sm text-muted-foreground mt-1">
       There are no {module} to display at the moment.
     </p>
   </div>
@@ -89,8 +94,8 @@ const EmptyState = ({ module }) => (
 
 const ControlsBar = ({ dataLength, module, density, onDensityChange }) => (
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-    <div className="text-sm text-gray-500">
-      Showing <span className="font-medium text-gray-700">{dataLength}</span>{" "}
+    <div className="text-sm text-muted-foreground">
+      Showing <span className="font-medium text-foreground">{dataLength}</span>{" "}
       {module}
     </div>
 
@@ -100,16 +105,16 @@ const ControlsBar = ({ dataLength, module, density, onDensityChange }) => (
 
 const DensityToggle = ({ density, onDensityChange }) => (
   <div className="hidden sm:flex items-center gap-2">
-    <span className="text-xs text-gray-500">Density:</span>
-    <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+    <span className="text-xs text-muted-foreground">Density:</span>
+    <div className="flex border border-border rounded-lg overflow-hidden">
       {["compact", "comfortable", "spacious"].map((densityOption) => (
         <button
           key={densityOption}
           onClick={() => onDensityChange(densityOption)}
           className={`px-2 sm:px-3 py-1 text-xs font-medium transition-colors ${
             density === densityOption
-              ? "bg-blue-600 text-white"
-              : "bg-white text-gray-600 hover:bg-gray-50"
+              ? "bg-primary text-primary-foreground"
+              : "bg-card text-foreground hover:bg-muted"
           }`}
         >
           {densityOption.charAt(0).toUpperCase()}
@@ -130,7 +135,7 @@ const TableHeader = ({ headerGroup, density, isTablet = false }) => (
               ? DENSITY_CONFIG[density].tablet
               : DENSITY_CONFIG[density].desktop
           }
-          text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap
+          text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center whitespace-nowrap
         `}
       >
         {header.isPlaceholder ? null : (
@@ -172,7 +177,7 @@ const TableRow = ({
               ? DENSITY_CONFIG[density].tablet
               : DENSITY_CONFIG[density].desktop
           }
-          whitespace-nowrap text-sm text-gray-900 text-center
+          whitespace-nowrap text-sm text-foreground text-center
         `}
       >
         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -184,8 +189,8 @@ const TableRow = ({
 const MobileCard = ({ row, getPriorityLevel, enableActions }) => (
   <div
     className={`
-      bg-white border-l-4 ${getPriorityBorder(row.original, getPriorityLevel)}
-      border border-gray-200 rounded-lg overflow-hidden
+      bg-card border-l-4 ${getPriorityBorder(row.original, getPriorityLevel)}
+      border border-border rounded-lg overflow-hidden
     `}
   >
     <div className="p-4 space-y-2">
@@ -195,12 +200,12 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => (
         return (
           <div
             key={cell.id}
-            className="flex justify-between items-start gap-4 py-2 border-b border-gray-100 last:border-b-0"
+            className="flex justify-between items-start gap-4 py-2 border-b border-border last:border-b-0"
           >
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide min-w-[100px]">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide min-w-[100px]">
               {cell.column.columnDef.header}
             </span>
-            <span className="text-sm text-gray-900 text-right flex-1">
+            <span className="text-sm text-foreground text-right flex-1">
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </span>
           </div>
@@ -209,7 +214,7 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => (
     </div>
 
     {enableActions && (
-      <div className="flex justify-end gap-2 px-4 py-3 bg-gray-50 border-t border-gray-100">
+      <div className="flex justify-end gap-2 px-4 py-3 bg-muted/30 border-t border-border">
         {flexRender(
           row.getVisibleCells().find((cell) => cell.column.id === "actions")
             ?.column.columnDef.cell,
@@ -224,8 +229,8 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => (
 );
 
 const ScrollIndicator = () => (
-  <div className="bg-blue-50 border-t border-blue-200 px-3 py-2 text-center">
-    <p className="text-xs text-blue-600 flex items-center justify-center gap-1">
+  <div className="bg-blue-50 dark:bg-blue-950/30 border-t border-blue-200 dark:border-blue-800/50 px-3 py-2 text-center">
+    <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center justify-center gap-1">
       <span>←</span>
       <span>Swipe to view all columns</span>
       <span>→</span>
@@ -304,11 +309,11 @@ export default function UniversalTable({
       />
 
       {/* Table Container */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <div className="border border-border rounded-lg overflow-hidden bg-card">
         {/* Desktop View (1024px+) */}
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200 ">
+            <thead className="bg-muted/50 border-b border-border">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableHeader
                   key={headerGroup.id}
@@ -317,7 +322,7 @@ export default function UniversalTable({
                 />
               ))}
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -335,7 +340,7 @@ export default function UniversalTable({
         <div className="hidden sm:block lg:hidden overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableHeader
                     key={headerGroup.id}
@@ -345,7 +350,7 @@ export default function UniversalTable({
                   />
                 ))}
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}

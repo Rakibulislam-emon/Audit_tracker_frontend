@@ -32,7 +32,7 @@ export default function RoleLayout({ children }) {
 
   if (isLoading || !mounted || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner />
       </div>
     );
@@ -40,18 +40,19 @@ export default function RoleLayout({ children }) {
 
   if (user.role !== role) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner />
       </div>
     );
   }
 
   return (
-    // default bg gray-50
-    <div className="flex min-h-screen bg-gray-50">
+    // CHANGED: bg-gray-50 → bg-background
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar - Fixed positioning */}
+      {/* CHANGED: bg-gray-500 → bg-sidebar */}
       <div
-        className={`fixed bg-gray-500 inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out bg-sidebar ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:inset-0`}
       >
@@ -90,4 +91,3 @@ export default function RoleLayout({ children }) {
     </div>
   );
 }
-
