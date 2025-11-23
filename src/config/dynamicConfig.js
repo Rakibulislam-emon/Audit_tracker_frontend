@@ -1861,6 +1861,12 @@ export const universalConfig = {
 
     // FILTER CONFIGURATION
     filters: {
+      search: {
+        type: "search",
+        label: "Search Team Assignments",
+        placeholder: "Search by roles...",
+        apiParam: "search",
+      },
       auditSession: {
         type: "select",
         label: "Audit Session",

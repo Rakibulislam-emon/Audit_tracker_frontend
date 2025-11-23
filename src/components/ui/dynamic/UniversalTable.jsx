@@ -12,6 +12,8 @@ import {
   ChevronUp,
   ChevronsUpDown,
   LayoutGrid,
+  ChevronRight,
+  MoreVertical,
 } from "lucide-react";
 import { useState } from "react";
 import UniversalActions from "./UniversalActions";
@@ -28,17 +30,20 @@ const DENSITY_CONFIG = {
 };
 
 const PRIORITY_COLORS = {
-  critical: "border-l-red-500",
-  high: "border-l-orange-500",
-  medium: "border-l-yellow-500",
-  low: "border-l-green-500",
+  critical: "border-l-red-500 dark:border-l-red-400",
+  high: "border-l-orange-500 dark:border-l-orange-400",
+  medium: "border-l-yellow-500 dark:border-l-yellow-400",
+  low: "border-l-green-500 dark:border-l-green-400",
 };
 
 const ROW_CONDITION_BACKGROUNDS = {
-  overdue: "bg-red-50 hover:bg-red-100",
-  pending: "bg-yellow-50 hover:bg-yellow-100",
-  attention: "bg-orange-50 hover:bg-orange-100",
-  normal: "hover:bg-gray-50",
+  overdue:
+    "bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50",
+  pending:
+    "bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/50",
+  attention:
+    "bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/30 dark:hover:bg-orange-950/50",
+  normal: "hover:bg-gray-50 dark:hover:bg-muted/50",
 };
 
 // =============================================================================
@@ -52,7 +57,7 @@ const getPriorityBorder = (row, getPriorityLevel) => {
 };
 
 const getRowBackground = (row, getRowCondition) => {
-  if (!getRowCondition) return "hover:bg-gray-50";
+  if (!getRowCondition) return "hover:bg-gray-50 ";
   const condition = getRowCondition(row);
   return ROW_CONDITION_BACKGROUNDS[condition] || "hover:bg-gray-50";
 };
@@ -61,7 +66,9 @@ const getSortIcon = (column) => {
   if (!column.getCanSort()) return null;
 
   const sortState = column.getIsSorted();
-  const iconProps = { className: "w-4 h-4 text-gray-400" };
+  const iconProps = {
+    className: "w-4 h-4 text-gray-400 dark:text-muted-foreground",
+  };
 
   switch (sortState) {
     case "asc":
@@ -78,10 +85,10 @@ const getSortIcon = (column) => {
 // =============================================================================
 
 const EmptyState = ({ module }) => (
-  <div className="text-center py-12 border border-gray-200 rounded-lg bg-gray-50">
-    <LayoutGrid className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-    <p className="text-gray-600 font-medium">No {module} found</p>
-    <p className="text-sm text-gray-400 mt-1">
+  <div className="text-center py-12 border border-border rounded-lg bg-muted/30 dark:bg-muted/20">
+    <LayoutGrid className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
+    <p className="text-foreground font-medium">No {module} found</p>
+    <p className="text-sm text-muted-foreground mt-1">
       There are no {module} to display at the moment.
     </p>
   </div>
@@ -89,8 +96,8 @@ const EmptyState = ({ module }) => (
 
 const ControlsBar = ({ dataLength, module, density, onDensityChange }) => (
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-    <div className="text-sm text-gray-500">
-      Showing <span className="font-medium text-gray-700">{dataLength}</span>{" "}
+    <div className="text-sm text-muted-foreground">
+      Showing <span className="font-medium text-foreground">{dataLength}</span>{" "}
       {module}
     </div>
 
@@ -100,16 +107,16 @@ const ControlsBar = ({ dataLength, module, density, onDensityChange }) => (
 
 const DensityToggle = ({ density, onDensityChange }) => (
   <div className="hidden sm:flex items-center gap-2">
-    <span className="text-xs text-gray-500">Density:</span>
-    <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+    <span className="text-xs text-muted-foreground">Density:</span>
+    <div className="flex border border-border rounded-lg overflow-hidden">
       {["compact", "comfortable", "spacious"].map((densityOption) => (
         <button
           key={densityOption}
           onClick={() => onDensityChange(densityOption)}
           className={`px-2 sm:px-3 py-1 text-xs font-medium transition-colors ${
             density === densityOption
-              ? "bg-blue-600 text-white"
-              : "bg-white text-gray-600 hover:bg-gray-50"
+              ? "bg-primary text-primary-foreground"
+              : "bg-card text-foreground hover:bg-muted"
           }`}
         >
           {densityOption.charAt(0).toUpperCase()}
@@ -130,7 +137,7 @@ const TableHeader = ({ headerGroup, density, isTablet = false }) => (
               ? DENSITY_CONFIG[density].tablet
               : DENSITY_CONFIG[density].desktop
           }
-          text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap
+          text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center whitespace-nowrap
         `}
       >
         {header.isPlaceholder ? null : (
@@ -172,7 +179,7 @@ const TableRow = ({
               ? DENSITY_CONFIG[density].tablet
               : DENSITY_CONFIG[density].desktop
           }
-          whitespace-nowrap text-sm text-gray-900 text-center
+          whitespace-nowrap text-sm text-foreground text-center
         `}
       >
         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -181,51 +188,158 @@ const TableRow = ({
   </tr>
 );
 
-const MobileCard = ({ row, getPriorityLevel, enableActions }) => (
-  <div
-    className={`
-      bg-white border-l-4 ${getPriorityBorder(row.original, getPriorityLevel)}
-      border border-gray-200 rounded-lg overflow-hidden
-    `}
-  >
-    <div className="p-4 space-y-2">
-      {row.getVisibleCells().map((cell) => {
-        if (cell.column.id === "actions") return null;
+// Enhanced MobileCard with better UX
+const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
+  const cells = row.getVisibleCells();
+  const actionCell = cells.find((cell) => cell.column.id === "actions");
+  const dataCells = cells.filter((cell) => cell.column.id !== "actions");
 
-        return (
-          <div
-            key={cell.id}
-            className="flex justify-between items-start gap-4 py-2 border-b border-gray-100 last:border-b-0"
-          >
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide min-w-[100px]">
-              {cell.column.columnDef.header}
-            </span>
-            <span className="text-sm text-gray-900 text-right flex-1">
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </span>
-          </div>
-        );
-      })}
-    </div>
+  // Separate primary and secondary fields for better hierarchy
+  const primaryField = dataCells[0];
+  const importantFields = dataCells.slice(1, 3); // Next 2 fields
+  const otherFields = dataCells.slice(3);
 
-    {enableActions && (
-      <div className="flex justify-end gap-2 px-4 py-3 bg-gray-50 border-t border-gray-100">
-        {flexRender(
-          row.getVisibleCells().find((cell) => cell.column.id === "actions")
-            ?.column.columnDef.cell,
-          row
-            .getVisibleCells()
-            .find((cell) => cell.column.id === "actions")
-            ?.getContext()
+  return (
+    <div
+      className={`
+        group relative bg-card border-l-4 ${getPriorityBorder(
+          row.original,
+          getPriorityLevel
         )}
+        border border-border rounded-xl overflow-hidden
+        shadow-sm hover:shadow-lg transition-all duration-300
+        hover:border-primary/30 hover:-translate-y-0.5
+      `}
+    >
+      {/* Priority Indicator Dot */}
+      {getPriorityLevel && (
+        <div
+          className={`
+          absolute top-3 right-3 w-2 h-2 rounded-full
+          ${getPriorityBorder(row.original, getPriorityLevel)
+            .replace("border-l-", "bg-")
+            .replace("-500", "-500")
+            .replace("dark:border-l-", "")}
+          ${
+            getPriorityLevel(row.original) === "critical"
+              ? "bg-red-500 animate-pulse"
+              : ""
+          }
+          ${getPriorityLevel(row.original) === "high" ? "bg-orange-500" : ""}
+          ${getPriorityLevel(row.original) === "medium" ? "bg-yellow-500" : ""}
+          ${getPriorityLevel(row.original) === "low" ? "bg-green-500" : ""}
+        `}
+        />
+      )}
+
+      {/* Card Header */}
+      <div className="px-4 py-4 bg-gradient-to-r from-muted/30 to-transparent border-b border-border">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0 pr-2">
+            {primaryField && (
+              <>
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                  {primaryField.column.columnDef.header}
+                </div>
+                <div className="text-lg font-bold text-foreground leading-tight line-clamp-2">
+                  {flexRender(
+                    primaryField.column.columnDef.cell,
+                    primaryField.getContext()
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          {enableActions && actionCell && (
+            <div className="flex-shrink-0 pt-1">
+              {flexRender(
+                actionCell.column.columnDef.cell,
+                actionCell.getContext()
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-);
+
+      {/* Important Fields Section */}
+      {importantFields.length > 0 && (
+        <div className="px-4 py-3 bg-muted/10 border-b border-border/50">
+          <div className="grid grid-cols-1 gap-2.5">
+            {importantFields.map((cell) => {
+              const cellValue = flexRender(
+                cell.column.columnDef.cell,
+                cell.getContext()
+              );
+              if (!cellValue) return null;
+
+              return (
+                <div key={cell.id} className="flex items-center gap-3">
+                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide min-w-[90px]">
+                    {cell.column.columnDef.header}:
+                  </div>
+                  <div className="flex-1 text-sm font-medium text-foreground">
+                    {cellValue}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Other Fields Section */}
+      {otherFields.length > 0 && (
+        <div className="px-4 py-3 space-y-2.5">
+          {otherFields.map((cell, index) => {
+            const cellValue = flexRender(
+              cell.column.columnDef.cell,
+              cell.getContext()
+            );
+            if (!cellValue) return null;
+
+            return (
+              <div
+                key={cell.id}
+                className={`
+                  flex flex-col gap-1.5 py-2 px-3 rounded-md
+                  ${
+                    index < otherFields.length - 1
+                      ? "border-b border-border/30"
+                      : ""
+                  }
+                  hover:bg-muted/20 transition-colors
+                `}
+              >
+                <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  {cell.column.columnDef.header}
+                </div>
+                <div className="text-sm text-foreground leading-relaxed break-words">
+                  {cellValue}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Footer Actions (if actions not in header) */}
+      {enableActions && actionCell && !actionCell && (
+        <div className="px-4 py-3 bg-muted/20 border-t border-border">
+          <div className="flex items-center justify-end gap-2">
+            {flexRender(
+              actionCell.column.columnDef.cell,
+              actionCell.getContext()
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ScrollIndicator = () => (
-  <div className="bg-blue-50 border-t border-blue-200 px-3 py-2 text-center">
-    <p className="text-xs text-blue-600 flex items-center justify-center gap-1">
+  <div className="bg-blue-50 dark:bg-blue-950/30 border-t border-blue-200 dark:border-blue-800/50 px-3 py-2 text-center">
+    <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center justify-center gap-1">
       <span>←</span>
       <span>Swipe to view all columns</span>
       <span>→</span>
@@ -304,11 +418,11 @@ export default function UniversalTable({
       />
 
       {/* Table Container */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <div className="border border-border rounded-lg overflow-hidden bg-card">
         {/* Desktop View (1024px+) */}
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200 ">
+            <thead className="bg-muted/50 border-b border-border">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableHeader
                   key={headerGroup.id}
@@ -317,7 +431,7 @@ export default function UniversalTable({
                 />
               ))}
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -335,7 +449,7 @@ export default function UniversalTable({
         <div className="hidden sm:block lg:hidden overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b border-border">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableHeader
                     key={headerGroup.id}
@@ -345,7 +459,7 @@ export default function UniversalTable({
                   />
                 ))}
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
