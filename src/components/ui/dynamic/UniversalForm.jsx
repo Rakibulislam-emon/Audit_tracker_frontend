@@ -127,7 +127,7 @@ const prepareSubmissionData = (data, config, mode) => {
   return submissionData;
 };
 const ErrorDisplay = ({ error }) => (
-  <div className="flex items-start gap-1.5 text-red-600 text-sm mt-1">
+  <div className="flex items-start gap-1.5 text-destructive text-sm mt-1">
     <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
     <p>{error.message}</p>
   </div>
@@ -136,11 +136,11 @@ const ErrorDisplay = ({ error }) => (
 const FieldLabel = ({ fieldKey, fieldConfig }) => (
   <Label
     htmlFor={fieldKey}
-    className="text-sm font-medium text-gray-700 flex items-center gap-1"
+    className="text-sm font-medium text-foreground flex items-center gap-1"
   >
     {fieldConfig.label}
     {fieldConfig.required && (
-      <span className="text-red-500" title="Required">
+      <span className="text-destructive" title="Required">
         *
       </span>
     )}
@@ -148,7 +148,7 @@ const FieldLabel = ({ fieldKey, fieldConfig }) => (
 );
 
 const FieldDescription = ({ description }) => (
-  <p className="text-xs text-gray-500 mt-1">{description}</p>
+  <p className="text-xs text-muted-foreground mt-1">{description}</p>
 );
 
 const LoadingButtonContent = ({ mode }) => (
@@ -178,7 +178,7 @@ const FormStatusIndicator = ({ mode, isDirty, isSubmitting }) => {
   if (mode === "edit" && !isDirty && !isSubmitting) {
     return (
       <div className="text-center">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           No changes detected. Make changes to enable save.
         </p>
       </div>
@@ -508,7 +508,7 @@ export default function UniversalForm({
 
   if (!config) {
     return (
-      <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-lg flex items-start gap-3">
+      <div className="p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg flex items-start gap-3">
         <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
         <div>
           <p className="font-semibold">Configuration Error</p>
@@ -558,14 +558,14 @@ export default function UniversalForm({
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-200 pt-5" />
+      <div className="border-t border-border pt-5" />
 
       {/* Action Buttons */}
       <div className="flex gap-3 justify-end">
         <Button
           type="submit"
           disabled={isSubmitting || (mode === "edit" && !isDirty)}
-          className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="min-w-[140px] bg-primary hover:bg-primary/90 text-primary-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <LoadingButtonContent mode={mode} />
