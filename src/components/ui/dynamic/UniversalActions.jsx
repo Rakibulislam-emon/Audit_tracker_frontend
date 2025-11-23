@@ -1,7 +1,16 @@
 // components/ui/dynamic/UniversalActions.jsx
 "use client";
 
-import { CheckCircle, Edit, MoreVertical, Trash2, XCircle,Play,Ban, Eye } from "lucide-react";
+import {
+  CheckCircle,
+  Edit,
+  MoreVertical,
+  Trash2,
+  XCircle,
+  Play,
+  Ban,
+  Eye,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -69,8 +78,8 @@ const CommentsForm = ({ actionType, onSubmit, isLoading, onCancel }) => {
           disabled={isLoading || (actionType === "reject" && !comments.trim())}
           className={
             actionType === "approve"
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-red-600 hover:bg-red-700"
+              ? "bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+              : "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
           }
         >
           {isLoading
@@ -127,10 +136,10 @@ const SimpleApprovalActions = ({
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
             approval.approvalStatus === "approved"
-              ? "bg-green-100 text-green-800"
+              ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400"
               : approval.approvalStatus === "rejected"
-              ? "bg-red-100 text-red-800"
-              : "bg-gray-100 text-gray-800"
+              ? "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400"
+              : "bg-muted text-muted-foreground"
           }`}
         >
           {approval.approvalStatus}
@@ -141,7 +150,7 @@ const SimpleApprovalActions = ({
             variant="outline"
             size="sm"
             onClick={() => onDelete(approval)}
-            className="text-red-600 hover:bg-red-50"
+            className="text-destructive hover:bg-destructive/10"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -236,7 +245,7 @@ const SimpleApprovalActions = ({
             variant="outline"
             size="sm"
             onClick={() => onDelete(approval)}
-            className="text-red-600 hover:bg-red-50"
+            className="text-destructive hover:bg-destructive/10"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -299,7 +308,8 @@ const getFilteredCustomActions = (moduleConfig, userRole, item) => {
 const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
   const ACTION_ICONS = {
     start: Play,
-    cancel: Ban, Eye,
+    cancel: Ban,
+    Eye,
     viewDetails: Eye,
     edit: Edit,
     delete: Trash2,
@@ -376,7 +386,7 @@ const DeleteButton = ({ onDelete, item }) => (
     variant="outline"
     size="sm"
     onClick={() => onDelete(item)}
-    className="text-red-600 hover:bg-red-50"
+    className="text-destructive hover:bg-destructive/10"
   >
     <Trash2 className="h-4 w-4 mr-2" />
     Delete
@@ -482,7 +492,7 @@ const MobileActionsView = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(item)}
-                className="text-red-600"
+                className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete

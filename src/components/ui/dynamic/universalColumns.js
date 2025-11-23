@@ -211,7 +211,8 @@ const RELATION_COLORS = {
   },
 };
 
-const DEFAULT_COLOR = "bg-gray-50 text-gray-600 border border-gray-200";
+// Update the DEFAULT_COLOR to be theme-aware
+const DEFAULT_COLOR = "bg-muted text-muted-foreground border border-border";
 const HOVER_EFFECTS = "transition-colors duration-200 hover:shadow-sm";
 
 // 🎯 HELPER FUNCTIONS

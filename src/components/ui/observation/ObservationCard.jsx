@@ -228,7 +228,7 @@ export default function ObservationCard({
 
       default:
         return (
-          <p className="text-red-500">
+          <p className="text-destructive">
             Error: Unknown response type "{responseType}"
           </p>
         );
@@ -244,12 +244,12 @@ export default function ObservationCard({
 
   const responseColor =
     response === "yes"
-      ? "border-green-500"
+      ? "border-green-500 dark:border-green-400"
       : response === "no"
-      ? "border-red-500"
+      ? "border-red-500 dark:border-red-400"
       : hasRespondedOrIsZero
-      ? "border-blue-500"
-      : "border-gray-200";
+      ? "border-primary"
+      : "border-border";
 
   const showSeverity =
     response === "no" ||
@@ -259,18 +259,18 @@ export default function ObservationCard({
     <>
       <div
         className={cn(
-          "p-4 bg-white border-l-4 rounded-lg shadow-sm",
+          "p-4 bg-card border-l-4 rounded-lg shadow-sm",
           responseColor
         )}
       >
         <div className="space-y-4">
-          <p className="font-medium text-gray-800">{question.questionText}</p>
+          <p className="font-medium text-foreground">{question.questionText}</p>
           {renderResponseInput()}
 
           {showSeverity && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center">
-                <AlertTriangle className="h-4 w-4 mr-2 text-red-500" />
+              <label className="text-sm font-medium text-foreground flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2 text-destructive" />
                 Severity
               </label>
               <Select
@@ -293,7 +293,7 @@ export default function ObservationCard({
 
           {hasRespondedOrIsZero && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground">
                 Comments (Optional)
               </label>
               <Textarea

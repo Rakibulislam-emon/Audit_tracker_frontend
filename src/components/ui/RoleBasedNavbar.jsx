@@ -13,10 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { handleLogout } from "@/utils/auth-client";
+import clsx from "clsx";
+import { motion } from "framer-motion";
 import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import clsx from "clsx";
+import { ModeToggle } from "./ThemeToggle";
 
 export function RoleBasedNavbar({ role, onToggleSidebar }) {
   const { user } = useAuthStore();
@@ -96,7 +97,7 @@ export function RoleBasedNavbar({ role, onToggleSidebar }) {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
             </span>
           </Button>
-
+          <ModeToggle />
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

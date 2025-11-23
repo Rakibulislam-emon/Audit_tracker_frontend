@@ -349,24 +349,28 @@ export default function UniversalCRUDManager({
 
       {/* Filter and Action Section */}
       {isAvailable && (
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 ">
-          {/* Filters */}
+        <div className="space-y-4 mb-6">
+          {/* Action Button Row - Right Aligned */}
+          {(canCreate && !config?.hasCustomCreate) || customHeaderActions ? (
+            <div className="flex justify-end w-full">
+              {customHeaderActions || (
+                <ActionButtons
+                  canCreate={canCreate}
+                  hasCustomCreate={config?.hasCustomCreate}
+                  customHeaderActions={customHeaderActions}
+                  addButtonText={addButtonText}
+                  onOpenCreateModal={openCreateModal}
+                />
+              )}
+            </div>
+          ) : null}
+
+          {/* Filters - Full Width Below */}
           {hasFilters && (
-            <div className="w-full flex-grow max-w-7xl">
+            <div className="w-full">
               <UniversalFilters module={module} token={token} />
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex-shrink-0 w-full md:w-auto">
-            <ActionButtons
-              canCreate={canCreate}
-              hasCustomCreate={config?.hasCustomCreate}
-              customHeaderActions={customHeaderActions}
-              addButtonText={addButtonText}
-              onOpenCreateModal={openCreateModal}
-            />
-          </div>
         </div>
       )}
 
