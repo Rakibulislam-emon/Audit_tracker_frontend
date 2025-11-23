@@ -17,11 +17,44 @@ import clsx from "clsx";
 import { motion } from "framer-motion";
 import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { ModeToggle } from "./ThemeToggle";
 
 export function RoleBasedNavbar({ role, onToggleSidebar }) {
   const { user } = useAuthStore();
   const pathname = usePathname();
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "New Audit Assigned",
+      message: "You have been assigned to the Q3 Financial Audit.",
+      time: "2 mins ago",
+      read: false,
+      type: "info",
+    },
+    {
+      id: 2,
+      title: "Security Alert",
+      message: "Unusual login attempt detected from new IP.",
+      time: "1 hour ago",
+      read: false,
+      type: "warning",
+    },
+    {
+      id: 3,
+      title: "Report Approved",
+      message: "The Compliance Report #2024-001 has been approved.",
+      time: "Yesterday",
+      read: true,
+      type: "success",
+    },
+  ]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+  };
 
   const roleStyles = {
     admin: "from-red-500 to-rose-600",
@@ -86,17 +119,89 @@ export function RoleBasedNavbar({ role, onToggleSidebar }) {
           </div>
 
           {/* Notification Bell */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-secondary/70 transition"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
-            </span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-secondary/70 transition"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive"></span>
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <h4 className="font-semibold text-sm">Notifications</h4>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+              </div>
+              <div className="max-h-[300px] overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No notifications
+                  </div>
+                ) : (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={clsx(
+                        "flex items-start gap-3 p-4 border-b last:border-0 hover:bg-muted/50 transition-colors cursor-pointer",
+                        !notification.read &&
+                          "bg-blue-50/50 dark:bg-blue-900/10"
+                      )}
+                    >
+                      <div
+                        className={clsx(
+                          "mt-1 h-2 w-2 rounded-full flex-shrink-0",
+                          !notification.read ? "bg-blue-600" : "bg-transparent"
+                        )}
+                      />
+                      <div className="space-y-1">
+                        <p
+                          className={clsx(
+                            "text-sm font-medium leading-none",
+                            !notification.read
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                          )}
+                        >
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground pt-1">
+                          {notification.time}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="p-2 border-t text-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-xs h-8"
+                >
+                  View all notifications
+                </Button>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <ModeToggle />
           {/* User Menu */}
           <DropdownMenu>

@@ -45,7 +45,7 @@ export const navItems = {
       icon: Factory,
       href: "/dashboard/admin/sites",
     },
-       {
+    {
       id: "check-types",
       label: "Category (Check Types)",
       icon: ListChecks,
@@ -63,7 +63,6 @@ export const navItems = {
       icon: ClipboardCheck,
       href: "/dashboard/admin/questions",
     },
- 
 
     {
       id: "templates",
@@ -158,14 +157,76 @@ export const navItems = {
       href: "/dashboard/admin/settings",
     },
   ],
-  audit_manager:[
-      {
+  manager: [
+    {
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/dashboard/audit_manager",
+      href: "/dashboard/manager",
     },
-  ]
+    {
+      id: "team-audits",
+      label: "Team Audits",
+      icon: Users,
+      href: "/dashboard/manager/team-audits",
+    },
+    {
+      id: "approvals",
+      label: "Approvals",
+      icon: ClipboardCheck,
+      href: "/dashboard/manager/approvals",
+    },
+    {
+      id: "schedules",
+      label: "Schedules",
+      icon: Calendar,
+      href: "/dashboard/manager/schedules",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: FileText,
+      href: "/dashboard/manager/reports",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/manager/settings",
+    },
+  ],
+  auditor: [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      href: "/dashboard/auditor",
+    },
+    {
+      id: "my-audits",
+      label: "My Audits",
+      icon: ClipboardList,
+      href: "/dashboard/auditor/my-audits",
+    },
+    {
+      id: "schedule",
+      label: "My Schedule",
+      icon: Calendar,
+      href: "/dashboard/auditor/schedule",
+    },
+    {
+      id: "reports",
+      label: "My Reports",
+      icon: FileText,
+      href: "/dashboard/auditor/reports",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/auditor/settings",
+    },
+  ],
 };
 
 // export { navItems };
