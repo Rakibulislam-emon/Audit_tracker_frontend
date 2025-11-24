@@ -1,43 +1,129 @@
-import React from 'react'
+"use client";
 
-export default function Dashboard() {
+// import React from "react";
+// import { useParams } from "next/navigation";
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import DashboardStats from "@/components/dashboard/DashboardStats";
+// import RecentActivityFeed from "@/components/dashboard/RecentActivityFeed";
+// import PendingApprovalsTable from "@/components/dashboard/PendingApprovalsTable";
+// import QuickActionsPanel from "@/components/dashboard/QuickActionsPanel";
+// ("use client");
+
+import React from "react";
+import { useParams } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import RecentActivityFeed from "@/components/dashboard/RecentActivityFeed";
+import PendingApprovalsTable from "@/components/dashboard/PendingApprovalsTable";
+import QuickActionsPanel from "@/components/dashboard/QuickActionsPanel";
+import AuditStatusChart from "@/components/dashboard/AuditStatusChart";
+import AuditProgressChart from "@/components/dashboard/analytics/AuditProgressChart";
+import ProblemsSeverityChart from "@/components/dashboard/analytics/ProblemsSeverityChart";
+import RiskMatrixHeatmap from "@/components/dashboard/analytics/RiskMatrixHeatmap";
+import SitePerformanceTable from "@/components/dashboard/analytics/SitePerformanceTable";
+
+import UpcomingSchedulesCalendar from "@/components/dashboard/advanced/UpcomingSchedulesCalendar";
+import TeamPerformanceLeaderboard from "@/components/dashboard/advanced/TeamPerformanceLeaderboard";
+import ApprovalWorkflowFunnel from "@/components/dashboard/advanced/ApprovalWorkflowFunnel";
+import FixActionsTracker from "@/components/dashboard/advanced/FixActionsTracker";
+
+export default function DashboardPage() {
+  const params = useParams();
+  const role = params.role;
+
+  // Capitalize role for display
+  const displayRole = role
+    ? role.charAt(0).toUpperCase() + role.slice(1)
+    : "User";
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
-      
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-800">Total Users</h3>
-          <p className="text-3xl font-bold text-blue-600">24</p>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-800">Active Audits</h3>
-          <p className="text-3xl font-bold text-green-600">12</p>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-800">Pending Tasks</h3>
-          <p className="text-3xl font-bold text-orange-600">8</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back, {displayRole}! Here&apos;s what&apos;s happening
+            today.
+          </p>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
-        <div className="flex gap-4">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            View Users
-          </button>
-          <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-            Create Audit
-          </button>
-          <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-            Generate Report
-          </button>
-        </div>
-      </div>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          {/* KPI Cards Row */}
+          <DashboardStats />
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            {/* Main Chart Area - 4 columns */}
+            <div className="col-span-4">
+              <AuditStatusChart />
+            </div>
+
+            {/* Quick Actions - 3 columns */}
+            <div className="col-span-3">
+              <QuickActionsPanel />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            {/* Recent Activity - 4 columns */}
+            <div className="col-span-4">
+              <RecentActivityFeed />
+            </div>
+
+            {/* Pending Approvals - 3 columns */}
+            <div className="col-span-3">
+              <PendingApprovalsTable />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="h-[400px]">
+              <AuditProgressChart />
+            </div>
+            <div className="h-[400px]">
+              <ProblemsSeverityChart />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="h-[400px]">
+              <RiskMatrixHeatmap />
+            </div>
+            <div className="h-[400px]">
+              <SitePerformanceTable />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="col-span-4 h-[400px]">
+              <UpcomingSchedulesCalendar />
+            </div>
+            <div className="col-span-3 h-[400px]">
+              <TeamPerformanceLeaderboard />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="h-[400px]">
+              <ApprovalWorkflowFunnel />
+            </div>
+            <div className="h-[400px]">
+              <FixActionsTracker />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
-  )
+  );
 }
