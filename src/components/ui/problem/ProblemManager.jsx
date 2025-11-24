@@ -20,7 +20,7 @@ const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
   "manager",
-  "compliance_officer",
+  "complianceOfficer",
 ];
 
 // =============================================================================

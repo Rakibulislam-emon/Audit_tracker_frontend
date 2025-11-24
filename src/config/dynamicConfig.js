@@ -41,7 +41,7 @@ export const universalConfig = {
         options: [
           "admin",
           "auditor",
-          "compliance_officer",
+          "complianceOfficer",
           "manager",
           "sysadmin",
         ],
@@ -84,7 +84,7 @@ export const universalConfig = {
         options: [
           "admin",
           "auditor",
-          "compliance_officer",
+          "complianceOfficer",
           "manager",
           "sysadmin",
         ],
@@ -2130,7 +2130,7 @@ export const universalConfig = {
       // create: ["admin", "sysadmin", "manager", "auditor"],
       edit: ["admin", "sysadmin", "manager"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
     },
   },
 
@@ -2362,7 +2362,7 @@ export const universalConfig = {
     permissions: {
       // Match backend roles
       // Who can view? Probably everyone involved.
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
       // Who creates actions? Usually Managers/Admins based on Problems.
       create: ["admin", "sysadmin", "manager"],
       // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
@@ -2577,7 +2577,7 @@ export const universalConfig = {
     // Permissions - Need careful consideration for file uploads/deletes
     permissions: {
       // View might be broad
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
       // Create (Upload) - Who can upload evidence?
       create: ["admin", "sysadmin", "manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
       // Edit (Caption/Status only) - Who can edit metadata?
@@ -2789,7 +2789,7 @@ export const universalConfig = {
       create: ["admin", "sysadmin"], // Manual create (hidden by hasCustomCreate)
       edit: ["admin", "sysadmin", "manager"], // Edit metadata
       delete: ["admin", "sysadmin"], // Delete report
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
       // ✅ Custom permission for generate button
       generate: ["admin", "sysadmin", "manager"],
     },
