@@ -252,6 +252,12 @@ export const navItems = {
       icon: ThumbsUp,
       href: "/dashboard/admin/approvals",
     },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/admin/settings",
+    },
   ],
 
   compliance_officer: [
@@ -314,6 +320,12 @@ export const navItems = {
       label: "Problems",
       icon: AlertTriangle,
       href: "/dashboard/compliance/problems",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/complianceOfficer/settings",
     },
   ],
 
@@ -384,6 +396,12 @@ export const navItems = {
       icon: ThumbsUp,
       href: "/dashboard/manager/approvals",
     },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/manager/settings",
+    },
   ],
 
   auditor: [
@@ -422,6 +440,12 @@ export const navItems = {
       label: "Proofs",
       icon: Camera,
       href: "/dashboard/auditor/proofs",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/auditor/settings",
     },
   ],
 };

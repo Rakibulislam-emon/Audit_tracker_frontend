@@ -99,10 +99,26 @@ const ActionButtons = ({
 
   if (canCreate && !hasCustomCreate) {
     return (
-      <Button onClick={onOpenCreateModal} size="sm">
-        <Plus className="h-4 w-4 mr-2" />
-        {addButtonText}
-      </Button>
+      <button
+        onClick={onOpenCreateModal}
+        className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden"
+      >
+        {/* Animated background shimmer */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+        {/* Icon with animation */}
+        <div className="relative z-10 p-1 bg-white/20 rounded-md group-hover:bg-white/30 transition-colors duration-300">
+          <Plus className="h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
+        </div>
+
+        {/* Button text */}
+        <span className="relative z-10 text-sm font-medium tracking-wide">
+          {addButtonText}
+        </span>
+
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl bg-blue-400/50"></div>
+      </button>
     );
   }
 
@@ -349,7 +365,7 @@ export default function UniversalCRUDManager({
 
       {/* Filter and Action Section */}
       {isAvailable && (
-        <div className="space-y-4 mb-6">
+        <div className="space-y-4 mb-6 ">
           {/* Action Button Row - Right Aligned */}
           {(canCreate && !config?.hasCustomCreate) || customHeaderActions ? (
             <div className="flex justify-end w-full">
