@@ -42,7 +42,7 @@ export const universalConfig = {
           "admin",
           "auditor",
           "compliance_officer",
-          "audit_manager",
+          "manager",
           "sysadmin",
         ],
         tableColumn: true,
@@ -85,7 +85,7 @@ export const universalConfig = {
           "admin",
           "auditor",
           "compliance_officer",
-          "audit_manager",
+          "manager",
           "sysadmin",
         ],
         placeholder: "All Roles",
@@ -105,7 +105,7 @@ export const universalConfig = {
       create: ["admin", "sysadmin"],
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "manager"],
     },
   },
   groups: {
@@ -184,7 +184,7 @@ export const universalConfig = {
       create: ["admin", "sysadmin"],
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "manager"],
     },
   },
 
@@ -307,7 +307,7 @@ export const universalConfig = {
       create: ["admin", "sysadmin"],
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "manager"],
     },
   },
 
@@ -418,10 +418,10 @@ export const universalConfig = {
 
     // PERMISSIONS (আপনার প্রয়োজন অনুযায়ী অ্যাডজাস্ট করুন)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"], // কারা তৈরি করতে পারবে
-      edit: ["admin", "sysadmin", "audit_manager"], // কারা এডিট করতে পারবে
+      create: ["admin", "sysadmin", "manager"], // কারা তৈরি করতে পারবে
+      edit: ["admin", "sysadmin", "manager"], // কারা এডিট করতে পারবে
       delete: ["admin", "sysadmin"], // কারা ডিলিট করতে পারবে
-      view: ["admin", "sysadmin", "audit_manager", "auditor"], // কারা দেখতে পারবে
+      view: ["admin", "sysadmin", "manager", "auditor"], // কারা দেখতে পারবে
     },
   },
 
@@ -515,10 +515,10 @@ export const universalConfig = {
 
     // PERMISSIONS (Adjust according to your needs)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Everyone can view?
+      view: ["admin", "sysadmin", "manager", "auditor"], // Everyone can view?
     },
   },
 
@@ -640,10 +640,10 @@ export const universalConfig = {
 
     // PERMISSIONS (Adjust as needed)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
     },
   },
 
@@ -808,10 +808,10 @@ export const universalConfig = {
 
     // PERMISSIONS (Match these with your backend roles in authorizeRoles)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
     },
   },
   templates: {
@@ -957,10 +957,10 @@ export const universalConfig = {
 
     // PERMISSIONS (Adjust as needed)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
     },
   },
 
@@ -1174,10 +1174,10 @@ export const universalConfig = {
 
     // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
     },
   },
 
@@ -1368,11 +1368,11 @@ export const universalConfig = {
 
     // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
-      start: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
+      start: ["admin", "sysadmin", "manager"],
     },
 
     // CUSTOM ACTIONS
@@ -1573,11 +1573,11 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      // create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Auditor might update status/dates
+      // create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager", "auditor"], // Auditor might update status/dates
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
-      viewDetails: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
     },
     customActions: [
       {
@@ -1767,10 +1767,10 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin", "audit_manager", "auditor"],
-      edit: ["admin", "sysadmin", "audit_manager", "auditor"], // Might need finer control later
+      create: ["admin", "sysadmin", "manager", "auditor"],
+      edit: ["admin", "sysadmin", "manager", "auditor"], // Might need finer control later
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "audit_manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor"],
     },
   },
 
@@ -1903,10 +1903,10 @@ export const universalConfig = {
 
     // PERMISSIONS (Match roles in authorizeRoles middleware)
     permissions: {
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
-      delete: ["admin", "sysadmin", "audit_manager"], // Allow manager to delete assignments too?
-      view: ["admin", "sysadmin", "audit_manager", "auditor"], // Allow auditors to see team assignments
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
+      delete: ["admin", "sysadmin", "manager"], // Allow manager to delete assignments too?
+      view: ["admin", "sysadmin", "manager", "auditor"], // Allow auditors to see team assignments
     },
   },
 
@@ -2127,16 +2127,10 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      // create: ["admin", "sysadmin", "audit_manager", "auditor"],
-      edit: ["admin", "sysadmin", "audit_manager"], // Who can edit problem details?
+      // create: ["admin", "sysadmin", "manager", "auditor"],
+      edit: ["admin", "sysadmin", "manager"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
-      view: [
-        "admin",
-        "sysadmin",
-        "audit_manager",
-        "auditor",
-        "compliance_officer",
-      ],
+      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
     },
   },
 
@@ -2368,17 +2362,11 @@ export const universalConfig = {
     permissions: {
       // Match backend roles
       // Who can view? Probably everyone involved.
-      view: [
-        "admin",
-        "sysadmin",
-        "audit_manager",
-        "auditor",
-        "compliance_officer",
-      ],
+      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       // Who creates actions? Usually Managers/Admins based on Problems.
-      create: ["admin", "sysadmin", "audit_manager"],
+      create: ["admin", "sysadmin", "manager"],
       // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
-      edit: ["admin", "sysadmin", "audit_manager" /*, add owner role? */],
+      edit: ["admin", "sysadmin", "manager" /*, add owner role? */],
       // Who deletes? Restricted.
       delete: ["admin", "sysadmin"],
     },
@@ -2589,17 +2577,11 @@ export const universalConfig = {
     // Permissions - Need careful consideration for file uploads/deletes
     permissions: {
       // View might be broad
-      view: [
-        "admin",
-        "sysadmin",
-        "audit_manager",
-        "auditor",
-        "compliance_officer",
-      ],
+      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       // Create (Upload) - Who can upload evidence?
-      create: ["admin", "sysadmin", "audit_manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
+      create: ["admin", "sysadmin", "manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
       // Edit (Caption/Status only) - Who can edit metadata?
-      edit: ["admin", "sysadmin", "audit_manager"], // UniversalForm edit can handle caption/status
+      edit: ["admin", "sysadmin", "manager"], // UniversalForm edit can handle caption/status
       // Delete - Highly restricted
       delete: ["admin", "sysadmin"],
     },
@@ -2805,17 +2787,11 @@ export const universalConfig = {
     // PERMISSIONS (Match backend roles)
     permissions: {
       create: ["admin", "sysadmin"], // Manual create (hidden by hasCustomCreate)
-      edit: ["admin", "sysadmin", "audit_manager"], // Edit metadata
+      edit: ["admin", "sysadmin", "manager"], // Edit metadata
       delete: ["admin", "sysadmin"], // Delete report
-      view: [
-        "admin",
-        "sysadmin",
-        "audit_manager",
-        "auditor",
-        "compliance_officer",
-      ],
+      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       // ✅ Custom permission for generate button
-      generate: ["admin", "sysadmin", "audit_manager"],
+      generate: ["admin", "sysadmin", "manager"],
     },
   },
 
@@ -3036,11 +3012,11 @@ export const universalConfig = {
 
     // In dynamicConfig.js - approvals permissions
     permissions: {
-      view: ["admin", "sysadmin", "audit_manager", "approver"],
-      create: ["admin", "sysadmin", "audit_manager"],
-      edit: ["admin", "sysadmin", "audit_manager"],
+      view: ["admin", "sysadmin", "manager", "approver"],
+      create: ["admin", "sysadmin", "manager"],
+      edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
-      approve: ["admin", "sysadmin", "audit_manager", "approver"], // ✅ ADD THIS
+      approve: ["admin", "sysadmin", "manager", "approver"], // ✅ ADD THIS
     },
     // customActions: [
     //   {
