@@ -26,6 +26,14 @@ import UpcomingSchedulesCalendar from "@/components/dashboard/advanced/UpcomingS
 import TeamPerformanceLeaderboard from "@/components/dashboard/advanced/TeamPerformanceLeaderboard";
 import ApprovalWorkflowFunnel from "@/components/dashboard/advanced/ApprovalWorkflowFunnel";
 import FixActionsTracker from "@/components/dashboard/advanced/FixActionsTracker";
+import PDFExportButton from "@/components/dashboard/shared/PDFExportButton";
+import {
+  useDashboardStats,
+  useAuditProgress,
+  useRiskMatrix,
+  useSitePerformance,
+  useFixActionsStatus,
+} from "@/hooks/useDashboardData";
 
 export default function DashboardPage() {
   const params = useParams();
@@ -35,6 +43,21 @@ export default function DashboardPage() {
   const displayRole = role
     ? role.charAt(0).toUpperCase() + role.slice(1)
     : "User";
+
+  // Fetch data for PDF Report
+  const { data: statsData } = useDashboardStats();
+  const { data: progressData } = useAuditProgress();
+  const { data: riskData } = useRiskMatrix();
+  const { data: siteData } = useSitePerformance();
+  const { data: fixData } = useFixActionsStatus();
+
+  const reportData = {
+    stats: statsData?.data,
+    auditProgress: progressData?.data,
+    riskMatrix: riskData?.data,
+    sitePerformance: siteData?.data,
+    fixActions: fixData?.data,
+  };
 
   return (
     <div className="space-y-6">
@@ -46,6 +69,7 @@ export default function DashboardPage() {
             today.
           </p>
         </div>
+        <PDFExportButton data={reportData} userName={displayRole} />
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">

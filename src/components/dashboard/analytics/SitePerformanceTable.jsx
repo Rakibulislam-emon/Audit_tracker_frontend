@@ -5,6 +5,7 @@ import { useSitePerformance } from "@/hooks/useDashboardData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import ExportButton from "@/components/dashboard/shared/ExportButton";
 
 /**
  * Site Performance Table Component
@@ -13,6 +14,13 @@ import { Badge } from "@/components/ui/badge";
 export default function SitePerformanceTable() {
   const { data, isLoading } = useSitePerformance();
   const sites = data?.data || [];
+
+  const csvHeaders = {
+    siteName: "Site Name",
+    complianceScore: "Compliance Score",
+    auditCount: "Total Audits",
+    openProblems: "Open Problems",
+  };
 
   const getScoreColor = (score) => {
     if (score >= 90) return "text-green-600 dark:text-green-400";
@@ -28,7 +36,7 @@ export default function SitePerformanceTable() {
 
   if (isLoading) {
     return (
-      <Card className="border-border h-full">
+      <Card className="border-border col-span-1 lg:col-span-2">
         <CardHeader>
           <CardTitle>Site Performance</CardTitle>
         </CardHeader>
@@ -48,9 +56,14 @@ export default function SitePerformanceTable() {
   }
 
   return (
-    <Card className="border-border h-full">
-      <CardHeader>
+    <Card className="border-border col-span-1 lg:col-span-2">
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Site Performance Leaderboard</CardTitle>
+        <ExportButton
+          data={sites}
+          filename="site_performance_report"
+          headers={csvHeaders}
+        />
       </CardHeader>
       <CardContent>
         {sites.length === 0 ? (

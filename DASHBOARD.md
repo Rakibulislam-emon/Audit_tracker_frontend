@@ -50,7 +50,7 @@
 
 - [ ] Real-time notifications
 - [ ] Widget customization
-- [ ] Export functionality
+- [x] Export functionality (CSV & PDF implemented)
 - [ ] Advanced filtering
 
   - Purpose: Dashboard API endpoints controller

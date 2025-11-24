@@ -5,6 +5,7 @@ import { useFixActionsStatus } from "@/hooks/useDashboardData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Clock, AlertCircle, ListTodo } from "lucide-react";
+import ExportButton from "@/components/dashboard/shared/ExportButton";
 
 /**
  * Fix Actions Tracker Component
@@ -18,6 +19,19 @@ export default function FixActionsTracker() {
     inProgress: 0,
     overdue: 0,
     completionRate: 0,
+  };
+
+  // For export, we might want a list of actions, but this component currently shows stats.
+  // We'll export the stats summary for now, or if we had a list, we'd export that.
+  // Since the API returns stats, we'll export the stats object as a single row.
+  const exportData = [stats];
+
+  const csvHeaders = {
+    total: "Total Actions",
+    completed: "Completed",
+    inProgress: "In Progress",
+    overdue: "Overdue",
+    completionRate: "Completion Rate (%)",
   };
 
   if (isLoading) {
@@ -45,8 +59,13 @@ export default function FixActionsTracker() {
 
   return (
     <Card className="border-border h-full">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Fix Actions Tracker</CardTitle>
+        <ExportButton
+          data={exportData}
+          filename="fix_actions_summary"
+          headers={csvHeaders}
+        />
       </CardHeader>
       <CardContent>
         <div className="space-y-6">

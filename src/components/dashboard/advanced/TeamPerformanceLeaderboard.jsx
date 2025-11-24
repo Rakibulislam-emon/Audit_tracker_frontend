@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Award } from "lucide-react";
+import ExportButton from "@/components/dashboard/shared/ExportButton";
 
 /**
  * Team Performance Leaderboard Component
@@ -14,6 +15,14 @@ import { Trophy, Medal, Award } from "lucide-react";
 export default function TeamPerformanceLeaderboard() {
   const { data, isLoading } = useTeamPerformance();
   const team = data?.data || [];
+
+  const csvHeaders = {
+    name: "Auditor Name",
+    role: "Role",
+    audits: "Audits Completed",
+    observations: "Observations Recorded",
+    email: "Email",
+  };
 
   const getRankIcon = (index) => {
     if (index === 0) return <Trophy className="h-5 w-5 text-yellow-500" />;
@@ -60,8 +69,13 @@ export default function TeamPerformanceLeaderboard() {
 
   return (
     <Card className="border-border h-full">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Top Auditors</CardTitle>
+        <ExportButton
+          data={team}
+          filename="auditor_performance_report"
+          headers={csvHeaders}
+        />
       </CardHeader>
       <CardContent>
         {team.length === 0 ? (
