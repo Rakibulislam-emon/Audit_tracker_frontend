@@ -52,16 +52,8 @@ export default function UniversalFilters({ module, token }) {
 
   const [filters, setFilters] = useState(getInitialFilters);
   const [debouncedFilters] = useDebounce(filters, 300);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // Collapsed by default for better UX
   const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile screen
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // Update URL when filters change
   useEffect(() => {
@@ -248,151 +240,166 @@ export default function UniversalFilters({ module, token }) {
     }
   };
 
-  // Mobile: Show first 2 filters, expand for more
-  const visibleFilters =
-    isMobile && !isExpanded ? filterEntries.slice(0, 2) : filterEntries;
-
   return (
     <div className="w-full">
-      {/* Filter Container */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+      {!isExpanded ? (
+        // Collapsed State - Compact Button
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="w-full cursor-pointer px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 rounded-lg"
+            type="button"
+          >
+            <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 rounded-lg">
-                <Filter className="h-5 w-5 text-blue-600" />
+                <Filter className="h-4 w-4 text-blue-600" />
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-                Filters
-              </h3>
+              <span className="text-sm font-medium text-gray-700">
+                {hasActiveFilters ? "Filters Applied" : "Show Filters"}
+              </span>
+              {hasActiveFilters && (
+                <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-blue-500 text-white text-xs font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearAllFilters();
+                  }}
+                  className="h-8 px-3 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200"
+                  type="button"
+                >
+                  <RotateCcw className="h-3 w-3 mr-1" />
+                  Clear
+                </Button>
+              )}
+              <ChevronDown className="h-5 w-5 text-gray-400" />
+            </div>
+          </button>
+
+          {/* Active Filters Preview */}
+          {hasActiveFilters && (
+            <div className="px-4 pb-3 pt-1 border-t border-gray-100">
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(filters).map(([key, value]) => {
+                  if (!value || value === "all" || value === "") return null;
+
+                  const filterConfigItem = filterConfig[key];
+                  const displayValue =
+                    filterConfigItem?.options?.find((opt) => opt === value) ||
+                    value;
+
+                  return (
+                    <div
+                      key={key}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md text-xs border border-blue-200"
+                    >
+                      <span className="font-medium">
+                        {filterConfigItem?.label || key}:
+                      </span>
+                      <span className="max-w-[100px] truncate">
+                        {displayValue}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFilterChange(key, "");
+                        }}
+                        className="ml-0.5 text-blue-500 hover:text-blue-700 transition-colors"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Expanded State - Full Filter Panel
+        <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300">
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Filter className="h-5 w-5 text-blue-600" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  Filters
+                </h3>
+              </div>
+
+              {hasActiveFilters && (
+                <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-blue-500 text-white text-sm font-bold transition-all duration-300 animate-in fade-in zoom-in-95 shadow-sm">
+                  {activeFilterCount}
+                </span>
+              )}
             </div>
 
-            {hasActiveFilters && (
-              <span className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 rounded-full bg-blue-500 text-white text-sm font-bold transition-all duration-300 animate-in fade-in zoom-in-95 shadow-sm">
-                {activeFilterCount}
-              </span>
-            )}
-          </div>
+            <div className="flex items-center gap-3">
+              {hasActiveFilters && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="h-9 px-4 text-sm text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm"
+                  type="button"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Clear All
+                </Button>
+              )}
 
-          <div className="flex items-center gap-3">
-            {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearAllFilters}
-                className="h-9 px-4 text-sm text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm"
-                type="button"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Clear All
-              </Button>
-            )}
-
-            {isMobile && filterEntries.length > 2 && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="h-9 px-3 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-all duration-200"
+                onClick={() => setIsExpanded(false)}
+                className="h-9 px-3 text-sm text-gray-600 hover:text-gray-700 hover:bg-gray-50 transition-all duration-200"
                 type="button"
               >
-                {isExpanded ? (
-                  <>
-                    <ChevronUp className="h-4 w-4 mr-1" />
-                    Show Less
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-4 w-4 mr-1" />
-                    Show More
-                  </>
-                )}
+                <ChevronUp className="h-4 w-4 mr-1" />
+                Hide Filters
               </Button>
-            )}
+            </div>
           </div>
-        </div>
 
-        {/* Filters Grid - Ultra Responsive */}
-        <div
-          className={`
-          grid gap-4 transition-all duration-500 ease-in-out
-          ${
-            isMobile
-              ? "grid-cols-1"
-              : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-          }
-          ${
-            isMobile && isExpanded
-              ? "max-h-[1000px] opacity-100"
-              : "opacity-100"
-          }
-        `}
-        >
-          {visibleFilters.map(([key, filter]) => renderFilter(key, filter))}
-        </div>
-
-        {/* Mobile Expand Indicator */}
-        {isMobile && filterEntries.length > 2 && !isExpanded && (
-          <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-            <p className="text-sm text-gray-500">
-              +{filterEntries.length - 2} more filters available
-            </p>
+          {/* Filters Grid - Ultra Responsive */}
+          <div
+            className={`
+            grid gap-4 transition-all duration-500 ease-in-out
+            grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4
+          `}
+          >
+            {filterEntries.map(([key, filter]) => renderFilter(key, filter))}
           </div>
-        )}
 
-        {/* Empty State */}
-        {!hasActiveFilters && filterEntries.length > 0 && (
-          <div className="text-center py-6 sm:py-8">
-            <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <Filter className="h-8 w-8 text-gray-400" />
+          {/* Empty State */}
+          {!hasActiveFilters && filterEntries.length > 0 && (
+            <div className="text-center py-6 sm:py-8 mt-4">
+              <div className="max-w-md mx-auto">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Filter className="h-8 w-8 text-gray-400" />
+                </div>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">
+                  No active filters
+                </h4>
+                <p className="text-gray-500 text-sm">
+                  Use the filters above to refine your search results and find
+                  exactly what you're looking for.
+                </p>
               </div>
-              <h4 className="text-lg font-medium text-gray-900 mb-2">
-                No active filters
-              </h4>
-              <p className="text-gray-500 text-sm">
-                Use the filters above to refine your search results and find
-                exactly what you're looking for.
-              </p>
             </div>
-          </div>
-        )}
-
-        {/* Active Filters Summary - Mobile */}
-        {isMobile && hasActiveFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(filters).map(([key, value]) => {
-                if (!value || value === "all" || value === "") return null;
-
-                const filterConfigItem = filterConfig[key];
-                const displayValue =
-                  filterConfigItem?.options?.find((opt) => opt === value) ||
-                  value;
-
-                return (
-                  <div
-                    key={key}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm border border-blue-200"
-                  >
-                    <span className="font-medium">
-                      {filterConfigItem?.label || key}:
-                    </span>
-                    <span>{displayValue}</span>
-                    <button
-                      onClick={() => handleFilterChange(key, "")}
-                      className="ml-1 text-blue-500 hover:text-blue-700 transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

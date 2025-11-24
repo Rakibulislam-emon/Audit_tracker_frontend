@@ -188,17 +188,68 @@ const TableRow = ({
   </tr>
 );
 
-// Enhanced MobileCard with better UX
+
 const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const cells = row.getVisibleCells();
   const actionCell = cells.find((cell) => cell.column.id === "actions");
   const dataCells = cells.filter((cell) => cell.column.id !== "actions");
 
-  // Separate primary and secondary fields for better hierarchy
   const primaryField = dataCells[0];
-  const importantFields = dataCells.slice(1, 3); // Next 2 fields
-  const otherFields = dataCells.slice(3);
+  const importantFields = dataCells.slice(1, 4);
+  const otherFields = dataCells.slice(4);
 
+ 
+  const getVisibleFields = (fields) => {
+    return fields.filter((cell) => {
+      const cellValue = flexRender(cell.column.columnDef.cell, cell.getContext());
+      return cellValue && cellValue !== "" && cellValue !== null && cellValue !== "N/A";
+    });
+  };
+
+  const visibleImportantFields = getVisibleFields(importantFields);
+  const visibleOtherFields = getVisibleFields(otherFields);
+  const hasMoreFields = visibleOtherFields.length > 0;
+
+
+  const getPriorityBorder = (data, priorityFn) => {
+    if (!priorityFn) return "border-l-border";
+    
+    const priority = priorityFn(data);
+    switch (priority) {
+      case "critical":
+        return "border-l-destructive";
+      case "high":
+        return "border-l-orange-500";
+      case "medium":
+        return "border-l-warning";
+      case "low":
+        return "border-l-green-500";
+      default:
+        return "border-l-border";
+    }
+  };
+
+ 
+  const getPriorityDotColor = (data, priorityFn) => {
+    if (!priorityFn) return "bg-muted-foreground";
+    
+    const priority = priorityFn(data);
+    switch (priority) {
+      case "critical":
+        return "bg-destructive animate-pulse";
+      case "high":
+        return "bg-orange-500";
+      case "medium":
+        return "bg-yellow-500";
+      case "low":
+        return "bg-green-500";
+      default:
+        return "bg-muted-foreground";
+    }
+  };
+
+  
   return (
     <div
       className={`
@@ -206,42 +257,32 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
           row.original,
           getPriorityLevel
         )}
-        border border-border rounded-xl overflow-hidden
-        shadow-sm hover:shadow-lg transition-all duration-300
-        hover:border-primary/30 hover:-translate-y-0.5
+        border border-border rounded-lg overflow-hidden
+        shadow-sm hover:shadow-md transition-all duration-300
+        hover:border-primary/20
       `}
     >
       {/* Priority Indicator Dot */}
       {getPriorityLevel && (
         <div
           className={`
-          absolute top-3 right-3 w-2 h-2 rounded-full
-          ${getPriorityBorder(row.original, getPriorityLevel)
-            .replace("border-l-", "bg-")
-            .replace("-500", "-500")
-            .replace("dark:border-l-", "")}
-          ${
-            getPriorityLevel(row.original) === "critical"
-              ? "bg-red-500 animate-pulse"
-              : ""
-          }
-          ${getPriorityLevel(row.original) === "high" ? "bg-orange-500" : ""}
-          ${getPriorityLevel(row.original) === "medium" ? "bg-yellow-500" : ""}
-          ${getPriorityLevel(row.original) === "low" ? "bg-green-500" : ""}
-        `}
+            absolute top-3  right-3 w-2 h-2 rounded-full z-10
+            ${getPriorityDotColor(row.original, getPriorityLevel)}
+          `}
         />
       )}
 
-      {/* Card Header */}
-      <div className="px-4 py-4 bg-gradient-to-r from-muted/30 to-transparent border-b border-border">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0 pr-2">
+      {/* Card Header - Primary Field */}
+      <div className="px-4 py-4  bg-gradient-to-r from-muted/20 to-transparent border-b border-border/50">
+        <div className="flex  items-start justify-between gap-3">
+          {/* Primary Content */}
+          <div className="flex-1 min-w-0 pr-2 ">
             {primaryField && (
               <>
-                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                <div className="text-xs  font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                   {primaryField.column.columnDef.header}
                 </div>
-                <div className="text-lg font-bold text-foreground leading-tight line-clamp-2">
+                <div className="text-base font-semibold text-foreground leading-tight line-clamp-2">
                   {flexRender(
                     primaryField.column.columnDef.cell,
                     primaryField.getContext()
@@ -250,8 +291,10 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
               </>
             )}
           </div>
+
+          {/* Actions */}
           {enableActions && actionCell && (
-            <div className="flex-shrink-0 pt-1">
+            <div className="flex-shrink-0 pt-1 ">
               {flexRender(
                 actionCell.column.columnDef.cell,
                 actionCell.getContext()
@@ -261,23 +304,25 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
         </div>
       </div>
 
-      {/* Important Fields Section */}
-      {importantFields.length > 0 && (
-        <div className="px-4 py-3 bg-muted/10 border-b border-border/50">
-          <div className="grid grid-cols-1 gap-2.5">
-            {importantFields.map((cell) => {
+      {/* Important Fields Section - Always Visible */}
+      {visibleImportantFields.length > 0 && (
+        <div className="px-4 py-1 ">
+          <div className="flex flex-wrap gap-3">
+            {visibleImportantFields.map((cell) => {
               const cellValue = flexRender(
                 cell.column.columnDef.cell,
                 cell.getContext()
               );
-              if (!cellValue) return null;
 
               return (
-                <div key={cell.id} className="flex items-center gap-3">
-                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide min-w-[90px]">
-                    {cell.column.columnDef.header}:
+                <div
+                  key={cell.id}
+                  className="flex flex-wrap gap-4 items-center p-3 rounded-lg bg-muted/10 border border-border/30 hover:bg-muted/20 transition-colors duration-200"
+                >
+                  <div className="text-xs  font-medium text-muted-foreground uppercase tracking-wide">
+                    {cell.column.columnDef.header} →
                   </div>
-                  <div className="flex-1 text-sm font-medium text-foreground">
+                  <div className="text-sm font-normal text-foreground break-words line-clamp-2">
                     {cellValue}
                   </div>
                 </div>
@@ -287,51 +332,63 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
         </div>
       )}
 
-      {/* Other Fields Section */}
-      {otherFields.length > 0 && (
-        <div className="px-4 py-3 space-y-2.5">
-          {otherFields.map((cell, index) => {
-            const cellValue = flexRender(
-              cell.column.columnDef.cell,
-              cell.getContext()
-            );
-            if (!cellValue) return null;
+      {/* Collapsible Other Fields Section */}
+      {hasMoreFields && (
+        <>
+          {/* Expandable Content */}
+          <div
+            className={`
+              overflow-hidden   transition-all duration-300 ease-in-out
+              ${isExpanded ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"}
+            `}
+          >
+            <div className="px-4 grid grid-cols-2 pb-4 pt-2 space-y-3 border-t border-border/50">
+              {visibleOtherFields.map((cell) => {
+                const cellValue = flexRender(
+                  cell.column.columnDef.cell,
+                  cell.getContext()
+                );
 
-            return (
-              <div
-                key={cell.id}
-                className={`
-                  flex flex-col gap-1.5 py-2 px-3 rounded-md
-                  ${
-                    index < otherFields.length - 1
-                      ? "border-b border-border/30"
-                      : ""
-                  }
-                  hover:bg-muted/20 transition-colors
-                `}
-              >
-                <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  {cell.column.columnDef.header}
-                </div>
-                <div className="text-sm text-foreground leading-relaxed break-words">
-                  {cellValue}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Footer Actions (if actions not in header) */}
-      {enableActions && actionCell && !actionCell && (
-        <div className="px-4 py-3 bg-muted/20 border-t border-border">
-          <div className="flex items-center justify-end gap-2">
-            {flexRender(
-              actionCell.column.columnDef.cell,
-              actionCell.getContext()
-            )}
+                return (
+                  <div
+                    key={cell.id}
+                    className="flex flex-col gap-2 py-2 px-3 rounded-lg hover:bg-muted/10 transition-colors duration-200"
+                  >
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      {cell.column.columnDef.header}
+                    </div>
+                    <div className="text-sm text-foreground leading-relaxed break-words">
+                      {cellValue}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+
+          {/* Expand/Collapse Button */}
+          <div className="border-t border-border/50">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="w-full cursor-pointer px-4 py-3 bg-muted/5 hover:bg-muted/10 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? "Collapse additional fields" : `Expand ${visibleOtherFields.length} more fields`}
+            >
+              <span>
+                {isExpanded
+                  ? "Show Less"
+                  : `Show ${visibleOtherFields.length} More Field${
+                      visibleOtherFields.length > 1 ? "s" : ""
+                    }`}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-300 ${
+                  isExpanded ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
