@@ -92,8 +92,8 @@ export default function ProofUploader({ fixActionId, onSuccess, onCancel }) {
   return (
     <div className="space-y-4">
       {/* Context Information */}
-      <div className="text-sm p-3 bg-blue-50 border border-blue-200 rounded text-blue-800">
-        <strong>🔗 Contextual Upload</strong>
+      <div className="text-sm p-3">
+        <strong >🔗 Contextual Upload</strong>
         <p className="mt-1">
           This proof will be automatically linked to the current Fix Action.
         </p>

@@ -6,7 +6,7 @@ export const useAuthStore = create(
     (set, get) => ({
       user: null,
       token: null,
-      isLoading: false,
+      isLoading: true,
 
       setUser: (user) => set({ user }),
       setToken: (token) => set({ token }),
@@ -56,6 +56,9 @@ export const useAuthStore = create(
         user: state.user,
         token: state.token,
       }),
+      onRehydrateStorage: () => (state) => {
+        state.setLoading(false);
+      },
     }
   )
 );
