@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -78,10 +78,10 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="email" className="text-sm font-medium text-slate-700">
           Email Address
         </Label>
         <Controller
@@ -99,22 +99,19 @@ export default function LoginForm() {
               {...field}
               type="email"
               id="email"
-              placeholder="you@example.com"
+              placeholder="name@company.com"
               disabled={isLoading}
-              className={`transition-all duration-200 ${
+              className={`h-11 bg-slate-50 border-slate-200 focus:bg-white transition-all duration-200 ${
                 errors.email
                   ? "border-red-500 focus:ring-red-500"
-                  : "focus:ring-blue-500"
+                  : "focus:ring-blue-500 focus:border-blue-500"
               }`}
               aria-invalid={!!errors.email}
             />
           )}
         />
         {errors.email && (
-          <p
-            className="text-sm text-red-600 flex items-center gap-1"
-            role="alert"
-          >
+          <p className="text-sm text-red-600 flex items-center gap-1">
             <AlertCircle className="w-4 h-4" /> {errors.email.message}
           </p>
         )}
@@ -125,13 +122,13 @@ export default function LoginForm() {
         <div className="flex items-center justify-between">
           <Label
             htmlFor="password"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-slate-700"
           >
             Password
           </Label>
           <a
             href="/forgot-password"
-            className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
           >
             Forgot password?
           </a>
@@ -151,10 +148,10 @@ export default function LoginForm() {
                 id="password"
                 placeholder="Enter your password"
                 disabled={isLoading}
-                className={`pr-10 transition-all duration-200 ${
+                className={`h-11 pr-10 bg-slate-50 border-slate-200 focus:bg-white transition-all duration-200 ${
                   errors.password
                     ? "border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
+                    : "focus:ring-blue-500 focus:border-blue-500"
                 }`}
                 aria-invalid={!!errors.password}
               />
@@ -163,7 +160,7 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-sm transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -173,46 +170,21 @@ export default function LoginForm() {
           </button>
         </div>
         {errors.password && (
-          <p
-            className="text-sm text-red-600 flex items-center gap-1"
-            role="alert"
-          >
+          <p className="text-sm text-red-600 flex items-center gap-1">
             <AlertCircle className="w-4 h-4" /> {errors.password.message}
           </p>
         )}
       </div>
 
-      {/* Remember Me */}
-      {/* <div className="flex items-center space-x-2">
-        <Controller
-          name="rememberMe"
-          control={control}
-          render={({ field }) => (
-            <Checkbox {...field} checked={field.value} disabled={isLoading} />
-          )}
-        />
-        <Label
-          htmlFor="rememberMe"
-          className="text-sm text-gray-700 cursor-pointer select-none"
-        >
-          Remember me for 30 days
-        </Label>
-      </div> */}
-
       {/* Server Error */}
       {serverError && (
-        <div
-          className="p-4 bg-red-50 border border-red-200 rounded-lg"
-          role="alert"
-        >
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-red-800">
-                Authentication Failed
-              </h3>
-              <p className="text-sm text-red-700 mt-1">{serverError}</p>
-            </div>
+        <div className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <h3 className="text-sm font-medium text-red-800">
+              Authentication Failed
+            </h3>
+            <p className="text-sm text-red-600 mt-1">{serverError}</p>
           </div>
         </div>
       )}
@@ -221,14 +193,16 @@ export default function LoginForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <Loader2 className="w-5 h-5 animate-spin" /> Signing in...
           </span>
         ) : (
-          "Sign In"
+          <span className="flex items-center justify-center gap-2">
+            Sign In <ArrowRight className="w-4 h-4" />
+          </span>
         )}
       </Button>
     </form>

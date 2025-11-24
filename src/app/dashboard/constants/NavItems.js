@@ -1,19 +1,148 @@
 import {
-  Building2,
-  Calendar,
-  ClipboardCheck,
-  ClipboardList,
-  Factory,
-  FileText,
-  Layers,
-  Layers3,
   LayoutDashboard,
-  ListChecks,
-  Settings,
   Users,
+  Building2,
+  Factory,
+  FolderCheck,
+  ShieldCheck,
+  HelpCircle,
+  FileEdit,
+  CalendarCheck,
+  Calendar,
+  ClipboardList,
+  SearchCheck,
+  AlertTriangle,
+  Wrench,
+  Camera,
+  BarChart3,
+  ThumbsUp,
+  Settings,
 } from "lucide-react";
 
 export const navItems = {
+  sysadmin: [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      href: "/dashboard/sysadmin",
+    },
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+      href: "/dashboard/sysadmin/users",
+    },
+    {
+      id: "groups",
+      label: "Groups",
+      icon: Building2,
+      href: "/dashboard/sysadmin/groups",
+    },
+    {
+      id: "companies",
+      label: "Companies",
+      icon: Building2,
+      href: "/dashboard/sysadmin/companies",
+    },
+    {
+      id: "sites",
+      label: "Sites",
+      icon: Factory,
+      href: "/dashboard/sysadmin/sites",
+    },
+    {
+      id: "check-types",
+      label: "Categories",
+      icon: FolderCheck,
+      href: "/dashboard/sysadmin/check-types",
+    },
+    {
+      id: "rules",
+      label: "Rules",
+      icon: ShieldCheck,
+      href: "/dashboard/sysadmin/rules",
+    },
+    {
+      id: "questions",
+      label: "Questions",
+      icon: HelpCircle,
+      href: "/dashboard/sysadmin/questions",
+    },
+    {
+      id: "templates",
+      label: "Templates",
+      icon: FileEdit,
+      href: "/dashboard/sysadmin/templates",
+    },
+    {
+      id: "programs",
+      label: "Programs",
+      icon: CalendarCheck,
+      href: "/dashboard/sysadmin/programs",
+    },
+    {
+      id: "schedules",
+      label: "Schedules",
+      icon: Calendar,
+      href: "/dashboard/sysadmin/schedules",
+    },
+    {
+      id: "auditSessions",
+      label: "Audit Sessions",
+      icon: ClipboardList,
+      href: "/dashboard/sysadmin/auditsessions",
+    },
+    {
+      id: "teams",
+      label: "Teams",
+      icon: Users,
+      href: "/dashboard/sysadmin/teams",
+    },
+    {
+      id: "observations",
+      label: "Observations",
+      icon: SearchCheck,
+      href: "/dashboard/sysadmin/observations",
+    },
+    {
+      id: "problems",
+      label: "Problems",
+      icon: AlertTriangle,
+      href: "/dashboard/sysadmin/problems",
+    },
+    {
+      id: "fix-actions",
+      label: "Fix Actions",
+      icon: Wrench,
+      href: "/dashboard/sysadmin/fix-actions",
+    },
+    {
+      id: "proofs",
+      label: "Proofs",
+      icon: Camera,
+      href: "/dashboard/sysadmin/proofs",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: BarChart3,
+      href: "/dashboard/sysadmin/reports",
+    },
+    {
+      id: "approvals",
+      label: "Approvals",
+      icon: ThumbsUp,
+      href: "/dashboard/sysadmin/approvals",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/sysadmin/settings",
+    },
+  ],
+
   admin: [
     {
       id: "dashboard",
@@ -28,12 +157,6 @@ export const navItems = {
       href: "/dashboard/admin/users",
     },
     {
-      id: "groups",
-      label: "Groups",
-      icon: Layers,
-      href: "/dashboard/admin/groups",
-    },
-    {
       id: "companies",
       label: "Companies",
       icon: Building2,
@@ -45,37 +168,34 @@ export const navItems = {
       icon: Factory,
       href: "/dashboard/admin/sites",
     },
-       {
+    {
       id: "check-types",
-      label: "Category (Check Types)",
-      icon: ListChecks,
+      label: "Categories",
+      icon: FolderCheck,
       href: "/dashboard/admin/check-types",
     },
     {
       id: "rules",
       label: "Rules",
-      icon: FileText,
+      icon: ShieldCheck,
       href: "/dashboard/admin/rules",
     },
     {
       id: "questions",
       label: "Questions",
-      icon: ClipboardCheck,
+      icon: HelpCircle,
       href: "/dashboard/admin/questions",
     },
- 
-
     {
       id: "templates",
       label: "Templates",
-      icon: ClipboardList,
+      icon: FileEdit,
       href: "/dashboard/admin/templates",
     },
-
     {
       id: "programs",
       label: "Programs",
-      icon: Layers3,
+      icon: CalendarCheck,
       href: "/dashboard/admin/programs",
     },
     {
@@ -84,13 +204,10 @@ export const navItems = {
       icon: Calendar,
       href: "/dashboard/admin/schedules",
     },
-    // teams
-
-    //  auditSessions
     {
       id: "auditSessions",
       label: "Audit Sessions",
-      icon: Calendar,
+      icon: ClipboardList,
       href: "/dashboard/admin/auditsessions",
     },
     {
@@ -99,201 +216,212 @@ export const navItems = {
       icon: Users,
       href: "/dashboard/admin/teams",
     },
-    // observations
     {
       id: "observations",
       label: "Observations",
-      icon: FileText,
+      icon: SearchCheck,
       href: "/dashboard/admin/observations",
     },
-    // problems
     {
       id: "problems",
       label: "Problems",
-      icon: ListChecks,
+      icon: AlertTriangle,
       href: "/dashboard/admin/problems",
     },
-    // fix-actions
     {
       id: "fix-actions",
       label: "Fix Actions",
-      icon: ClipboardCheck,
+      icon: Wrench,
       href: "/dashboard/admin/fix-actions",
     },
-    // proofs
     {
       id: "proofs",
       label: "Proofs",
-      icon: FileText,
+      icon: Camera,
       href: "/dashboard/admin/proofs",
     },
     {
       id: "reports",
       label: "Reports",
-      icon: FileText,
+      icon: BarChart3,
       href: "/dashboard/admin/reports",
     },
     {
       id: "approvals",
       label: "Approvals",
-      icon: FileText,
+      icon: ThumbsUp,
       href: "/dashboard/admin/approvals",
     },
-    // {
-    //   id: "metrics",
-    //   label: "Metrics",
-    //   icon: LayoutDashboard,
-    //   href: "/dashboard/admin/metrics",
-    // },
-    // {
-    //   id: "question-rule-links",
-    //   label: "Question Rule Links",
-    //   icon: Layers,
-    //   href: "/dashboard/admin/question-rule-links",
-    // },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      href: "/dashboard/admin/settings",
-    },
   ],
-  audit_manager:[
-      {
+
+  compliance_officer: [
+    {
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/dashboard/audit_manager",
+      href: "/dashboard/compliance",
     },
-  ]
+    {
+      id: "check-types",
+      label: "Categories",
+      icon: FolderCheck,
+      href: "/dashboard/compliance/check-types",
+    },
+    {
+      id: "rules",
+      label: "Rules",
+      icon: ShieldCheck,
+      href: "/dashboard/compliance/rules",
+    },
+    {
+      id: "questions",
+      label: "Questions",
+      icon: HelpCircle,
+      href: "/dashboard/compliance/questions",
+    },
+    {
+      id: "templates",
+      label: "Templates",
+      icon: FileEdit,
+      href: "/dashboard/compliance/templates",
+    },
+    {
+      id: "programs",
+      label: "Programs",
+      icon: CalendarCheck,
+      href: "/dashboard/compliance/programs",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: BarChart3,
+      href: "/dashboard/compliance/reports",
+    },
+    {
+      id: "approvals",
+      label: "Approvals",
+      icon: ThumbsUp,
+      href: "/dashboard/compliance/approvals",
+    },
+    {
+      id: "observations",
+      label: "Observations",
+      icon: SearchCheck,
+      href: "/dashboard/compliance/observations",
+    },
+    {
+      id: "problems",
+      label: "Problems",
+      icon: AlertTriangle,
+      href: "/dashboard/compliance/problems",
+    },
+  ],
+
+  manager: [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      href: "/dashboard/manager",
+    },
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+      href: "/dashboard/manager/users",
+    },
+    {
+      id: "schedules",
+      label: "Schedules",
+      icon: Calendar,
+      href: "/dashboard/manager/schedules",
+    },
+    {
+      id: "auditSessions",
+      label: "Audit Sessions",
+      icon: ClipboardList,
+      href: "/dashboard/manager/auditsessions",
+    },
+    {
+      id: "teams",
+      label: "Teams",
+      icon: Users,
+      href: "/dashboard/manager/teams",
+    },
+    {
+      id: "observations",
+      label: "Observations",
+      icon: SearchCheck,
+      href: "/dashboard/manager/observations",
+    },
+    {
+      id: "problems",
+      label: "Problems",
+      icon: AlertTriangle,
+      href: "/dashboard/manager/problems",
+    },
+    {
+      id: "fix-actions",
+      label: "Fix Actions",
+      icon: Wrench,
+      href: "/dashboard/manager/fix-actions",
+    },
+    {
+      id: "proofs",
+      label: "Proofs",
+      icon: Camera,
+      href: "/dashboard/manager/proofs",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: BarChart3,
+      href: "/dashboard/manager/reports",
+    },
+    {
+      id: "approvals",
+      label: "Approvals",
+      icon: ThumbsUp,
+      href: "/dashboard/manager/approvals",
+    },
+  ],
+
+  auditor: [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      href: "/dashboard/auditor",
+    },
+    {
+      id: "auditSessions",
+      label: "Audit Sessions",
+      icon: ClipboardList,
+      href: "/dashboard/auditor/auditsessions",
+    },
+    {
+      id: "observations",
+      label: "Observations",
+      icon: SearchCheck,
+      href: "/dashboard/auditor/observations",
+    },
+    {
+      id: "problems",
+      label: "Problems",
+      icon: AlertTriangle,
+      href: "/dashboard/auditor/problems",
+    },
+    {
+      id: "fix-actions",
+      label: "Fix Actions",
+      icon: Wrench,
+      href: "/dashboard/auditor/fix-actions",
+    },
+    {
+      id: "proofs",
+      label: "Proofs",
+      icon: Camera,
+      href: "/dashboard/auditor/proofs",
+    },
+  ],
 };
-
-// export { navItems };
-
-// import {
-//   HomeIcon,
-//   UsersIcon,
-//   SettingsIcon,
-//   FileTextIcon,
-//   ClockIcon,
-//   BuildingIcon,
-//   LayersIcon,
-//   CheckSquareIcon,
-//   ClipboardListIcon,
-//   CalendarIcon,
-//   ShieldIcon,
-// } from "lucide-react";
-
-// export const navItems = {
-//   admin: [
-//     {
-//       id: 1,
-//       label: "Dashboard",
-//       href: "/dashboard/admin",
-//       icon: HomeIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 2,
-//       label: "Users",
-//       href: "/dashboard/admin/users",
-//       icon: UsersIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 3,
-//       label: "Companies",
-//       href: "/dashboard/admin/companies",
-//       icon: BuildingIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 4,
-//       label: "Templates",
-//       href: "/dashboard/admin/templates",
-//       icon: ClipboardListIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 5,
-//       label: "Check Types",
-//       href: "/dashboard/admin/check-types",
-//       icon: CheckSquareIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 6,
-//       label: "Programs",
-//       href: "/dashboard/admin/programs",
-//       icon: LayersIcon,
-//       roles: ["admin"],
-//     },
-//     {
-//       id: 7,
-//       label: "Settings",
-//       href: "/dashboard/admin/settings",
-//       icon: SettingsIcon,
-//       roles: ["admin"],
-//     },
-//   ],
-//   auditor: [
-//     {
-//       id: 1,
-//       label: "Dashboard",
-//       href: "/dashboard/auditor",
-//       icon: HomeIcon,
-//       roles: ["auditor"],
-//     },
-//     {
-//       id: 2,
-//       label: "Audit Reports",
-//       href: "/dashboard/auditor/reports",
-//       icon: FileTextIcon,
-//       roles: ["auditor"],
-//     },
-//     {
-//       id: 3,
-//       label: "Pending Audits",
-//       href: "/dashboard/auditor/pending",
-//       icon: ClockIcon,
-//       roles: ["auditor"],
-//     },
-//     {
-//       id: 4,
-//       label: "Schedules",
-//       href: "/dashboard/auditor/schedules",
-//       icon: CalendarIcon,
-//       roles: ["auditor"],
-//     },
-//   ],
-//   manager: [
-//     {
-//       id: 1,
-//       label: "Dashboard",
-//       href: "/dashboard/manager",
-//       icon: HomeIcon,
-//       roles: ["manager"],
-//     },
-//     {
-//       id: 2,
-//       label: "Team Audits",
-//       href: "/dashboard/manager/team-audits",
-//       icon: UsersIcon,
-//       roles: ["manager"],
-//     },
-//     {
-//       id: 3,
-//       label: "Reports",
-//       href: "/dashboard/manager/reports",
-//       icon: FileTextIcon,
-//       roles: ["manager"],
-//     },
-//     {
-//       id: 4,
-//       label: "Compliance",
-//       href: "/dashboard/manager/compliance",
-//       icon: ShieldIcon,
-//       roles: ["manager"],
-//     },
-//   ],
-// };
