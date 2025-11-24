@@ -133,6 +133,7 @@ export const universalService = {
   create: async (token, endpoint, data) => {
     try {
       console.log(`🆕 Creating from 86 line${endpoint}:`, data);
+      
 
       const response = await fetch(
         `${baseUrl}/${endpoint}`,

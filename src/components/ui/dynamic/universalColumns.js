@@ -14,7 +14,7 @@ const COLOR_SYSTEM = {
     admin: "bg-purple-50 text-purple-700 border border-purple-200",
     auditor: "bg-blue-50 text-blue-700 border border-blue-200",
     compliance_officer: "bg-amber-50 text-amber-700 border border-amber-200",
-    audit_manager: "bg-teal-50 text-teal-700 border border-teal-200",
+    manager: "bg-teal-50 text-teal-700 border border-teal-200",
     sysadmin: "bg-red-50 text-red-700 border border-red-200",
     user: "bg-green-50 text-green-700 border border-green-200",
     lead: "bg-yellow-50 text-yellow-700 border border-yellow-200",

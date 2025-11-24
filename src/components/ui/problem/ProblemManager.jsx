@@ -19,7 +19,7 @@ const MODULE_NAME = "problems";
 const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
-  "audit_manager",
+  "manager",
   "compliance_officer",
 ];
 
