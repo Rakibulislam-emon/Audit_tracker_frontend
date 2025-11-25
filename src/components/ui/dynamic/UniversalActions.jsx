@@ -324,10 +324,12 @@ const getActionIcon = (actionType, className = "h-4 w-4 mr-2") => {
 // SUB-COMPONENTS
 // =============================================================================
 
-const DesktopActionButton = ({ action, item, onCustomAction }) => {
+const DesktopActionButton = ({ action, item, onCustomAction, userRole }) => {
   const icon = getActionIcon(action.action);
   if (action.type === "link") {
-    const href = action.href.replace(":id", item._id);
+    const href = action.href
+      .replace(":id", item._id)
+      .replace(":role", userRole);
     return (
       <Button asChild variant="outline" size="sm" key={action.action}>
         <Link href={href}>
@@ -350,10 +352,12 @@ const DesktopActionButton = ({ action, item, onCustomAction }) => {
   );
 };
 
-const MobileDropdownItem = ({ action, item, onCustomAction }) => {
+const MobileDropdownItem = ({ action, item, onCustomAction, userRole }) => {
   const icon = getActionIcon(action.action);
   if (action.type === "link") {
-    const href = action.href.replace(":id", item._id);
+    const href = action.href
+      .replace(":id", item._id)
+      .replace(":role", userRole);
     return (
       <DropdownMenuItem asChild key={action.action}>
         <Link href={href}>
@@ -427,6 +431,7 @@ const DesktopActionsView = ({
           action={action}
           item={item}
           onCustomAction={onCustomAction}
+          userRole={userRole}
         />
       ))}
       {canDelete && <DeleteButton onDelete={onDelete} item={item} />}
@@ -483,6 +488,7 @@ const MobileActionsView = ({
                   action={action}
                   item={item}
                   onCustomAction={onCustomAction}
+                  userRole={userRole}
                 />
               ))}
             </>
