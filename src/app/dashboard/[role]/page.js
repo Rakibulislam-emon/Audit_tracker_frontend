@@ -1,14 +1,4 @@
 "use client";
-
-// import React from "react";
-// import { useParams } from "next/navigation";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import DashboardStats from "@/components/dashboard/DashboardStats";
-// import RecentActivityFeed from "@/components/dashboard/RecentActivityFeed";
-// import PendingApprovalsTable from "@/components/dashboard/PendingApprovalsTable";
-// import QuickActionsPanel from "@/components/dashboard/QuickActionsPanel";
-// ("use client");
-
 import React from "react";
 import { useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -73,7 +63,7 @@ export default function DashboardPage() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList >
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
