@@ -16,8 +16,11 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import BulkActionToolbar from "./BulkActionToolbar";
 import UniversalActions from "./UniversalActions";
 import { generateUniversalColumns } from "./universalColumns";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 // =============================================================================
 // CONSTANTS & CONFIGURATION
@@ -188,22 +191,31 @@ const TableRow = ({
   </tr>
 );
 
-
 const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const cells = row.getVisibleCells();
   const actionCell = cells.find((cell) => cell.column.id === "actions");
-  const dataCells = cells.filter((cell) => cell.column.id !== "actions");
+  // Filter out select and actions columns
+  const dataCells = cells.filter(
+    (cell) => cell.column.id !== "actions" && cell.column.id !== "select"
+  );
 
   const primaryField = dataCells[0];
   const importantFields = dataCells.slice(1, 4);
   const otherFields = dataCells.slice(4);
 
- 
   const getVisibleFields = (fields) => {
     return fields.filter((cell) => {
-      const cellValue = flexRender(cell.column.columnDef.cell, cell.getContext());
-      return cellValue && cellValue !== "" && cellValue !== null && cellValue !== "N/A";
+      const cellValue = flexRender(
+        cell.column.columnDef.cell,
+        cell.getContext()
+      );
+      return (
+        cellValue &&
+        cellValue !== "" &&
+        cellValue !== null &&
+        cellValue !== "N/A"
+      );
     });
   };
 
@@ -211,10 +223,9 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
   const visibleOtherFields = getVisibleFields(otherFields);
   const hasMoreFields = visibleOtherFields.length > 0;
 
-
   const getPriorityBorder = (data, priorityFn) => {
     if (!priorityFn) return "border-l-border";
-    
+
     const priority = priorityFn(data);
     switch (priority) {
       case "critical":
@@ -230,10 +241,9 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
     }
   };
 
- 
   const getPriorityDotColor = (data, priorityFn) => {
     if (!priorityFn) return "bg-muted-foreground";
-    
+
     const priority = priorityFn(data);
     switch (priority) {
       case "critical":
@@ -249,7 +259,6 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
     }
   };
 
-  
   return (
     <div
       className={`
@@ -372,7 +381,11 @@ const MobileCard = ({ row, getPriorityLevel, enableActions }) => {
               onClick={() => setIsExpanded(!isExpanded)}
               className="w-full cursor-pointer px-4 py-3 bg-muted/5 hover:bg-muted/10 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
               aria-expanded={isExpanded}
-              aria-label={isExpanded ? "Collapse additional fields" : `Expand ${visibleOtherFields.length} more fields`}
+              aria-label={
+                isExpanded
+                  ? "Collapse additional fields"
+                  : `Expand ${visibleOtherFields.length} more fields`
+              }
             >
               <span>
                 {isExpanded
@@ -412,6 +425,7 @@ export default function UniversalTable({
   module,
   data = [],
   enableActions = true,
+  enableBulkActions = true,
   onEdit,
   onDelete,
   options = {},
@@ -419,15 +433,48 @@ export default function UniversalTable({
   getRowCondition = null,
   moduleConfig,
   onCustomAction,
+  onBulkDelete,
+  onBulkExport,
+  onBulkStatusChange,
 }) {
   const [sorting, setSorting] = useState([]);
   const [density, setDensity] = useState("comfortable");
+  const [rowSelection, setRowSelection] = useState({});
+  const { user } = useAuthStore();
 
   // Generate table columns
   const baseColumns = generateUniversalColumns(module);
-  const columns = enableActions
+
+  // Add selection column if bulk actions enabled
+  const selectionColumn = enableBulkActions
     ? [
-        ...baseColumns,
+        {
+          id: "select",
+          header: ({ table }) => (
+            <Checkbox
+              checked={table.getIsAllPageRowsSelected()}
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+              aria-label="Select all"
+            />
+          ),
+          cell: ({ row }) => (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+            />
+          ),
+          enableSorting: false,
+          enableHiding: false,
+        },
+      ]
+    : [];
+
+  // Add actions column if enabled
+  const actionsColumn = enableActions
+    ? [
         {
           id: "actions",
           header: "Actions",
@@ -444,19 +491,28 @@ export default function UniversalTable({
           enableSorting: false,
         },
       ]
-    : baseColumns;
+    : [];
+
+  const columns = [...selectionColumn, ...baseColumns, ...actionsColumn];
 
   // Initialize React Table
   const table = useReactTable({
     data,
     columns,
-    state: { sorting },
+    state: { sorting, rowSelection },
     onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    enableRowSelection: enableBulkActions,
+    getRowId: (row) => row._id || row.id,
     ...options,
   });
+
+  // Get selected rows
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedItems = selectedRows.map((row) => row.original);
 
   console.log("[UniversalTable] data:", data);
   // Handle empty state
@@ -466,6 +522,20 @@ export default function UniversalTable({
 
   return (
     <div className="space-y-3">
+      {/* Bulk Action Toolbar */}
+      {enableBulkActions && selectedItems.length > 0 && (
+        <BulkActionToolbar
+          selectedCount={selectedItems.length}
+          selectedItems={selectedItems}
+          onDeselectAll={() => setRowSelection({})}
+          onBulkDelete={onBulkDelete}
+          onBulkExport={onBulkExport}
+          onBulkStatusChange={onBulkStatusChange}
+          moduleConfig={moduleConfig}
+          userRole={user?.role || ""}
+        />
+      )}
+
       {/* Controls */}
       <ControlsBar
         dataLength={data.length}

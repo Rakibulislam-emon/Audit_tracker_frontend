@@ -291,6 +291,62 @@ export default function UniversalCRUDManager({
     });
   }, [selectedItem, deleteItem, closeModal, module]);
 
+  const handleBulkDelete = useCallback(
+    async (selectedItems) => {
+      const ids = selectedItems.map((item) => item._id);
+      const deletePromises = ids.map(
+        (id) =>
+          new Promise((resolve, reject) => {
+            deleteItem(id, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          })
+      );
+      try {
+        await Promise.all(deletePromises);
+        toast.success(`Successfully deleted ${ids.length} items`);
+      } catch (error) {
+        toast.error(`Failed to delete some items: ${error.message}`);
+        throw error;
+      }
+    },
+    [deleteItem]
+  );
+
+  const handleBulkExport = useCallback(
+    (selectedItems) => {
+      if (selectedItems.length === 0) return;
+      const headers = Object.keys(selectedItems[0]).filter(
+        (key) => !key.startsWith("_")
+      );
+      const csvContent = [
+        headers.join(","),
+        ...selectedItems.map((item) =>
+          headers
+            .map((header) => {
+              const value = item[header];
+              if (typeof value === "object" && value !== null) {
+                return JSON.stringify(value).replace(/,/g, ";");
+              }
+              return value;
+            })
+            .join(",")
+        ),
+      ].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${module}_export_${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+    [module]
+  );
+
   const handleCustomAction = useCallback(
     (action, item) => {
       const endpoint = buildCustomActionEndpoint(
@@ -405,6 +461,8 @@ export default function UniversalCRUDManager({
           getPriorityLevel={getPriorityLevel}
           moduleConfig={config}
           onCustomAction={handleCustomAction}
+          onBulkDelete={handleBulkDelete}
+          onBulkExport={handleBulkExport}
         />
       )}
 
