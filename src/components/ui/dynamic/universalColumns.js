@@ -192,6 +192,7 @@ const RELATION_COLORS = {
   },
   auditSessions: {
     auditSession: "bg-purple-50 text-purple-700 border border-purple-200",
+    teamMembers: "bg-indigo-50 text-indigo-700 border border-indigo-200",
   },
   questions: {
     question: "bg-teal-50 text-teal-700 border border-teal-200",
@@ -293,6 +294,13 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
 
     case "approvals":
       return item.title || `Approval#${item._id}`;
+
+    case "auditSessions":
+      if (fieldKey === "teamMembers") {
+        // Handle Team object structure: { user: { name: "..." }, roleInTeam: "..." }
+        return item.user?.name || item.user?.email || "Unknown User";
+      }
+      return item.title || `Session#${item._id}`;
 
     default:
       // console.log("❌ DEFAULT case for:", relationModule);
