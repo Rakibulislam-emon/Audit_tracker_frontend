@@ -106,6 +106,38 @@ export const universalConfig = {
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager"],
+      viewDetails: ["admin", "sysadmin", "manager"],
+    },
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/users/view/:id",
+      },
+    ],
+    detailView: {
+      titleField: "name",
+      subtitleField: "email",
+      headerCards: [
+        { field: "role", icon: "User", label: "Role" },
+        { field: "isActive", icon: "CheckCircle", label: "Status" },
+        { field: "lastLogin", icon: "Calendar", label: "Last Login" },
+      ],
+      sections: [
+        {
+          title: "User Information",
+          fields: ["name", "email", "role", "isActive"],
+        },
+        {
+          title: "Activity",
+          fields: ["lastLogin"],
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
   groups: {
@@ -185,6 +217,45 @@ export const universalConfig = {
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager"],
+      viewDetails: ["admin", "sysadmin", "manager"],
+    },
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/groups/view/:id",
+      },
+    ],
+    detailView: {
+      titleField: "name",
+      subtitleField: "description",
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Group Information",
+          fields: ["name", "description", "status"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Companies",
+          module: "companies",
+          filterBy: "group",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -308,6 +379,47 @@ export const universalConfig = {
       edit: ["admin", "sysadmin"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager"],
+      viewDetails: ["admin", "sysadmin", "manager"],
+    },
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/companies/view/:id",
+      },
+    ],
+    detailView: {
+      titleField: "name",
+      subtitleField: (data) =>
+        `${data.group?.name || ""} | ${data.sector || ""}`.trim(),
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "sector", icon: "User", label: "Sector" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Company Information",
+          fields: ["name", "group", "sector", "address", "status"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Sites",
+          module: "sites",
+          filterBy: "company",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -422,6 +534,57 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"], // কারা এডিট করতে পারবে
       delete: ["admin", "sysadmin"], // কারা ডিলিট করতে পারবে
       view: ["admin", "sysadmin", "manager", "auditor"], // কারা দেখতে পারবে
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/sites/view/:id",
+      },
+    ],
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "name",
+      subtitleField: (data) =>
+        `${data.company?.name || ""} ${
+          data.location ? `| ${data.location}` : ""
+        }`.trim(),
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "company", icon: "User", label: "Company" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Site Information",
+          fields: ["name", "location", "status"],
+        },
+        {
+          title: "Company",
+          fields: ["company"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Audit Sessions",
+          module: "auditSessions",
+          filterBy: "site",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -519,6 +682,37 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"], // Everyone can view?
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+    },
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/check-types/view/:id",
+      },
+    ],
+    detailView: {
+      titleField: "name",
+      subtitleField: "description",
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Check Type Information",
+          fields: ["name", "description", "status"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -644,6 +838,38 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+    },
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/rules/view/:id",
+      },
+    ],
+    detailView: {
+      titleField: "title",
+      subtitleField: "description",
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "checkType", icon: "User", label: "Check Type" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Rule Information",
+          fields: ["title", "description", "checkType", "status"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -807,18 +1033,6 @@ export const universalConfig = {
     },
 
     // PERMISSIONS (Match these with your backend roles in authorizeRoles)
-    permissions: {
-      create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor"],
-    },
-  },
-  templates: {
-    // API Configuration
-    endpoint: "templates", // Matches backend route
-
-    // UI Configuration
     title: "Template Management",
     description: "Manage audit templates",
 
@@ -961,6 +1175,50 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/templates/view/:id",
+      },
+    ],
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "title",
+      subtitleField: (data) => `Version ${data.version || "1.0"}`,
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "version", icon: "CheckCircle", label: "Version" },
+        { field: "createdAt", icon: "Calendar", label: "Created" },
+      ],
+      sections: [
+        {
+          title: "Template Information",
+          fields: ["title", "description", "version", "status"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Questions",
+          module: "questions",
+          filterBy: "template",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -1178,6 +1436,56 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/programs/view/:id",
+      },
+    ],
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "name",
+      subtitleField: (data) =>
+        `${data.frequency || ""} | ${data.company?.name || ""}`.trim(),
+      headerCards: [
+        { field: "status", icon: "CheckCircle", label: "Status" },
+        { field: "frequency", icon: "Clock", label: "Frequency" },
+        { field: "startDate", icon: "Calendar", label: "Start Date" },
+        { field: "endDate", icon: "Calendar", label: "End Date" },
+      ],
+      sections: [
+        {
+          title: "Program Information",
+          fields: ["name", "description", "frequency", "status"],
+        },
+        {
+          title: "Configuration",
+          fields: ["company", "template", "startDate", "endDate"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Schedules",
+          module: "schedules",
+          filterBy: "program",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
     },
   },
 
@@ -1373,10 +1681,17 @@ export const universalConfig = {
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
       start: ["admin", "sysadmin", "manager"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
     },
 
     // CUSTOM ACTIONS
     customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/schedules/view/:id",
+      },
       {
         label: "Start Audit",
         action: "start",
@@ -1390,6 +1705,52 @@ export const universalConfig = {
         },
       },
     ],
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "title",
+      subtitleField: (data) => {
+        const program = data.program?.name || "";
+        const dates = `${new Date(
+          data.startDate
+        ).toLocaleDateString()} - ${new Date(
+          data.endDate
+        ).toLocaleDateString()}`;
+        return program ? `${program} | ${dates}` : dates;
+      },
+      headerCards: [
+        { field: "scheduleStatus", icon: "CheckCircle", label: "Status" },
+        { field: "startDate", icon: "Calendar", label: "Start Date" },
+        { field: "endDate", icon: "Calendar", label: "End Date" },
+        { field: "assignedUser", icon: "User", label: "Assigned To" },
+      ],
+      sections: [
+        {
+          title: "Schedule Details",
+          fields: ["title", "description", "scheduleStatus"],
+        },
+        {
+          title: "Assignment",
+          fields: ["program", "assignedUser", "startDate", "endDate"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Audit Sessions",
+          module: "auditSessions",
+          filterBy: "schedule",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
+    },
   },
 
   auditSessions: {
@@ -1515,6 +1876,14 @@ export const universalConfig = {
       updatedAt: {
         type: "date",
         label: "Last Updated At", // Changed label slightly
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+      },
+      teamMembers: {
+        type: "relation",
+        label: "Team Members",
+        relation: "auditSessions", // Points to self to use the specific handler in universalColumns
         tableColumn: true,
         formField: false,
         readOnly: true,
@@ -1771,7 +2140,55 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager", "auditor"], // Might need finer control later
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
+      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
     },
+
+    // Detail View Configuration
+    detailView: {
+      titleField: (data) => `Observation #${data._id?.slice(-6)}`,
+      subtitleField: "description",
+      headerCards: [
+        { field: "severity", icon: "AlertCircle", label: "Severity" },
+        { field: "resolutionStatus", icon: "CheckCircle", label: "Status" },
+        { field: "createdAt", icon: "Calendar", label: "Observed On" },
+      ],
+      sections: [
+        {
+          title: "Observation Details",
+          fields: ["description", "response", "severity", "resolutionStatus"],
+        },
+        {
+          title: "Context",
+          fields: ["auditSession", "question", "checkType"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Related Problems",
+          module: "problems",
+          filterBy: "observation",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/observations/view/:id",
+      },
+    ],
   },
 
   teams: {
@@ -2131,7 +2548,70 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+      ],
     },
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "title",
+      subtitleField: (data) => {
+        const session = data.auditSession?.schedule?.title || "Audit Session";
+        const site = data.auditSession?.site?.name || "";
+        return site ? `${session} - ${site}` : session;
+      },
+      headerCards: [
+        { field: "problemStatus", icon: "AlertCircle", label: "Status" },
+        { field: "riskRating", icon: "AlertCircle", label: "Risk Rating" },
+        { field: "impact", icon: "AlertCircle", label: "Impact" },
+        { field: "likelihood", icon: "Clock", label: "Likelihood" },
+      ],
+      sections: [
+        {
+          title: "Problem Details",
+          fields: ["title", "description", "problemStatus"],
+        },
+        {
+          title: "Risk Assessment",
+          fields: ["impact", "likelihood", "riskRating"],
+        },
+        {
+          title: "Context",
+          fields: ["auditSession", "observation", "question"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Fix Actions",
+          module: "fixActions",
+          filterBy: "problem",
+          displayAs: "table",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/problems/view/:id",
+      },
+    ],
   },
 
   fixActions: {
@@ -2369,7 +2849,77 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager" /*, add owner role? */],
       // Who deletes? Restricted.
       delete: ["admin", "sysadmin"],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+      ],
     },
+
+    // Detail View Configuration
+    detailView: {
+      titleField: "actionText",
+      subtitleField: (data) => `For Problem: ${data.problem?.title || "N/A"}`,
+      headerCards: [
+        { field: "actionStatus", icon: "CheckCircle", label: "Status" },
+        {
+          field: "verificationResult",
+          icon: "CheckCircle",
+          label: "Verification",
+        },
+        { field: "dueDate", icon: "Clock", label: "Due Date" },
+        { field: "completionDate", icon: "Calendar", label: "Completed" },
+      ],
+      sections: [
+        {
+          title: "Action Details",
+          fields: [
+            "actionText",
+            "rootCause",
+            "actionStatus",
+            "dueDate",
+            "completionDate",
+          ],
+        },
+        {
+          title: "Verification",
+          fields: [
+            "verificationResult",
+            "verificationNotes",
+            "verificationMethod",
+            "verifiedBy",
+          ],
+        },
+        {
+          title: "Assignment",
+          fields: ["problem", "owner", "createdBy", "updatedBy"],
+        },
+      ],
+      relatedData: [
+        {
+          label: "Proofs",
+          module: "proofs",
+          filterBy: "fixAction",
+          displayAs: "list",
+        },
+      ],
+      actions: [
+        { type: "edit", label: "Edit", permission: "edit" },
+        { type: "delete", label: "Delete", permission: "delete" },
+      ],
+    },
+
+    // Custom Actions
+    customActions: [
+      {
+        label: "View Details",
+        action: "viewDetails",
+        type: "link",
+        href: "/dashboard/:role/fix-actions/view/:id",
+      },
+    ],
   },
 
   proofs: {
