@@ -15,7 +15,7 @@ import {
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import BulkActionToolbar from "./BulkActionToolbar";
 import UniversalActions from "./UniversalActions";
@@ -442,58 +442,66 @@ export default function UniversalTable({
   const [rowSelection, setRowSelection] = useState({});
   const { user } = useAuthStore();
 
-  // Generate table columns
-  const baseColumns = generateUniversalColumns(module);
+  // Memoize columns to prevent regeneration on every render
+  const columns = useMemo(() => {
+    const baseColumns = generateUniversalColumns(module);
 
-  // Add selection column if bulk actions enabled
-  const selectionColumn = enableBulkActions
-    ? [
-        {
-          id: "select",
-          header: ({ table }) => (
-            <Checkbox
-              checked={table.getIsAllPageRowsSelected()}
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-              aria-label="Select all"
-            />
-          ),
-          cell: ({ row }) => (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              aria-label="Select row"
-            />
-          ),
-          enableSorting: false,
-          enableHiding: false,
-        },
-      ]
-    : [];
+    const selectionColumn = enableBulkActions
+      ? [
+          {
+            id: "select",
+            header: ({ table }) => (
+              <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                onCheckedChange={(value) =>
+                  table.toggleAllPageRowsSelected(!!value)
+                }
+                aria-label="Select all"
+              />
+            ),
+            cell: ({ row }) => (
+              <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+              />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+          },
+        ]
+      : [];
 
-  // Add actions column if enabled
-  const actionsColumn = enableActions
-    ? [
-        {
-          id: "actions",
-          header: "Actions",
-          cell: (info) => (
-            <UniversalActions
-              item={info.row.original}
-              module={module}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              moduleConfig={moduleConfig}
-              onCustomAction={onCustomAction}
-            />
-          ),
-          enableSorting: false,
-        },
-      ]
-    : [];
+    const actionsColumn = enableActions
+      ? [
+          {
+            id: "actions",
+            header: "Actions",
+            cell: (info) => (
+              <UniversalActions
+                item={info.row.original}
+                module={module}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                moduleConfig={moduleConfig}
+                onCustomAction={onCustomAction}
+              />
+            ),
+            enableSorting: false,
+          },
+        ]
+      : [];
 
-  const columns = [...selectionColumn, ...baseColumns, ...actionsColumn];
+    return [...selectionColumn, ...baseColumns, ...actionsColumn];
+  }, [
+    module,
+    enableActions,
+    enableBulkActions,
+    onEdit,
+    onDelete,
+    moduleConfig,
+    onCustomAction,
+  ]);
 
   // Initialize React Table
   const table = useReactTable({
