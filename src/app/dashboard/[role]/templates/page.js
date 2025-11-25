@@ -14,7 +14,7 @@ export default function TemplatesManagementPage() {
         token={token}
         title={title}
         desc={description}
-        addButtonText="Add templates"
+        addButtonText="Add Template"
       />
     </div>
   );
