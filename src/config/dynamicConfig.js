@@ -1111,15 +1111,15 @@ export const universalConfig = {
         filterable: false, // Usually not filtered
         // You might want to add validation (e.g., pattern for X.Y format)
       },
-      company: {
-        type: "select",
-        label: "Company",
-        required: true,
-        relation: "companies", // Link to companies module
-        tableColumn: true,
-        filterable: true, // For filtering
-        dataAccessor: "company.name", // Show company name in table
-      },
+      // company: {
+      //   type: "select",
+      //   label: "Company",
+      //   required: true,
+      //   relation: "companies", // Link to companies module
+      //   tableColumn: true,
+      //   filterable: true, // For filtering
+      //   dataAccessor: "company.name", // Show company name in table
+      // },
       checkType: {
         type: "select",
         label: "Check Type (Category)",
@@ -1252,16 +1252,16 @@ export const universalConfig = {
         filterable: true,
         fullWidth: true,
       },
-      company: {
-        type: "select",
-        label: "Company",
-        required: true,
-        relation: "companies", // Populates dropdown from 'companies' module
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "company.name", // Displays 'company.name' in the table
-        placeholder: "Select Company",
-      },
+      // company: {
+      //   type: "select",
+      //   label: "Company",
+      //   required: true,
+      //   relation: "companies", // Populates dropdown from 'companies' module
+      //   tableColumn: true,
+      //   filterable: true,
+      //   dataAccessor: "company.name", // Displays 'company.name' in the table
+      //   placeholder: "Select Company",
+      // },
       // Field for Template relation
       template: {
         type: "select",
@@ -1519,6 +1519,7 @@ export const universalConfig = {
         filterable: true,
         dataAccessor: "company.name",
         placeholder: "Select Company",
+        dependsOn: { field: "purpose", value: ["site", "company"] },
       },
       program: {
         type: "select",
@@ -1529,6 +1530,17 @@ export const universalConfig = {
         filterable: true,
         dataAccessor: "program.name",
         placeholder: "Select Program",
+      },
+      // ✅ NEW FIELD - Purpose
+      purpose: {
+        type: "select",
+        label: "Schedule For ",
+        required: true,
+        options: ["site", "company"],
+        // default: "site", // Removed default to hide fields initially
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Select Purpose",
       },
       // ✅ NEW FIELD - Handling the Array
       sites: {
@@ -1541,6 +1553,7 @@ export const universalConfig = {
         dataAccessor: "sites", // Let the component handle rendering the array
         placeholder: "Select Site(s)",
         fullWidth: true,
+        dependsOn: { field: "purpose", value: ["site"] }, // Only show if purpose is 'site'
       },
       // ✅ NEW FIELD - Handling the Array
       assignedUser: {

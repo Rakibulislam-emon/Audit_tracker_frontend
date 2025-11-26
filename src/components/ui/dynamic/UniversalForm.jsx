@@ -430,6 +430,19 @@ export default function UniversalForm({
     if (mode === "edit" && fieldConfig.createOnly) return false;
     if (mode === "create" && fieldConfig.editOnly) return false;
     if (fieldConfig.formField === false) return false;
+
+    // Handle conditional rendering
+    if (fieldConfig.dependsOn) {
+      const dependentValue = watch(fieldConfig.dependsOn.field);
+      const targetValue = fieldConfig.dependsOn.value;
+
+      if (Array.isArray(targetValue)) {
+        if (!targetValue.includes(dependentValue)) return false;
+      } else {
+        if (dependentValue !== targetValue) return false;
+      }
+    }
+
     return true;
   };
 

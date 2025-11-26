@@ -3,7 +3,7 @@
 import { universalConfig } from "@/config/dynamicConfig";
 import { universalService } from "@/services/universalService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 
 /**
  * ==================== PRODUCTION-READY HOOKS ====================
@@ -256,12 +256,25 @@ export const useGetByIdUniversal = (token, endpoint, id) => {
 /**
  * ✅ PRODUCTION: Module-Based Data Fetcher
  */
+/**
+ * ✅ PRODUCTION: Module-Based Data Fetcher (FIXED)
+ */
 export const useModuleData = (module, token, filters = {}) => {
+  // ✅ 1. ALWAYS call hooks unconditionally at the top level
   const config = universalConfig[module];
+  
+  // ✅ 2. Use the hook unconditionally
+  const universalResult = useUniversal(
+    token, 
+    config?.endpoint || 'fallback-endpoint', // Provide fallback
+    config ? filters : {} // Only pass filters if config exists
+  );
 
+  // ✅ 3. NOW handle conditional logic AFTER hook calls
   if (!config) {
     console.warn(`⚠️ No configuration found for module: ${module}`);
     return {
+      ...universalResult,
       data: null,
       isLoading: false,
       error: new Error(`Module configuration not found: ${module}`),
@@ -269,7 +282,8 @@ export const useModuleData = (module, token, filters = {}) => {
     };
   }
 
-  return useUniversal(token, config.endpoint, filters);
+  // ✅ 4. Return normal result when config exists
+  return universalResult;
 };
 
 /**
