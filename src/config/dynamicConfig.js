@@ -912,16 +912,16 @@ export const universalConfig = {
         placeholder: "Select a Rule (Optional)",
       },
 
-      checkType: {
-        type: "select",
-        label: "Check Type",
-        required: false, // Optional
-        relation: "checkTypes", // Links to 'checkTypes' module
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "checkType.name", // Display checkType name
-        placeholder: "Select a Check Type (Optional)",
-      },
+      // checkType: {
+      //   type: "select",
+      //   label: "Check Type",
+      //   required: false, // Optional
+      //   relation: "checkTypes", // Links to 'checkTypes' module
+      //   tableColumn: true,
+      //   filterable: true,
+      //   dataAccessor: "checkType.name", // Display checkType name
+      //   placeholder: "Select a Check Type (Optional)",
+      // },
       responseType: {
         type: "select",
         label: "Response Type",
@@ -1008,13 +1008,13 @@ export const universalConfig = {
         apiParam: "rule",
         relation: "rules",
       },
-      checkType: {
-        type: "select",
-        label: "Check Type",
-        placeholder: "All Check Types",
-        apiParam: "checkType",
-        relation: "checkTypes",
-      },
+      // checkType: {
+      //   type: "select",
+      //   label: "Check Type",
+      //   placeholder: "All Check Types",
+      //   apiParam: "checkType",
+      //   relation: "checkTypes",
+      // },
       responseType: {
         // Added filter for response type
         type: "select",
@@ -1032,144 +1032,7 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS (Match these with your backend roles in authorizeRoles)
-    title: "Template Management",
-    description: "Manage audit templates",
-
-    // FIELD DEFINITIONS - Based on Template.js model
-    fields: {
-      title: {
-        type: "text",
-        label: "Template Title",
-        placeholder: "Enter a descriptive title",
-        required: true,
-        tableColumn: true,
-        filterable: true, // For search
-      },
-      description: {
-        type: "textarea",
-        label: "Description",
-        placeholder: "Enter details about the template",
-        required: false,
-        tableColumn: true,
-        filterable: true, // For search
-        fullWidth: true,
-      },
-      version: {
-        type: "text", // Could be number if needed
-        label: "Version",
-        placeholder: "e.g., 1.0",
-        required: false, // Has default in schema
-        tableColumn: true,
-        filterable: false, // Usually not filtered
-        // You might want to add validation (e.g., pattern for X.Y format)
-      },
-      company: {
-        type: "select",
-        label: "Company",
-        required: true,
-        relation: "companies", // Link to companies module
-        tableColumn: true,
-        filterable: true, // For filtering
-        dataAccessor: "company.name", // Show company name in table
-      },
-      checkType: {
-        type: "select",
-        label: "Check Type (Category)",
-        required: true,
-        relation: "checkTypes",
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "checkType.name",
-        placeholder: "Select a Check Type",
-      },
-      questions: {
-        type: "select-multi", // ❗ This is a NEW type, needs a custom component
-        label: "Questions",
-        required: false, // Can be empty
-        relation: "questions", // Links to 'questions' module
-        tableColumn: false, // Don't show array in table
-        filterable: false,
-        placeholder: "Select questions for this template",
-        formField: true,
-        fullWidth: true,
-      },
-      status: {
-        type: "select",
-        label: "Status",
-        required: true,
-        options: ["active", "inactive"],
-        default: "active",
-        tableColumn: true,
-        filterable: true, // For filtering
-      },
-      // Common fields
-      createdBy: {
-        type: "relation",
-        label: "Created By",
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        // dataAccessor: "createdBy.name",
-      },
-      updatedBy: {
-        type: "relation",
-        label: "Updated By",
-        relation: "users",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-        // dataAccessor: "updatedBy.name",
-      },
-      createdAt: {
-        type: "date",
-        label: "Created At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-      updatedAt: {
-        type: "date",
-        label: "Updated At",
-        tableColumn: true,
-        formField: false,
-        readOnly: true,
-      },
-    },
-
-    // FILTER CONFIGURATION
-    filters: {
-      search: {
-        type: "search",
-        label: "Search Templates",
-        placeholder: "Search by title or description...",
-        apiParam: "search", // Matches req.query.search
-      },
-      company: {
-        type: "select",
-        label: "Company",
-        placeholder: "All Companies",
-        apiParam: "company", // Matches req.query.company
-        relation: "companies", // Load options from companies
-      },
-      checkType: {
-        type: "select",
-        label: "Check Type",
-        placeholder: "All Check Types",
-        apiParam: "checkType",
-        relation: "checkTypes",
-      },
-      status: {
-        type: "select",
-        label: "Status",
-        placeholder: "All Statuses",
-        apiParam: "status", // Matches req.query.status
-        options: ["active", "inactive"],
-      },
-    },
-
-    // PERMISSIONS (Adjust as needed)
+    // PERMISSIONS
     permissions: {
       create: ["admin", "sysadmin", "manager"],
       edit: ["admin", "sysadmin", "manager"],
@@ -1178,41 +1041,30 @@ export const universalConfig = {
       viewDetails: ["admin", "sysadmin", "manager", "auditor"],
     },
 
-    // Custom Actions
-    customActions: [
-      {
-        label: "View Details",
-        action: "viewDetails",
-        type: "link",
-        href: "/dashboard/:role/templates/view/:id",
-      },
-    ],
-
     // Detail View Configuration
     detailView: {
-      titleField: "title",
-      subtitleField: (data) => `Version ${data.version || "1.0"}`,
+      titleField: "questionText",
       headerCards: [
         { field: "status", icon: "CheckCircle", label: "Status" },
-        { field: "version", icon: "CheckCircle", label: "Version" },
+        { field: "checkType", icon: "Tag", label: "Check Type" },
         { field: "createdAt", icon: "Calendar", label: "Created" },
       ],
       sections: [
         {
-          title: "Template Information",
-          fields: ["title", "description", "version", "status"],
+          title: "Question Details",
+          fields: [
+            "questionText",
+            "rule",
+            "checkType",
+            "responseType",
+            "severityDefault",
+            "weight",
+            "status",
+          ],
         },
         {
           title: "Audit Trail",
           fields: ["createdBy", "updatedBy", "createdAt", "updatedAt"],
-        },
-      ],
-      relatedData: [
-        {
-          label: "Questions",
-          module: "questions",
-          filterBy: "template",
-          displayAs: "table",
         },
       ],
       actions: [
@@ -1259,15 +1111,15 @@ export const universalConfig = {
         filterable: false, // Usually not filtered
         // You might want to add validation (e.g., pattern for X.Y format)
       },
-      company: {
-        type: "select",
-        label: "Company",
-        required: true,
-        relation: "companies", // Link to companies module
-        tableColumn: true,
-        filterable: true, // For filtering
-        dataAccessor: "company.name", // Show company name in table
-      },
+      // company: {
+      //   type: "select",
+      //   label: "Company",
+      //   required: true,
+      //   relation: "companies", // Link to companies module
+      //   tableColumn: true,
+      //   filterable: true, // For filtering
+      //   dataAccessor: "company.name", // Show company name in table
+      // },
       checkType: {
         type: "select",
         label: "Check Type (Category)",
@@ -1400,16 +1252,16 @@ export const universalConfig = {
         filterable: true,
         fullWidth: true,
       },
-      company: {
-        type: "select",
-        label: "Company",
-        required: true,
-        relation: "companies", // Populates dropdown from 'companies' module
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "company.name", // Displays 'company.name' in the table
-        placeholder: "Select Company",
-      },
+      // company: {
+      //   type: "select",
+      //   label: "Company",
+      //   required: true,
+      //   relation: "companies", // Populates dropdown from 'companies' module
+      //   tableColumn: true,
+      //   filterable: true,
+      //   dataAccessor: "company.name", // Displays 'company.name' in the table
+      //   placeholder: "Select Company",
+      // },
       // Field for Template relation
       template: {
         type: "select",
@@ -1667,6 +1519,7 @@ export const universalConfig = {
         filterable: true,
         dataAccessor: "company.name",
         placeholder: "Select Company",
+        dependsOn: { field: "purpose", value: ["site", "company"] },
       },
       program: {
         type: "select",
@@ -1677,6 +1530,17 @@ export const universalConfig = {
         filterable: true,
         dataAccessor: "program.name",
         placeholder: "Select Program",
+      },
+      // ✅ NEW FIELD - Purpose
+      purpose: {
+        type: "select",
+        label: "Schedule For ",
+        required: true,
+        options: ["site", "company"],
+        // default: "site", // Removed default to hide fields initially
+        tableColumn: true,
+        filterable: true,
+        placeholder: "Select Purpose",
       },
       // ✅ NEW FIELD - Handling the Array
       sites: {
@@ -1689,6 +1553,7 @@ export const universalConfig = {
         dataAccessor: "sites", // Let the component handle rendering the array
         placeholder: "Select Site(s)",
         fullWidth: true,
+        dependsOn: { field: "purpose", value: ["site"] }, // Only show if purpose is 'site'
       },
       // ✅ NEW FIELD - Handling the Array
       assignedUser: {

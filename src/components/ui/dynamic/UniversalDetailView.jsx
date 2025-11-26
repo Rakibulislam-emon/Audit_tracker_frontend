@@ -258,6 +258,32 @@ const RelatedDataTab = ({ relatedConfig, parentId, token }) => {
 // MAIN COMPONENT
 // =============================================================================
 
+// ... (previous imports)
+import { toast } from "sonner";
+import UniversalForm from "@/components/ui/dynamic/UniversalForm";
+import Modal from "@/components/ui/modal";
+import { useUpdateModule, useDeleteModule } from "@/hooks/useUniversal";
+
+// ... (ICON_MAP, HELPER FUNCTIONS, SUB-COMPONENTS remain same)
+
+// Delete Confirmation Component (Local)
+const DeleteConfirmation = ({ itemName, onCancel, onConfirm, isDeleting }) => (
+  <div className="space-y-4">
+    <p className="text-gray-600">
+      Are you sure you want to delete <strong>{itemName}</strong>?
+    </p>
+    <p className="text-sm text-red-600">This action cannot be undone.</p>
+    <div className="flex gap-3 justify-end pt-4">
+      <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
+        Cancel
+      </Button>
+      <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
+        {isDeleting ? "Deleting..." : "Delete"}
+      </Button>
+    </div>
+  </div>
+);
+
 export default function UniversalDetailView({ module }) {
   const params = useParams();
   const { id } = params;
@@ -265,12 +291,50 @@ export default function UniversalDetailView({ module }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("details");
 
+  // Modal States
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   // Get module configuration
   const config = universalConfig[module];
   const detailConfig = config?.detailView || {};
 
   // Fetch data
-  const { data, isLoading, error } = useModuleDataById(module, token, id);
+  const { data, isLoading, error, refetch } = useModuleDataById(
+    module,
+    token,
+    id
+  );
+
+  // Mutations
+  const updateMutation = useUpdateModule(module, token);
+  const deleteMutation = useDeleteModule(module, token);
+
+  // Handle Edit Submit
+  const handleEditSubmit = async (formData) => {
+    try {
+      await updateMutation.mutateAsync({ id, data: formData });
+      toast.success(`${config.name || "Item"} updated successfully`);
+      setIsEditModalOpen(false);
+      refetch(); // Refresh data
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error.message || "Failed to update item");
+    }
+  };
+
+  // Handle Delete Confirm
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success(`${config.name || "Item"} deleted successfully`);
+      setIsDeleteModalOpen(false);
+      router.push(`/dashboard/${params.role}/${module}`); // Redirect to list
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(error.message || "Failed to delete item");
+    }
+  };
 
   // Handle loading and error states
   if (isLoading) return <LoadingState />;
@@ -309,11 +373,7 @@ export default function UniversalDetailView({ module }) {
                   key="edit"
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/${params.role}/${module}?edit=${id}`
-                    )
-                  }
+                  onClick={() => setIsEditModalOpen(true)}
                   className="gap-2"
                 >
                   <Edit className="h-4 w-4" />
@@ -331,7 +391,10 @@ export default function UniversalDetailView({ module }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -408,6 +471,36 @@ export default function UniversalDetailView({ module }) {
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title={`Edit ${config.name || "Item"}`}
+      >
+        <UniversalForm
+          module={module}
+          initialData={data}
+          onSubmit={handleEditSubmit}
+          onCancel={() => setIsEditModalOpen(false)}
+          isSubmitting={updateMutation.isPending}
+          mode="edit"
+        />
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title={`Delete ${config.name || "Item"}`}
+      >
+        <DeleteConfirmation
+          itemName={title}
+          onCancel={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          isDeleting={deleteMutation.isPending}
+        />
+      </Modal>
     </div>
   );
 }

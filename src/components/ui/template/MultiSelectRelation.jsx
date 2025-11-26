@@ -26,12 +26,18 @@ const DEFAULT_MESSAGES = {
  * Custom hook to handle click outside detection
  */
 const useClickOutside = (ref, handler) => {
+  const handlerRef = React.useRef(handler);
+
+  React.useEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
+
   React.useEffect(() => {
     const listener = (event) => {
       if (!ref.current || ref.current.contains(event.target)) {
         return;
       }
-      handler(event);
+      handlerRef.current(event);
     };
 
     document.addEventListener("mousedown", listener);
@@ -41,7 +47,7 @@ const useClickOutside = (ref, handler) => {
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
     };
-  }, [ref, handler]);
+  }, [ref]);
 };
 
 // =============================================================================
@@ -288,7 +294,7 @@ export default function MultiSelectRelation({
   const { data: relationData, isLoading } = useModuleData(
     fieldConfig.relation,
     token,
-    { search: searchTerm }
+    { search: searchTerm, status: "active" }
   );
 
   const options = relationData?.data || [];
