@@ -1008,13 +1008,13 @@ export const universalConfig = {
         apiParam: "rule",
         relation: "rules",
       },
-      checkType: {
-        type: "select",
-        label: "Check Type",
-        placeholder: "All Check Types",
-        apiParam: "checkType",
-        relation: "checkTypes",
-      },
+      // checkType: {
+      //   type: "select",
+      //   label: "Check Type",
+      //   placeholder: "All Check Types",
+      //   apiParam: "checkType",
+      //   relation: "checkTypes",
+      // },
       responseType: {
         // Added filter for response type
         type: "select",
