@@ -6,26 +6,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 /**
- * ==================== PRODUCTION-READY HOOKS ====================
- * Optimized for performance, memory management, and error handling
+ * ✅ FIXED: Stable filters hook (ESLint compliant)
  */
-
-/**
- * ✅ PRODUCTION: Universal Data Fetcher with stable query keys and cancellation
- */
-export const useUniversal = (token, endpoint, filters = {}) => {
-  // ✅ STABLE QUERY KEY: Prevents infinite re-renders
-  const queryKey = useMemo(() => {
+const useStableFilters = (filters = {}) => {
+  return useMemo(() => {
     if (!filters || typeof filters !== "object") {
-      return [endpoint];
+      return {};
     }
 
-    // Create stable filter object with sorted keys
-    const stableFilters = Object.keys(filters)
+    return Object.keys(filters)
       .sort()
       .reduce((acc, key) => {
         const value = filters[key];
-        // Only include meaningful values
         if (
           value !== undefined &&
           value !== null &&
@@ -36,38 +28,82 @@ export const useUniversal = (token, endpoint, filters = {}) => {
         }
         return acc;
       }, {});
+  }, [filters]);
+};
 
+/**
+ * ✅ FIXED: Universal Data Fetcher (No lint errors)
+ */
+export const useUniversal = (token, endpoint, filters = {}) => {
+  const stableFilters = useStableFilters(filters);
+  
+  const queryKey = useMemo(() => {
     return [endpoint, stableFilters];
-  }, [endpoint, JSON.stringify(filters)]); // Deep comparison
+  }, [endpoint, stableFilters]);
+
+  const queryContext = useMemo(() => ({
+    token,
+    endpoint,
+    filters
+  }), [token, endpoint, filters]);
 
   return useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
-      // ✅ PASS ABORT SIGNAL for request cancellation
-      return await universalService.getAll(token, endpoint, filters, signal);
+      return await universalService.getAll(
+        queryContext.token, 
+        queryContext.endpoint, 
+        queryContext.filters, 
+        signal
+      );
     },
     keepPreviousData: true,
     enabled: !!token && !!endpoint,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
-
-    // ✅ OPTIMIZED RETRY STRATEGY
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: (failureCount, error) => {
-      // Don't retry cancelled requests
       if (error?.message === "Request cancelled") return false;
-
-      // Don't retry client errors (4xx)
       if (error?.message?.includes("HTTP 4")) return false;
-
-      // Don't retry auth errors
       if (error?.message?.includes("401") || error?.message?.includes("403"))
         return false;
-
-      // Retry others max 2 times
       return failureCount < 2;
     },
+    throwOnError: false,
+  });
+};
 
-    // ✅ ERROR HANDLING
+/**
+ * ✅ FIXED: Universal Single Item Fetcher (No lint errors)
+ */
+export const useGetByIdUniversal = (token, endpoint, id) => {
+  const queryKey = useMemo(() => [endpoint, id], [endpoint, id]);
+
+  const queryContext = useMemo(() => ({
+    token,
+    endpoint,
+    id
+  }), [token, endpoint, id]);
+
+  return useQuery({
+    queryKey,
+    queryFn: async ({ signal }) => {
+      if (!queryContext.id) throw new Error("ID is required");
+      return await universalService.getById(
+        queryContext.token, 
+        queryContext.endpoint, 
+        queryContext.id, 
+        signal
+      );
+    },
+    enabled: !!token && !!endpoint && !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    retry: (failureCount, error) => {
+      if (error?.message === "Request cancelled") return false;
+      if (error?.message?.includes("HTTP 4")) return false;
+      if (error?.message?.includes("404")) return false;
+      return failureCount < 2;
+    },
     throwOnError: false,
   });
 };
@@ -82,16 +118,9 @@ export const useCreateUniversal = (token, endpoint) => {
     mutationFn: async (data) => {
       return await universalService.create(token, endpoint, data);
     },
-
-    // ✅ OPTIMISTIC UPDATE: Immediately update UI
     onMutate: async (newData) => {
-      // Cancel outgoing refetches so they don't overwrite our optimistic update
       await queryClient.cancelQueries({ queryKey: [endpoint] });
-
-      // Snapshot the previous value
       const previousData = queryClient.getQueryData([endpoint]);
-
-      // Optimistically update the cache
       if (previousData?.data && Array.isArray(previousData.data)) {
         queryClient.setQueryData([endpoint], (old) => ({
           ...old,
@@ -99,21 +128,15 @@ export const useCreateUniversal = (token, endpoint) => {
           count: old.count + 1,
         }));
       }
-
       return { previousData };
     },
-
-    // ✅ ROLLBACK ON ERROR
     onError: (error, newData, context) => {
       console.error(`❌ Create failed for ${endpoint}:`, error);
       if (context?.previousData) {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-
-    // ✅ INVALIDATE QUERIES
     onSuccess: () => {
-      // Debounced invalidation to prevent race conditions
       setTimeout(() => {
         queryClient.invalidateQueries({
           queryKey: [endpoint],
@@ -121,8 +144,6 @@ export const useCreateUniversal = (token, endpoint) => {
         });
       }, 100);
     },
-
-    // ✅ ALWAYS REFETCH ON SETTLEMENT
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
     },
@@ -139,14 +160,9 @@ export const useUpdateUniversal = (token, endpoint) => {
     mutationFn: async ({ id, data }) => {
       return await universalService.update(token, endpoint, id, data);
     },
-
-    // ✅ OPTIMISTIC UPDATE
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: [endpoint] });
-
       const previousData = queryClient.getQueryData([endpoint]);
-
-      // Optimistically update the specific item
       if (previousData?.data && Array.isArray(previousData.data)) {
         queryClient.setQueryData([endpoint], (old) => ({
           ...old,
@@ -155,23 +171,19 @@ export const useUpdateUniversal = (token, endpoint) => {
           ),
         }));
       }
-
       return { previousData };
     },
-
     onError: (error, variables, context) => {
       console.error(`❌ Update failed for ${endpoint}:`, error);
       if (context?.previousData) {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-
     onSuccess: () => {
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: [endpoint] });
       }, 100);
     },
-
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
     },
@@ -188,14 +200,9 @@ export const useDeleteUniversal = (token, endpoint) => {
     mutationFn: async (id) => {
       return await universalService.delete(token, endpoint, id);
     },
-
-    // ✅ OPTIMISTIC UPDATE
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: [endpoint] });
-
       const previousData = queryClient.getQueryData([endpoint]);
-
-      // Optimistically remove the item
       if (previousData?.data && Array.isArray(previousData.data)) {
         queryClient.setQueryData([endpoint], (old) => ({
           ...old,
@@ -203,17 +210,14 @@ export const useDeleteUniversal = (token, endpoint) => {
           count: old.count - 1,
         }));
       }
-
       return { previousData };
     },
-
     onError: (error, id, context) => {
       console.error(`❌ Delete failed for ${endpoint}:`, error);
       if (context?.previousData) {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-
     onSuccess: () => {
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: [endpoint] });
@@ -223,54 +227,16 @@ export const useDeleteUniversal = (token, endpoint) => {
 };
 
 /**
- * ✅ PRODUCTION: Universal Single Item Fetcher
- */
-export const useGetByIdUniversal = (token, endpoint, id) => {
-  const queryKey = useMemo(() => [endpoint, id], [endpoint, id]);
-
-  return useQuery({
-    queryKey,
-    queryFn: async ({ signal }) => {
-      if (!id) throw new Error("ID is required");
-      return await universalService.getById(token, endpoint, id, signal);
-    },
-    enabled: !!token && !!endpoint && !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
-
-    retry: (failureCount, error) => {
-      if (error?.message === "Request cancelled") return false;
-      if (error?.message?.includes("HTTP 4")) return false;
-      if (error?.message?.includes("404")) return false; // Not found
-      return failureCount < 2;
-    },
-
-    throwOnError: false,
-  });
-};
-
-/**
- * ==================== MODULE-BASED HOOKS ====================
- */
-
-/**
  * ✅ PRODUCTION: Module-Based Data Fetcher
  */
-/**
- * ✅ PRODUCTION: Module-Based Data Fetcher (FIXED)
- */
 export const useModuleData = (module, token, filters = {}) => {
-  // ✅ 1. ALWAYS call hooks unconditionally at the top level
   const config = universalConfig[module];
-  
-  // ✅ 2. Use the hook unconditionally
   const universalResult = useUniversal(
     token, 
-    config?.endpoint || 'fallback-endpoint', // Provide fallback
-    config ? filters : {} // Only pass filters if config exists
+    config?.endpoint || 'fallback-endpoint',
+    config ? filters : {}
   );
 
-  // ✅ 3. NOW handle conditional logic AFTER hook calls
   if (!config) {
     console.warn(`⚠️ No configuration found for module: ${module}`);
     return {
@@ -282,7 +248,6 @@ export const useModuleData = (module, token, filters = {}) => {
     };
   }
 
-  // ✅ 4. Return normal result when config exists
   return universalResult;
 };
 
@@ -291,11 +256,9 @@ export const useModuleData = (module, token, filters = {}) => {
  */
 export const useCreateModule = (module, token) => {
   const config = universalConfig[module];
-
   if (!config) {
     throw new Error(`Module configuration not found: ${module}`);
   }
-
   return useCreateUniversal(token, config.endpoint);
 };
 
@@ -304,11 +267,9 @@ export const useCreateModule = (module, token) => {
  */
 export const useUpdateModule = (module, token) => {
   const config = universalConfig[module];
-
   if (!config) {
     throw new Error(`Module configuration not found: ${module}`);
   }
-
   return useUpdateUniversal(token, config.endpoint);
 };
 
@@ -317,11 +278,9 @@ export const useUpdateModule = (module, token) => {
  */
 export const useDeleteModule = (module, token) => {
   const config = universalConfig[module];
-
   if (!config) {
     throw new Error(`Module configuration not found: ${module}`);
   }
-
   return useDeleteUniversal(token, config.endpoint);
 };
 
@@ -330,11 +289,9 @@ export const useDeleteModule = (module, token) => {
  */
 export const useModuleDataById = (module, token, id) => {
   const config = universalConfig[module];
-
   if (!config) {
     throw new Error(`Module configuration not found: ${module}`);
   }
-
   return useGetByIdUniversal(token, config.endpoint, id);
 };
 
@@ -364,9 +321,7 @@ export const useCustomAction = (token, { modulesToInvalidate = [] } = {}) => {
 
       return await response.json();
     },
-
     onSuccess: () => {
-      // Invalidate specified modules
       modulesToInvalidate.forEach((moduleName) => {
         const endpoint = universalConfig[moduleName]?.endpoint;
         if (endpoint) {
@@ -379,13 +334,10 @@ export const useCustomAction = (token, { modulesToInvalidate = [] } = {}) => {
         }
       });
     },
-
     onError: (error) => {
       console.error("❌ Custom Action failed:", error);
     },
-
     onSettled: () => {
-      // Ensure data consistency
       modulesToInvalidate.forEach((moduleName) => {
         const endpoint = universalConfig[moduleName]?.endpoint;
         if (endpoint) {
