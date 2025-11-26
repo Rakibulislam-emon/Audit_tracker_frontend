@@ -471,7 +471,7 @@ export default function UniversalCRUDManager({
         <Modal
           isOpen={isModalOpen}
           onClose={closeModal}
-          title={modalType === "edit" ? "Edit Item" : "Create Item"}
+          title={modalType === "edit" ? "Edit Item" : `Create ${module}`}
         >
           {modalType === "delete" ? (
             <DeleteConfirmation
