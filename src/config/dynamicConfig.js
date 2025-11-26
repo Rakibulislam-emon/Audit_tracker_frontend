@@ -912,16 +912,16 @@ export const universalConfig = {
         placeholder: "Select a Rule (Optional)",
       },
 
-      checkType: {
-        type: "select",
-        label: "Check Type",
-        required: false, // Optional
-        relation: "checkTypes", // Links to 'checkTypes' module
-        tableColumn: true,
-        filterable: true,
-        dataAccessor: "checkType.name", // Display checkType name
-        placeholder: "Select a Check Type (Optional)",
-      },
+      // checkType: {
+      //   type: "select",
+      //   label: "Check Type",
+      //   required: false, // Optional
+      //   relation: "checkTypes", // Links to 'checkTypes' module
+      //   tableColumn: true,
+      //   filterable: true,
+      //   dataAccessor: "checkType.name", // Display checkType name
+      //   placeholder: "Select a Check Type (Optional)",
+      // },
       responseType: {
         type: "select",
         label: "Response Type",
