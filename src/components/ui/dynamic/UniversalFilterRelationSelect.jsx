@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useModuleData } from "@/hooks/useUniversal";
-import { useEffect, useState } from "react";
 
 export default function UniversalFilterRelationSelect({
   id,
@@ -18,8 +17,6 @@ export default function UniversalFilterRelationSelect({
   value,
   onChange,
 }) {
-  const [data, setData] = useState([]);
-
   // ✅ API থেকে রিলেটেড ডেটা (যেমন 'groups') ফেচ করা
   const { data: relationData, isLoading } = useModuleData(
     moduleName,
@@ -27,11 +24,7 @@ export default function UniversalFilterRelationSelect({
     {}
   );
 
-  useEffect(() => {
-    if (relationData?.data) {
-      setData(relationData.data);
-    }
-  }, [relationData]);
+  const data = relationData?.data || [];
 
   const loadingText = `Loading ${moduleName}...`;
 
