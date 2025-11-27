@@ -59,8 +59,6 @@ const normalizeFormData = (data, config) => {
 
   const normalized = JSON.parse(JSON.stringify(data)); // Deep clone to avoid mutations
 
-  console.log("🔍 Starting data normalization:", { rawData: data });
-
   Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
     const currentValue = normalized[fieldKey];
 
@@ -69,24 +67,13 @@ const normalizeFormData = (data, config) => {
 
     // Handle object values for relation fields
     if (typeof currentValue === "object" && currentValue !== null) {
-      console.log(`🔍 Processing ${fieldKey}:`, {
-        type: typeof currentValue,
-        value: currentValue,
-        hasId: !!currentValue._id,
-      });
-
       // Extract ID from relation object
       if (currentValue._id) {
         normalized[fieldKey] = currentValue._id;
-        console.log(`✅ Normalized ${fieldKey}: ${currentValue._id}`);
-      } else {
-        // If no _id but it's an object, keep it as is (might be a nested structure)
-        console.log(`⚠️ ${fieldKey} is object but no _id found:`, currentValue);
       }
     }
   });
 
-  console.log("🔍 Final normalized data:", normalized);
   return normalized;
 };
 
@@ -96,6 +83,19 @@ const normalizeFormData = (data, config) => {
  */
 const prepareSubmissionData = (data, config, mode) => {
   const submissionData = { ...data };
+
+  // Apply defaults for hidden fields in create mode (e.g., editOnly status fields)
+  if (mode === "create") {
+    Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
+      // If field has a default and is not in the submission data, add it
+      if (
+        fieldConfig.default !== undefined &&
+        submissionData[fieldKey] === undefined
+      ) {
+        submissionData[fieldKey] = fieldConfig.default;
+      }
+    });
+  }
 
   Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
     // Remove fields that shouldn't be submitted in edit mode
@@ -389,6 +389,7 @@ export default function UniversalForm({
   initialData = {},
   mode = "create",
   token,
+  submissionError,
 }) {
   // ===========================================================================
   // HOOKS & CONFIG
@@ -399,18 +400,21 @@ export default function UniversalForm({
   // Normalize initial data to extract IDs from objects
   const normalizedInitialData = normalizeFormData(initialData, config);
 
-  console.log("🔍 UniversalForm Debug:", {
-    rawInitialData: initialData,
-    normalizedInitialData,
-    entityId: {
-      raw: initialData?.entityId,
-      normalized: normalizedInitialData?.entityId,
-    },
-    approver: {
-      raw: initialData?.approver,
-      normalized: normalizedInitialData?.approver,
-    },
-  });
+  // Apply default values from config for create mode
+  const getInitialFormData = () => {
+    if (mode === "create") {
+      const defaults = {};
+      Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
+        if (fieldConfig.default !== undefined) {
+          defaults[fieldKey] = fieldConfig.default;
+        }
+      });
+      return { ...defaults, ...normalizedInitialData };
+    }
+    return normalizedInitialData;
+  };
+
+  // Form initialization complete
 
   const {
     register,
@@ -419,7 +423,7 @@ export default function UniversalForm({
     control,
     formState: { errors, isDirty },
   } = useForm({
-    defaultValues: normalizedInitialData,
+    defaultValues: getInitialFormData(),
   });
 
   // ===========================================================================
@@ -430,6 +434,19 @@ export default function UniversalForm({
     if (mode === "edit" && fieldConfig.createOnly) return false;
     if (mode === "create" && fieldConfig.editOnly) return false;
     if (fieldConfig.formField === false) return false;
+
+    // Handle conditional rendering
+    if (fieldConfig.dependsOn) {
+      const dependentValue = watch(fieldConfig.dependsOn.field);
+      const targetValue = fieldConfig.dependsOn.value;
+
+      if (Array.isArray(targetValue)) {
+        if (!targetValue.includes(dependentValue)) return false;
+      } else {
+        if (dependentValue !== targetValue) return false;
+      }
+    }
+
     return true;
   };
 
@@ -532,6 +549,14 @@ export default function UniversalForm({
       }}
       className="space-y-5"
     >
+      {/* Global Error Display */}
+      {submissionError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2 text-red-600 animate-in fade-in slide-in-from-top-2">
+          <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+          <div className="text-sm font-medium">{submissionError}</div>
+        </div>
+      )}
+
       {/* Form Fields Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {visibleFields.map(([fieldKey, fieldConfig]) => {

@@ -57,16 +57,29 @@ export default function UniversalFilters({ module, token }) {
 
   // Update URL when filters change
   useEffect(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString()); // Preserve existing params
+    let hasChanged = false;
+
     Object.entries(debouncedFilters).forEach(([key, value]) => {
-      if (value && value !== "all" && value !== "") {
-        params.append(key, value);
+      const currentVal = params.get(key);
+      const newVal = value && value !== "all" && value !== "" ? value : null;
+
+      if (currentVal !== newVal) {
+        if (newVal) {
+          params.set(key, newVal);
+        } else {
+          params.delete(key);
+        }
+        hasChanged = true;
       }
     });
 
-    const queryString = params.toString();
-    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
-    router.push(newUrl);
+    if (hasChanged) {
+      const queryString = params.toString();
+      const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.push(newUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedFilters, router, pathname]);
 
   const handleFilterChange = (key, value) => {

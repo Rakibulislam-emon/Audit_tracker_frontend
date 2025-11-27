@@ -180,9 +180,7 @@ Observation Details:
 • Question: ${question.questionText}
 • Response: ${observation.response}
 • Severity: ${observation.severity}
-${observation.comments ? `• Comments: ${observation.comments}` : ""}
-
-Issue Description: [Describe the specific problem identified]`;
+${observation.comments ? `• Comments: ${observation.comments}` : ""}`;
 }
 
 function getImpactFromSeverity(severity) {

@@ -52,16 +52,9 @@ const LoadingState = () => (
 );
 
 const OptionItem = ({ item, isSelected, onSelect }) => (
-  <CommandItem
-    key={item._id}
-    value={getDisplayValue(item)}
-    onSelect={onSelect}
-  >
+  <CommandItem key={item._id} value={getDisplayValue(item)} onSelect={onSelect}>
     <Check
-      className={cn(
-        "mr-2 h-4 w-4",
-        isSelected ? "opacity-100" : "opacity-0"
-      )}
+      className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
     />
     <span className="truncate">{getDisplayValue(item)}</span>
   </CommandItem>
@@ -85,7 +78,7 @@ export default function RelationSelect({
   const { data: relationData, isLoading } = useModuleData(
     fieldConfig.relation,
     token,
-    { search: searchTerm }
+    { search: searchTerm, status: "active" }
   );
 
   const options = relationData?.data || [];
