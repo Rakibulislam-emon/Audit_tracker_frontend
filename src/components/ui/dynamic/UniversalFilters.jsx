@@ -79,7 +79,8 @@ export default function UniversalFilters({ module, token }) {
       const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
       router.push(newUrl);
     }
-  }, [debouncedFilters, router, pathname, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedFilters, router, pathname]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({

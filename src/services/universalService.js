@@ -29,8 +29,6 @@ export const universalService = {
     if (!endpoint) throw new Error("Endpoint is required");
 
     try {
-      console.log(`🔍 [API] Fetching ${endpoint}`, filters);
-
       // Build query parameters
       const params = new URLSearchParams();
 
@@ -48,8 +46,6 @@ export const universalService = {
       const url = `${baseUrl}/${endpoint}${
         params.toString() ? `?${params}` : ""
       }`;
-
-      console.log(`🌐 [API] GET: ${url}`);
 
       const fetchPromise = fetch(url, {
         method: "GET",
@@ -88,9 +84,6 @@ export const universalService = {
         throw new Error(`Invalid response format from ${endpoint}`);
       }
 
-      console.log(
-        `✅ [API] Successfully fetched ${result.data?.length || 0} ${endpoint}`
-      );
       return result;
     } catch (error) {
       // Handle cancellation gracefully
@@ -98,7 +91,6 @@ export const universalService = {
         error.name === "AbortError" ||
         error.message === "Request cancelled"
       ) {
-        console.log(`⏹️ [API] Request cancelled for ${endpoint}`);
         throw new Error("Request cancelled");
       }
 
@@ -122,10 +114,7 @@ export const universalService = {
     }
 
     try {
-      console.log(`🔍 [API] Fetching ${endpoint} by ID: ${id}`);
-
       const url = `${baseUrl}/${endpoint}/${id}`;
-      console.log(`🌐 [API] GET: ${url}`);
 
       const fetchPromise = fetch(url, {
         method: "GET",
@@ -160,14 +149,12 @@ export const universalService = {
         throw new Error(`Invalid response format from ${endpoint}/${id}`);
       }
 
-      console.log(`✅ [API] Successfully fetched ${endpoint} ${id}`);
       return result.data;
     } catch (error) {
       if (
         error.name === "AbortError" ||
         error.message === "Request cancelled"
       ) {
-        console.log(`⏹️ [API] Request cancelled for ${endpoint}/${id}`);
         throw new Error("Request cancelled");
       }
 
@@ -190,8 +177,6 @@ export const universalService = {
       throw new Error("Valid data is required");
 
     try {
-      console.log(`🆕 [API] Creating ${endpoint}:`, data);
-
       const fetchPromise = fetch(`${baseUrl}/${endpoint}`, {
         method: "POST",
         headers: {
@@ -220,14 +205,12 @@ export const universalService = {
       }
 
       const result = await response.json();
-      console.log(`✅ [API] Created ${endpoint} successfully`);
       return result;
     } catch (error) {
       if (
         error.name === "AbortError" ||
         error.message === "Request cancelled"
       ) {
-        console.log(`⏹️ [API] Create request cancelled for ${endpoint}`);
         throw new Error("Request cancelled");
       }
 
@@ -250,8 +233,6 @@ export const universalService = {
       throw new Error("Valid data is required");
 
     try {
-      console.log(`✏️ [API] Updating ${endpoint} ${id}:`, data);
-
       const fetchPromise = fetch(`${baseUrl}/${endpoint}/${id}`, {
         method: "PATCH",
         headers: {
@@ -280,14 +261,12 @@ export const universalService = {
       }
 
       const result = await response.json();
-      console.log(`✅ [API] Updated ${endpoint} successfully`);
       return result;
     } catch (error) {
       if (
         error.name === "AbortError" ||
         error.message === "Request cancelled"
       ) {
-        console.log(`⏹️ [API] Update request cancelled for ${endpoint}/${id}`);
         throw new Error("Request cancelled");
       }
 
@@ -308,8 +287,6 @@ export const universalService = {
     if (!endpoint || !id) throw new Error("Endpoint and ID are required");
 
     try {
-      console.log(`🗑️ [API] Deleting ${endpoint} ${id}`);
-
       const fetchPromise = fetch(`${baseUrl}/${endpoint}/${id}`, {
         method: "DELETE",
         headers: {
@@ -346,14 +323,12 @@ export const universalService = {
         result = { success: true, message: "Item deleted successfully" };
       }
 
-      console.log(`✅ [API] Deleted ${endpoint} successfully`);
       return result;
     } catch (error) {
       if (
         error.name === "AbortError" ||
         error.message === "Request cancelled"
       ) {
-        console.log(`⏹️ [API] Delete request cancelled for ${endpoint}/${id}`);
         throw new Error("Request cancelled");
       }
 

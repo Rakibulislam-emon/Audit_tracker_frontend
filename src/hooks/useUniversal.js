@@ -36,11 +36,51 @@ const useStableFilters = (filters = {}) => {
  */
 export const useUniversal = (token, endpoint, filters = {}) => {
   const stableFilters = useStableFilters(filters);
-  
+
   const queryKey = useMemo(() => {
     return [endpoint, stableFilters];
   }, [endpoint, stableFilters]);
 
+  const queryContext = useMemo(
+    () => ({
+      token,
+      endpoint,
+      filters,
+    }),
+    [token, endpoint, filters]
+  );
+
+  return useQuery({
+    queryKey,
+    queryFn: async ({ signal }) => {
+      return await universalService.getAll(
+        queryContext.token,
+        queryContext.endpoint,
+        queryContext.filters,
+        signal
+      );
+    },
+    keepPreviousData: true,
+    enabled: !!token && !!endpoint,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    // refetchOnMount: "always", // Add this line
+    // refetchOnWindowFocus: true,
+    refetchOnMount: true, // Refetch if data is stale
+    refetchOnWindowFocus: false, // Disable to prevent excessive refetching
+    retry: (failureCount, error) => {
+      if (error?.message === "Request cancelled") return false;
+      if (error?.message?.includes("HTTP 4")) return false;
+      if (error?.message?.includes("401") || error?.message?.includes("403"))
+        return false;
+      return failureCount < 2;
+    },
+    throwOnError: false,
+  });
+};
+
+/**
+ * ✅ FIXED: Universal Single Item Fetcher (No lint errors)
   const queryContext = useMemo(() => ({
     token,
     endpoint,
@@ -78,20 +118,23 @@ export const useUniversal = (token, endpoint, filters = {}) => {
 export const useGetByIdUniversal = (token, endpoint, id) => {
   const queryKey = useMemo(() => [endpoint, id], [endpoint, id]);
 
-  const queryContext = useMemo(() => ({
-    token,
-    endpoint,
-    id
-  }), [token, endpoint, id]);
+  const queryContext = useMemo(
+    () => ({
+      token,
+      endpoint,
+      id,
+    }),
+    [token, endpoint, id]
+  );
 
   return useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       if (!queryContext.id) throw new Error("ID is required");
       return await universalService.getById(
-        queryContext.token, 
-        queryContext.endpoint, 
-        queryContext.id, 
+        queryContext.token,
+        queryContext.endpoint,
+        queryContext.id,
         signal
       );
     },
@@ -136,14 +179,6 @@ export const useCreateUniversal = (token, endpoint) => {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-    onSuccess: () => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: [endpoint],
-          refetchType: "active",
-        });
-      }, 100);
-    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
     },
@@ -179,11 +214,6 @@ export const useUpdateUniversal = (token, endpoint) => {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-    onSuccess: () => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: [endpoint] });
-      }, 100);
-    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
     },
@@ -218,10 +248,9 @@ export const useDeleteUniversal = (token, endpoint) => {
         queryClient.setQueryData([endpoint], context.previousData);
       }
     },
-    onSuccess: () => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: [endpoint] });
-      }, 100);
+    onSettled: () => {
+      // Invalidate to ensure cache is fresh after delete completes
+      queryClient.invalidateQueries({ queryKey: [endpoint] });
     },
   });
 };
@@ -232,8 +261,8 @@ export const useDeleteUniversal = (token, endpoint) => {
 export const useModuleData = (module, token, filters = {}) => {
   const config = universalConfig[module];
   const universalResult = useUniversal(
-    token, 
-    config?.endpoint || 'fallback-endpoint',
+    token,
+    config?.endpoint || "fallback-endpoint",
     config ? filters : {}
   );
 
@@ -322,17 +351,7 @@ export const useCustomAction = (token, { modulesToInvalidate = [] } = {}) => {
       return await response.json();
     },
     onSuccess: () => {
-      modulesToInvalidate.forEach((moduleName) => {
-        const endpoint = universalConfig[moduleName]?.endpoint;
-        if (endpoint) {
-          setTimeout(() => {
-            queryClient.invalidateQueries({
-              queryKey: [endpoint],
-              refetchType: "active",
-            });
-          }, 50);
-        }
-      });
+      // Cache invalidation handled in onSettled
     },
     onError: (error) => {
       console.error("❌ Custom Action failed:", error);

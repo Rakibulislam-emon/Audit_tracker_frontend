@@ -181,6 +181,7 @@ export default function UniversalCRUDManager({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("create");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [submissionError, setSubmissionError] = useState(null);
 
   const searchParams = useSearchParams();
   const { user } = useAuthStore();
@@ -229,12 +230,14 @@ export default function UniversalCRUDManager({
     console.log(`Opening modal: ${type}`, item);
     setModalType(type);
     setSelectedItem(item);
+    setSubmissionError(null); // Clear error on open
     setIsModalOpen(true);
   }, []);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedItem(null);
+    setSubmissionError(null); // Clear error on close
   }, []);
 
   const openCreateModal = useCallback(() => openModal("create"), [openModal]);
@@ -254,6 +257,7 @@ export default function UniversalCRUDManager({
   const handleSubmit = useCallback(
     (formData) => {
       const isEditMode = modalType === "edit";
+      setSubmissionError(null); // Clear previous errors
 
       if (!isEditMode) {
         createItem(formData, {
@@ -261,7 +265,10 @@ export default function UniversalCRUDManager({
             closeModal();
             showSuccessToast(res, module, "created");
           },
-          onError: (error) => showErrorToast(error, module, "create"),
+          onError: (error) => {
+            setSubmissionError(error.message || "Failed to create item");
+            showErrorToast(error, module, "create");
+          },
         });
       } else if (selectedItem) {
         updateItem(
@@ -271,7 +278,10 @@ export default function UniversalCRUDManager({
               closeModal();
               showSuccessToast(res, module, "updated");
             },
-            onError: (error) => showErrorToast(error, module, "update"),
+            onError: (error) => {
+              setSubmissionError(error.message || "Failed to update item");
+              showErrorToast(error, module, "update");
+            },
           }
         );
       }
@@ -490,6 +500,7 @@ export default function UniversalCRUDManager({
               mode={modalType}
               token={token}
               isSubmitting={isCreating || isUpdating}
+              submissionError={submissionError}
             />
           )}
         </Modal>

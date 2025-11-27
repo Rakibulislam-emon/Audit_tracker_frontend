@@ -467,7 +467,7 @@ export const universalConfig = {
         default: "active",
         tableColumn: true,
         filterable: true, // ফিল্টারিং এর জন্য
-        // editOnly: true, // প্রয়োজন অনুযায়ী যোগ করুন
+        editOnly: true,
       },
       // commonFields থেকে আসা বাকি ফিল্ডগুলো
       createdBy: {
@@ -621,6 +621,7 @@ export const universalConfig = {
         required: true,
         options: ["active", "inactive"],
         default: "active",
+        editOnly: true,
         tableColumn: true,
         filterable: true, // For filtering
       },
@@ -770,6 +771,7 @@ export const universalConfig = {
         default: "active",
         tableColumn: true,
         filterable: true, // For filtering
+        editOnly: true,
       },
       // Common fields
       createdBy: {
@@ -955,6 +957,7 @@ export const universalConfig = {
         required: true,
         options: ["active", "inactive"],
         default: "active",
+        editOnly: true,
         tableColumn: true,
         filterable: true, // For filtering
       },
@@ -1147,6 +1150,7 @@ export const universalConfig = {
         required: true,
         options: ["active", "inactive"],
         default: "active",
+        editOnly: true,
         tableColumn: true,
         filterable: true, // For filtering
       },
@@ -1543,17 +1547,17 @@ export const universalConfig = {
         placeholder: "Select Purpose",
       },
       // ✅ NEW FIELD - Handling the Array
-      sites: {
-        type: "select-multi", // ❗ This is a NEW, custom component type
-        label: "Sites",
-        required: false, // Per your schema
-        relation: "sites", // Loads options from 'sites' module
-        tableColumn: true, // We can show multiple names
+      site: {
+        type: "select",
+        label: "Site",
+        required: false, // Required only if purpose is 'site', handled by backend or custom validation
+        relation: "sites",
+        tableColumn: true,
         filterable: true,
-        dataAccessor: "sites", // Let the component handle rendering the array
-        placeholder: "Select Site(s)",
+        dataAccessor: "site.name",
+        placeholder: "Select Site",
         fullWidth: true,
-        dependsOn: { field: "purpose", value: ["site"] }, // Only show if purpose is 'site'
+        dependsOn: { field: "purpose", value: "site" },
       },
       // ✅ NEW FIELD - Handling the Array
       assignedUser: {
@@ -2372,7 +2376,7 @@ export const universalConfig = {
         label: " Observation Severity",
         required: false,
         relation: "observations",
-        tableColumn: true,
+        tableColumn: false,
         filterable: true,
         dataAccessor: (item) => {
           if (!item.observation) return "N/A (Manual)";
@@ -2381,18 +2385,18 @@ export const universalConfig = {
         placeholder: "Enter Observation Severity",
         formField: true, // Allow linking on create/edit
       },
-      question: {
-        // Optional link
-        type: "select",
-        label: "Related Question (Optional)",
-        required: false,
-        relation: "questions",
-        tableColumn: false,
-        filterable: true, // Maybe hide from main table?
-        dataAccessor: "question.questionText",
-        placeholder: "Link Question",
-        formField: true,
-      },
+      // question: {
+      //   // Optional link
+      //   type: "select",
+      //   label: "Related Question (Optional)",
+      //   required: false,
+      //   relation: "questions",
+      //   tableColumn: false,
+      //   filterable: true, // Maybe hide from main table?
+      //   dataAccessor: "question.questionText",
+      //   placeholder: "Link Question",
+      //   formField: true,
+      // },
       description: {
         type: "textarea",
         label: "Description",
@@ -2453,7 +2457,7 @@ export const universalConfig = {
         label: "Corrective Actions",
         required: false,
         relation: "fixActions", // Link to FixAction model
-        tableColumn: true,
+        tableColumn: false,
         filterable: false, // Filtering might be complex
         // Displaying multiple requires custom cell or backend format
         dataAccessor: "fixActions", // Shows array of objects/IDs for now
@@ -2560,7 +2564,7 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      // create: ["admin", "sysadmin", "manager", "auditor"],
+      create: ["admin", "sysadmin", "manager", "auditor"],
       edit: ["admin", "sysadmin", "manager"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
