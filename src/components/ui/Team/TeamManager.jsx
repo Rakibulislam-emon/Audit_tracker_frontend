@@ -2,6 +2,7 @@
 
 import { useAuthStore } from "@/stores/useAuthStore";
 import { AlertCircle, Loader2, Trash2, UserPlus } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -104,7 +105,14 @@ const TeamMemberRow = ({ teamMember, onRemove, isDeleting }) => (
   </div>
 );
 
-const AddMemberForm = ({ control, errors, isCreating, onSubmit, token }) => {
+const AddMemberForm = ({
+  control,
+  errors,
+  isCreating,
+  onSubmit,
+  token,
+  error,
+}) => {
   const userFieldConfig = universalConfig.teams.fields.user;
   const roleFieldConfig = universalConfig.teams.fields.roleInTeam;
 
@@ -153,6 +161,13 @@ const AddMemberForm = ({ control, errors, isCreating, onSubmit, token }) => {
               </>
             )}
           </Button>
+          {/* 🎯 Persistent Error Display */}
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-red-600 p-3 bg-red-50 border border-red-200 rounded-md mt-4">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span className="break-words">{error}</span>
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>
@@ -212,6 +227,8 @@ export default function TeamManager({ auditSessionId }) {
     defaultValues: DEFAULT_FORM_VALUES,
   });
 
+  const [formError, setFormError] = useState("");
+
   // ===========================================================================
   // DATA FETCHING
   // ===========================================================================
@@ -245,8 +262,11 @@ export default function TeamManager({ auditSessionId }) {
   // ===========================================================================
 
   const handleAddMember = (formData) => {
+    setFormError("");
     if (isUserAlreadyInTeam(currentTeam, formData.user)) {
-      toast.error("This user is already in the team.");
+      const msg = "This user is already in the team.";
+      setFormError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -261,7 +281,10 @@ export default function TeamManager({ auditSessionId }) {
           refetch();
           reset();
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => {
+          setFormError(error.message || "Failed to add team member");
+          toast.error(error.message);
+        },
       }
     );
   };
@@ -291,6 +314,7 @@ export default function TeamManager({ auditSessionId }) {
         isCreating={isCreating}
         onSubmit={handleSubmit(handleAddMember)}
         token={token}
+        error={formError}
       />
 
       {/* Team Members List */}
