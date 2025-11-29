@@ -32,6 +32,7 @@ export default function FixActionForm({
   );
 
   const isSubmitting = isCreating || isUpdating;
+  const mode = fixAction ? "edit" : "create";
 
   // 🎯 REACT HOOK FORM SETUP
   const {
