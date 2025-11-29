@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { universalConfig } from "@/config/dynamicConfig";
 import { useCreateModule } from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { Loader2, Plus } from "lucide-react";
+import { AlertCircle, Loader2, Plus, Save } from "lucide-react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import UniversalStaticSelect from "../dynamic/UniversalStaticSelect";
@@ -25,6 +26,9 @@ export default function ProblemForm({
   const likelihoodConfig = config.fields.likelihood;
   const riskRatingConfig = config.fields.riskRating;
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
+
   const {
     control,
     register,
@@ -32,7 +36,6 @@ export default function ProblemForm({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      // ✅ Description-এই Observation Answer include করছেন
       title: `Issue: ${question.questionText.substring(0, 60)}...`,
       description: generateDescription(observation, question),
       impact: getImpactFromSeverity(observation.severity),
@@ -42,35 +45,44 @@ export default function ProblemForm({
     },
   });
 
-  const { mutate: createProblem, isPending } = useCreateModule(
-    "problems",
-    token
+  const { mutate: createProblem } = useCreateModule("problems", token);
+
+  const onSubmit = useCallback(
+    (formData) => {
+      setServerError("");
+      setIsSubmitting(true);
+      const toastId = toast.loading("Saving problem...");
+
+      const problemData = {
+        ...formData,
+        auditSession: session._id,
+        observation: observation._id,
+        question: question._id,
+      };
+
+      createProblem(problemData, {
+        onSuccess: (res) => {
+          toast.success("Problem created successfully!", { id: toastId });
+          if (onProblemCreated) onProblemCreated(res.data);
+          onClose();
+          setIsSubmitting(false);
+        },
+        onError: (err) => {
+          const errorMessage = err.message || "Failed to create problem.";
+          setServerError(errorMessage);
+          toast.error(errorMessage, { id: toastId });
+          setIsSubmitting(false);
+        },
+      });
+    },
+    [session, observation, question, createProblem, onProblemCreated, onClose]
   );
-
-  const onSubmit = (formData) => {
-    const problemData = {
-      ...formData,
-      // ✅ শুধু ID গুলো silently pass করছেন
-      auditSession: session._id,
-      observation: observation._id, // Backend relation-এর জন্য
-      question: question._id,
-    };
-
-    createProblem(problemData, {
-      onSuccess: (res) => {
-        toast.success("Problem created successfully!");
-        onProblemCreated(res.data);
-        onClose();
-      },
-      onError: (err) => toast.error(err.message),
-    });
-  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h3 className="text-lg font-medium">Create Problem from Observation</h3>
 
-      {/* ✅ Observation Info Display (Read-only) */}
+      {/* Observation Info Display (Read-only) */}
       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <h4 className="font-medium text-sm text-blue-800 mb-2">
           Based on Observation:
@@ -99,73 +111,98 @@ export default function ProblemForm({
         </div>
       </div>
 
-      {/* --- Title --- */}
+      {/* Title */}
       <div className="space-y-2">
-        <label>Problem Title</label>
+        <label className="text-sm font-medium">Problem Title</label>
         <Input
           {...register("title", { required: "Title is required" })}
-          disabled={isPending}
+          disabled={isSubmitting}
         />
+        {errors.title && (
+          <p className="text-xs text-red-500">{errors.title.message}</p>
+        )}
       </div>
 
-      {/* --- Description --- */}
+      {/* Description */}
       <div className="space-y-2">
-        <label>Description</label>
+        <label className="text-sm font-medium">Description</label>
         <Textarea
           {...register("description", { required: "Description is required" })}
-          disabled={isPending}
+          disabled={isSubmitting}
           rows={4}
         />
+        {errors.description && (
+          <p className="text-xs text-red-500">{errors.description.message}</p>
+        )}
         <p className="text-xs text-gray-500">
           Includes observation response: "{observation.response}"
         </p>
       </div>
 
-      {/* --- Risk Matrix --- */}
+      {/* Risk Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <label>Impact</label>
+          <label className="text-sm font-medium">Impact</label>
           <UniversalStaticSelect
             fieldKey="impact"
             fieldConfig={impactConfig}
             control={control}
             errors={errors}
-            isSubmitting={isPending}
+            isSubmitting={isSubmitting}
           />
         </div>
         <div className="space-y-2">
-          <label>Likelihood</label>
+          <label className="text-sm font-medium">Likelihood</label>
           <UniversalStaticSelect
             fieldKey="likelihood"
             fieldConfig={likelihoodConfig}
             control={control}
             errors={errors}
-            isSubmitting={isPending}
+            isSubmitting={isSubmitting}
           />
         </div>
         <div className="space-y-2">
-          <label>Risk Rating</label>
+          <label className="text-sm font-medium">Risk Rating</label>
           <UniversalStaticSelect
             fieldKey="riskRating"
             fieldConfig={riskRatingConfig}
             control={control}
             errors={errors}
-            isSubmitting={isPending}
+            isSubmitting={isSubmitting}
           />
         </div>
       </div>
 
-      <div className="flex justify-end pt-4 gap-2">
-        <Button type="button" variant="outline" onClick={onClose}>
+      {/* Persistent Server Error Display */}
+      {serverError && (
+        <div className="flex items-center gap-2 text-sm text-red-600 p-3 bg-red-50 border border-red-200 rounded-md">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span className="break-words">{serverError}</span>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3 pt-4 border-t mt-6 sticky bottom-0 bg-white py-3 px-1">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={isPending}>
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+        <Button type="submit" disabled={isSubmitting} className="min-w-[140px]">
+          {isSubmitting ? (
+            <div className="flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Saving...</span>
+            </div>
           ) : (
-            <Plus className="h-4 w-4 mr-2" />
+            <div className="flex items-center gap-2">
+              <Save className="h-4 w-4" />
+              <span>Save Problem</span>
+            </div>
           )}
-          Create Problem
         </Button>
       </div>
     </form>
