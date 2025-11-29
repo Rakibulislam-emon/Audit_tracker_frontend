@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import UniversalDatePicker from "@/components/ui/dynamic/UniversalDatePicker";
 import UniversalRelationSelect from "@/components/ui/dynamic/UniversalRelationSelect";
@@ -8,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateModule, useUpdateModule } from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { Loader2, Plus, Save } from "lucide-react";
+import { AlertCircle, Loader2, Plus, Save } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -19,9 +21,7 @@ export default function FixActionForm({
   onCancel,
 }) {
   const { token } = useAuthStore();
-  const mode = fixAction ? "edit" : "create";
-
-  // 🎯 USING YOUR EXISTING HOOKS
+  const [formError, setFormError] = useState("");
   const { mutate: createFixAction, isPending: isCreating } = useCreateModule(
     "fixActions",
     token
@@ -51,6 +51,7 @@ export default function FixActionForm({
 
   // 🎯 FORM SUBMISSION
   const onSubmit = (formData) => {
+    setFormError("");
     const payload = {
       ...formData,
       problem: problem._id, // 🎯 Auto-populate problem ID
@@ -62,7 +63,10 @@ export default function FixActionForm({
           toast.success("Fix Action created successfully!");
           onSuccess();
         },
-        onError: (error) => toast.error(error.message),
+        onError: (error) => {
+          setFormError(error.message || "Failed to create fix action");
+          toast.error(error.message);
+        },
       });
     } else {
       updateFixAction(
@@ -72,7 +76,10 @@ export default function FixActionForm({
             toast.success("Fix Action updated successfully!");
             onSuccess();
           },
-          onError: (error) => toast.error(error.message),
+          onError: (error) => {
+            setFormError(error.message || "Failed to update fix action");
+            toast.error(error.message);
+          },
         }
       );
     }
@@ -230,6 +237,14 @@ export default function FixActionForm({
           <p className="text-xs text-gray-500">
             No changes detected. Make changes to enable save.
           </p>
+        </div>
+      )}
+
+      {/* 🎯 Persistent Error Display */}
+      {formError && (
+        <div className="flex items-center gap-2 text-sm text-red-600 p-3 bg-red-50 border border-red-200 rounded-md">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span className="break-words">{formError}</span>
         </div>
       )}
     </form>
