@@ -267,12 +267,24 @@ import { useUpdateModule, useDeleteModule } from "@/hooks/useUniversal";
 // ... (ICON_MAP, HELPER FUNCTIONS, SUB-COMPONENTS remain same)
 
 // Delete Confirmation Component (Local)
-const DeleteConfirmation = ({ itemName, onCancel, onConfirm, isDeleting }) => (
+const DeleteConfirmation = ({
+  itemName,
+  onCancel,
+  onConfirm,
+  isDeleting,
+  error,
+}) => (
   <div className="space-y-4">
     <p className="text-gray-600">
       Are you sure you want to delete <strong>{itemName}</strong>?
     </p>
     <p className="text-sm text-red-600">This action cannot be undone.</p>
+    {error && (
+      <div className="flex items-center gap-2 text-sm text-red-600 p-3 bg-red-50 border border-red-200 rounded-md">
+        <AlertCircle className="h-4 w-4 shrink-0" />
+        <span className="break-words">{error}</span>
+      </div>
+    )}
     <div className="flex gap-3 justify-end pt-4">
       <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
         Cancel
@@ -294,6 +306,7 @@ export default function UniversalDetailView({ module }) {
   // Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
 
   // Get module configuration
   const config = universalConfig[module];
@@ -312,6 +325,7 @@ export default function UniversalDetailView({ module }) {
 
   // Handle Edit Submit
   const handleEditSubmit = async (formData) => {
+    setSubmissionError(null);
     try {
       await updateMutation.mutateAsync({ id, data: formData });
       toast.success(`${config.name || "Item"} updated successfully`);
@@ -319,12 +333,15 @@ export default function UniversalDetailView({ module }) {
       refetch(); // Refresh data
     } catch (error) {
       console.error("Update error:", error);
-      toast.error(error.message || "Failed to update item");
+      const msg = error.message || "Failed to update item";
+      setSubmissionError(msg);
+      toast.error(msg);
     }
   };
 
   // Handle Delete Confirm
   const handleDeleteConfirm = async () => {
+    setSubmissionError(null);
     try {
       await deleteMutation.mutateAsync(id);
       toast.success(`${config.name || "Item"} deleted successfully`);
@@ -332,7 +349,9 @@ export default function UniversalDetailView({ module }) {
       router.push(`/dashboard/${params.role}/${module}`); // Redirect to list
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error(error.message || "Failed to delete item");
+      const msg = error.message || "Failed to delete item";
+      setSubmissionError(msg);
+      toast.error(msg);
     }
   };
 
@@ -485,6 +504,7 @@ export default function UniversalDetailView({ module }) {
           onCancel={() => setIsEditModalOpen(false)}
           isSubmitting={updateMutation.isPending}
           mode="edit"
+          submissionError={submissionError}
         />
       </Modal>
 
@@ -499,6 +519,7 @@ export default function UniversalDetailView({ module }) {
           onCancel={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteConfirm}
           isDeleting={deleteMutation.isPending}
+          error={submissionError}
         />
       </Modal>
     </div>
