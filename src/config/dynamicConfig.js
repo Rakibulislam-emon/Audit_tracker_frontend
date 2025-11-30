@@ -1562,13 +1562,13 @@ export const universalConfig = {
       // ✅ NEW FIELD - Handling the Array
       assignedUser: {
         type: "select",
-        label: "Assigned Auditor",
+        label: "Lead Auditor",
         required: false,
         relation: "users",
         tableColumn: true,
         filterable: true,
         dataAccessor: "assignedUser.name", // ✅ CORRECT
-        placeholder: "Select Auditor",
+        placeholder: "Select Lead Auditor",
         fullWidth: true,
       },
       startDate: {
@@ -1857,6 +1857,28 @@ export const universalConfig = {
         filterable: false,
         formField: true, // Show on form
       },
+      leadAuditor: {
+        type: "select",
+        label: "Lead Auditor",
+        required: false,
+        relation: "users",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "leadAuditor.name",
+        placeholder: "Select Lead Auditor",
+        formField: true,
+      },
+      auditor: {
+        type: "select",
+        label: "Auditor",
+        required: false,
+        relation: "users",
+        tableColumn: false,
+        filterable: false,
+        dataAccessor: "auditor.name",
+        placeholder: "Select Auditor",
+        formField: true,
+      },
       status: {
         // System status
         type: "select",
@@ -1965,15 +1987,21 @@ export const universalConfig = {
       // create: ["admin", "sysadmin", "manager"],
       edit: ["admin", "sysadmin", "manager", "auditor"], // Auditor might update status/dates
       delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor"],
-      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+      ],
     },
     customActions: [
       {
         label: "Manage",
         action: "viewDetails", // Permission-er shathe match korbe
         type: "link", // ✅ Notun property: Eti ekta "command" na, eti ekta "link"
-        href: "/dashboard/admin/auditsessions/:id", // ✅ Notun property: Kothay jabe
+        href: "/dashboard/:role/auditsessions/:id", // ✅ Notun property: Kothay jabe
       },
     ],
   },
@@ -2156,8 +2184,8 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin", "manager", "auditor"],
-      edit: ["admin", "sysadmin", "manager", "auditor"], // Might need finer control later
+      create: ["admin", "sysadmin", "auditor"],
+      edit: ["admin", "sysadmin", "auditor"], // Might need finer control later
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
       viewDetails: ["admin", "sysadmin", "manager", "auditor"],
@@ -2564,8 +2592,8 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin", "manager", "auditor"],
-      edit: ["admin", "sysadmin", "manager"], // Who can edit problem details?
+      create: ["admin", "sysadmin", "auditor"],
+      edit: ["admin", "sysadmin"], // Who can edit problem details?
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       viewDetails: [
@@ -2864,9 +2892,9 @@ export const universalConfig = {
       // Who can view? Probably everyone involved.
       view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       // Who creates actions? Usually Managers/Admins based on Problems.
-      create: ["admin", "sysadmin", "manager"],
+      create: ["admin", "sysadmin"],
       // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
-      edit: ["admin", "sysadmin", "manager" /*, add owner role? */],
+      edit: ["admin", "sysadmin" /*, add owner role? */],
       // Who deletes? Restricted.
       delete: ["admin", "sysadmin"],
       viewDetails: [
@@ -3149,9 +3177,9 @@ export const universalConfig = {
       // View might be broad
       view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
       // Create (Upload) - Who can upload evidence?
-      create: ["admin", "sysadmin", "manager", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
+      create: ["admin", "sysadmin", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
       // Edit (Caption/Status only) - Who can edit metadata?
-      edit: ["admin", "sysadmin", "manager"], // UniversalForm edit can handle caption/status
+      edit: ["admin", "sysadmin"], // UniversalForm edit can handle caption/status
       // Delete - Highly restricted
       delete: ["admin", "sysadmin"],
     },

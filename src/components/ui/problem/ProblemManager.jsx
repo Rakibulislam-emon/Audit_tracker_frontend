@@ -19,7 +19,6 @@ const MODULE_NAME = "problems";
 const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
-  "manager",
   "compliance_officer",
 ];
 
@@ -150,20 +149,22 @@ const ProblemRow = ({
         </Button>
       )}
 
-      {/* Delete Button */}
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onDelete(problem._id)}
-        disabled={isDeleting}
-        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-      >
-        {isDeleting ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Trash2 className="h-3 w-3" />
-        )}
-      </Button>
+      {/* Delete Button - Admin/SysAdmin Only */}
+      {["admin", "sysadmin"].includes(useAuthStore.getState().user?.role) && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onDelete(problem._id)}
+          disabled={isDeleting}
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          {isDeleting ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Trash2 className="h-3 w-3" />
+          )}
+        </Button>
+      )}
     </div>
   </div>
 );

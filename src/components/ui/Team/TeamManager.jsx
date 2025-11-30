@@ -70,7 +70,7 @@ const TeamEmptyState = () => (
   </div>
 );
 
-const TeamMemberRow = ({ teamMember, onRemove, isDeleting }) => (
+const TeamMemberRow = ({ teamMember, onRemove, isDeleting, canManage }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-3">
@@ -88,19 +88,21 @@ const TeamMemberRow = ({ teamMember, onRemove, isDeleting }) => (
       <Badge variant="secondary" className="text-xs font-medium">
         {teamMember.roleInTeam}
       </Badge>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onRemove(teamMember._id)}
-        disabled={isDeleting}
-        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-      >
-        {isDeleting ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Trash2 className="h-3 w-3" />
-        )}
-      </Button>
+      {canManage && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onRemove(teamMember._id)}
+          disabled={isDeleting}
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          {isDeleting ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Trash2 className="h-3 w-3" />
+          )}
+        </Button>
+      )}
     </div>
   </div>
 );
@@ -179,6 +181,7 @@ const TeamMembersList = ({
   isLoadingTeam,
   onRemoveMember,
   isDeleting,
+  canManage,
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -199,6 +202,7 @@ const TeamMembersList = ({
               teamMember={teamMember}
               onRemove={onRemoveMember}
               isDeleting={isDeleting}
+              canManage={canManage}
             />
           ))}
         </div>
@@ -216,7 +220,7 @@ export default function TeamManager({ auditSessionId }) {
   // HOOKS & STATE
   // ===========================================================================
 
-  const { token } = useAuthStore();
+  const { token, user: currentUser } = useAuthStore();
 
   const {
     control,
@@ -233,6 +237,16 @@ export default function TeamManager({ auditSessionId }) {
   // DATA FETCHING
   // ===========================================================================
 
+  // Fetch audit session to check lead auditor
+  const { data: auditSessionData } = useModuleData(
+    "auditSessions",
+    token,
+    { _id: auditSessionId },
+    { enabled: !!auditSessionId }
+  );
+
+  const auditSession = auditSessionData?.data?.[0];
+
   const {
     data: teamData,
     isLoading: isLoadingTeam,
@@ -242,6 +256,33 @@ export default function TeamManager({ auditSessionId }) {
   });
 
   const currentTeam = teamData?.data || [];
+
+  // ===========================================================================
+  // PERMISSION CHECKS
+  // ===========================================================================
+
+  const canManageTeam = () => {
+    const userRole = currentUser?.role;
+    const userId = currentUser?._id;
+
+    // Admin and Manager can always manage (Program Managers assign teams)
+    if (
+      userRole === "admin" ||
+      userRole === "sysadmin" ||
+      userRole === "manager"
+    )
+      return true;
+
+    // Check if current user is the lead auditor of this session
+    if (auditSession?.leadAuditor?._id === userId) return true;
+
+    // Check if current user is in the team as a lead
+    const isLead = currentTeam?.some(
+      (member) => member.user?._id === userId && member.roleInTeam === "lead"
+    );
+
+    return isLead;
+  };
 
   // ===========================================================================
   // MUTATIONS
@@ -305,17 +346,21 @@ export default function TeamManager({ auditSessionId }) {
   // RENDER
   // ===========================================================================
 
+  const hasManagePermission = canManageTeam();
+
   return (
     <div className="space-y-6">
-      {/* Add Member Form */}
-      <AddMemberForm
-        control={control}
-        errors={errors}
-        isCreating={isCreating}
-        onSubmit={handleSubmit(handleAddMember)}
-        token={token}
-        error={formError}
-      />
+      {/* Add Member Form - Only show if user has permission */}
+      {hasManagePermission && (
+        <AddMemberForm
+          control={control}
+          errors={errors}
+          isCreating={isCreating}
+          onSubmit={handleSubmit(handleAddMember)}
+          token={token}
+          error={formError}
+        />
+      )}
 
       {/* Team Members List */}
       <TeamMembersList
@@ -323,7 +368,20 @@ export default function TeamManager({ auditSessionId }) {
         isLoadingTeam={isLoadingTeam}
         onRemoveMember={handleRemoveMember}
         isDeleting={isDeleting}
+        canManage={hasManagePermission}
       />
+
+      {/* Permission message for non-managers */}
+      {!hasManagePermission && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <AlertCircle className="h-4 w-4" />
+              <span>Only team leads and admins can manage team members.</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
