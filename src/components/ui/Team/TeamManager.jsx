@@ -269,7 +269,7 @@ export default function TeamManager({ auditSessionId }) {
     if (
       userRole === "admin" ||
       userRole === "sysadmin" ||
-      userRole === "manager"
+      userRole === "manager" 
     )
       return true;
 

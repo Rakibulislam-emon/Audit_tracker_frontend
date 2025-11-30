@@ -20,6 +20,7 @@ const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
   "compliance_officer",
+  "auditor",
 ];
 
 // =============================================================================
@@ -149,8 +150,10 @@ const ProblemRow = ({
         </Button>
       )}
 
-      {/* Delete Button - Admin/SysAdmin Only */}
-      {["admin", "sysadmin"].includes(useAuthStore.getState().user?.role) && (
+      {/* Delete Button - Admin/SysAdmin/Auditor Only */}
+      {["admin", "sysadmin", "auditor"].includes(
+        useAuthStore.getState().user?.role
+      ) && (
         <Button
           variant="outline"
           size="icon"
