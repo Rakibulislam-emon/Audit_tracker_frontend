@@ -19,7 +19,8 @@ const MODULE_NAME = "problems";
 const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
-  "compliance_officer",
+  // "manager",
+  "complianceOfficer",
   "auditor",
 ];
 
@@ -95,6 +96,7 @@ const ProblemRow = ({
   onOpenFixActions,
   onDelete,
   isDeleting,
+  isLeadAuditor,
 }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     {/* Problem Details */}
@@ -150,10 +152,29 @@ const ProblemRow = ({
         </Button>
       )}
 
-      {/* Delete Button - Admin/SysAdmin/Auditor Only */}
-      {["admin", "sysadmin", "auditor"].includes(
-        useAuthStore.getState().user?.role
-      ) && (
+      {/* Delete Button - Granular Permissions */}
+      {(() => {
+        const user = useAuthStore.getState().user;
+        const userRole = user?.role;
+        const userId = user?._id || user?.id;
+
+        // 1. Admin/SysAdmin can delete anything
+        if (["admin", "sysadmin"].includes(userRole)) return true;
+
+        // 2. Compliance Officer / Manager CANNOT delete
+        if (["compliance_officer", "manager"].includes(userRole)) return false;
+
+        // 3. Lead Auditor can delete anything in their session
+        if (isLeadAuditor) return true;
+
+        // 4. General Auditor can ONLY delete their own
+        const isCreator =
+          problem.createdBy?._id === userId || problem.createdBy === userId;
+
+        if (userRole === "auditor" && isCreator) return true;
+
+        return false;
+      })() && (
         <Button
           variant="outline"
           size="icon"
@@ -182,6 +203,7 @@ const ProblemsList = ({
   onOpenFixActions,
   onDeleteProblem,
   isDeleting,
+  isLeadAuditor,
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -204,6 +226,7 @@ const ProblemsList = ({
               onOpenFixActions={onOpenFixActions}
               onDelete={onDeleteProblem}
               isDeleting={isDeleting}
+              isLeadAuditor={isLeadAuditor}
             />
           ))}
         </div>
@@ -247,6 +270,10 @@ export default function ProblemManager({
    * Checks if current user can manage fix actions
    */
   const canManageFixActions = FIX_ACTION_PERMITTED_ROLES.includes(user?.role);
+
+  const isLeadAuditor =
+    session?.leadAuditor?._id === user?._id ||
+    session?.leadAuditor === user?._id;
 
   // ===========================================================================
   // EVENT HANDLERS
@@ -304,6 +331,7 @@ export default function ProblemManager({
         onOpenFixActions={handleOpenFixActionManager}
         onDeleteProblem={handleDeleteProblem}
         isDeleting={isDeleting}
+        isLeadAuditor={isLeadAuditor}
       />
 
       {/* 🎯 Fix Action Management Modal */}

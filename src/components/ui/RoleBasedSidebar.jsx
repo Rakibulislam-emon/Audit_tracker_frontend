@@ -13,7 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 export function RoleBasedSidebar({ role, isOpen, onToggle }) {
   const pathname = usePathname();
@@ -47,6 +48,21 @@ export function RoleBasedSidebar({ role, isOpen, onToggle }) {
 }
 
 function SidebarContent({ role, items, pathname }) {
+  // Track which submenus are open
+  const [openSubmenus, setOpenSubmenus] = useState({});
+
+  const toggleSubmenu = (id) => {
+    setOpenSubmenus(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  // Check if any item in submenu is active
+  const isSubmenuItemActive = (submenuItems) => {
+    return submenuItems?.some(item => pathname === item.href);
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -72,28 +88,92 @@ function SidebarContent({ role, items, pathname }) {
           <nav className="grid gap-1">
             {items.map((item) => {
               const Icon = item.icon;
+              const hasSubmenu = item.submenu && item.submenu.length > 0;
               const isActive = pathname === item.href;
+              const isSubmenuActive = hasSubmenu && isSubmenuItemActive(item.submenu);
+              const isSubmenuOpen = openSubmenus[item.id];
 
+              // Handle items without submenu (regular links)
+              if (!hasSubmenu) {
+                return (
+                  <TooltipProvider key={item.id} delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link href={item.href || "#"}>
+                          <Button
+                            variant={(isActive || isSubmenuActive) ? "secondary" : "ghost"}
+                            className={cn(
+                              "w-full justify-start gap-3 font-normal h-11",
+                              (isActive || isSubmenuActive) && "bg-accent"
+                            )}
+                          >
+                            {Icon && <Icon className="h-4 w-4" />}
+                            <span className="text-sm">{item.label}</span>
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.label}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              }
+
+              // Handle items with submenu
               return (
-                <TooltipProvider key={item.id} delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link href={item.href}>
+                <div key={item.id} className="mb-1">
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <Button
-                          variant={isActive ? "secondary" : "ghost"}
+                          variant={(isSubmenuActive || isSubmenuOpen) ? "secondary" : "ghost"}
                           className={cn(
                             "w-full justify-start gap-3 font-normal h-11",
-                            isActive && "bg-accent"
+                            (isSubmenuActive || isSubmenuOpen) && "bg-accent"
                           )}
+                          onClick={() => toggleSubmenu(item.id)}
                         >
-                          <Icon className="h-4 w-4" />
-                          <span className="text-sm">{item.label}</span>
+                          {Icon && <Icon className="h-4 w-4" />}
+                          <span className="text-sm flex-1 text-left">{item.label}</span>
+                          {isSubmenuOpen ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
                         </Button>
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.label}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  {/* Submenu items */}
+                  {isSubmenuOpen && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      {item.submenu.map((subItem) => {
+                        const isSubItemActive = pathname === subItem.href;
+                        return (
+                          <TooltipProvider key={subItem.id} delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link href={subItem.href || "#"}>
+                                  <Button
+                                    variant={isSubItemActive ? "secondary" : "ghost"}
+                                    className={cn(
+                                      "w-full justify-start gap-3 font-normal h-10 pl-4",
+                                      isSubItemActive && "bg-accent"
+                                    )}
+                                  >
+                                    <span className="text-xs">{subItem.label}</span>
+                                  </Button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent side="right">{subItem.label}</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
