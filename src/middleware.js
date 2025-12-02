@@ -155,7 +155,7 @@ export async function middleware(request) {
     console.log(`Token verification SUCCESS. Payload role: ${payload.role}`);
     const role = payload.role;
 
-    const allowedRoles = ["admin", "auditor", "compliance", "manager"];
+    const allowedRoles = ["admin", "auditor", "complianceOfficer", "manager"];
     if (!allowedRoles.includes(role)) {
       console.log(`Role NOT ALLOWED. Role: ${role}. Redirecting to login.`);
       return NextResponse.redirect(new URL("/auth/login", request.url));

@@ -170,7 +170,7 @@ export default function QuickActionsPanel() {
           variant: "default",
         },
       ],
-      compliance_officer: [
+      complianceOfficer: [
         {
           label: "Review Reports",
           icon: FileTextIcon,
