@@ -17,6 +17,8 @@ import {
   BarChart3,
   ThumbsUp,
   Settings,
+  ClipboardCheck,
+  BookOpen,
 } from "lucide-react";
 
 export const navItems = {
@@ -260,72 +262,81 @@ export const navItems = {
     },
   ],
 
-  compliance_officer: [
+  complianceOfficer: [
     {
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/dashboard/compliance",
+      href: "/dashboard/complianceOfficer",
     },
     {
-      id: "check-types",
-      label: "Categories",
-      icon: FolderCheck,
-      href: "/dashboard/compliance/check-types",
-    },
-    {
-      id: "rules",
-      label: "Rules",
-      icon: ShieldCheck,
-      href: "/dashboard/compliance/rules",
-    },
-    {
-      id: "questions",
-      label: "Questions",
-      icon: HelpCircle,
-      href: "/dashboard/compliance/questions",
-    },
-    {
-      id: "templates",
-      label: "Templates",
-      icon: FileEdit,
-      href: "/dashboard/compliance/templates",
+      id: "library",
+      label: "Standards Library",
+      icon: BookOpen,
+      submenu: [
+        {
+          id: "checkTypes",
+          label: "Check Types",
+          href: "/dashboard/complianceOfficer/check-types",
+        },
+        {
+          id: "rules",
+          label: "Rules",
+          href: "/dashboard/complianceOfficer/rules",
+        },
+        {
+          id: "questions",
+          label: "Questions",
+          href: "/dashboard/complianceOfficer/questions",
+        },
+        {
+          id: "templates",
+          label: "Templates",
+          href: "/dashboard/complianceOfficer/templates",
+        },
+      ],
     },
     {
       id: "programs",
       label: "Programs",
+      href: "/dashboard/complianceOfficer/programs",
       icon: CalendarCheck,
-      href: "/dashboard/compliance/programs",
     },
     {
-      id: "reports",
-      label: "Reports",
-      icon: BarChart3,
-      href: "/dashboard/compliance/reports",
-    },
-    {
-      id: "approvals",
-      label: "Approvals",
-      icon: ThumbsUp,
-      href: "/dashboard/compliance/approvals",
+      id: "auditSessions",
+      label: "Audit Sessions",
+      href: "/dashboard/complianceOfficer/auditsessions",
+      icon: ClipboardList,
     },
     {
       id: "observations",
       label: "Observations",
+      href: "/dashboard/complianceOfficer/observations",
       icon: SearchCheck,
-      href: "/dashboard/compliance/observations",
     },
     {
       id: "problems",
       label: "Problems",
+      href: "/dashboard/complianceOfficer/problems",
       icon: AlertTriangle,
-      href: "/dashboard/compliance/problems",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      href: "/dashboard/complianceOfficer/reports",
+      icon: BarChart3,
+    },
+    {
+      id: "approvals",
+      label: "Approvals",
+      href: "/dashboard/complianceOfficer/approvals",
+      icon: ThumbsUp,
     },
     {
       id: "settings",
       label: "Settings",
-      icon: Settings,
       href: "/dashboard/complianceOfficer/settings",
+      icon: Settings,
     },
   ],
 
