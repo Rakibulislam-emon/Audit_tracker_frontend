@@ -42,7 +42,8 @@ export default function ObservationCard({
   onSave,
   onProblemCreated,
 }) {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
+  const canEdit = ["admin", "sysadmin", "auditor"].includes(user?.role);
 
   const [response, setResponse] = useState(savedObservation?.response ?? null);
   const [severity, setSeverity] = useState(
@@ -188,6 +189,7 @@ export default function ObservationCard({
               variant={response === "yes" ? "default" : "outline"}
               size="sm"
               onClick={() => handleYesNoClick("yes")}
+              disabled={!canEdit}
               className="bg-green-50 text-green-700 border-green-300 hover:bg-green-100 data-[state=on]:bg-green-600 data-[state=on]:text-white"
             >
               <ThumbsUp className="h-4 w-4 mr-2" /> Yes
@@ -196,6 +198,7 @@ export default function ObservationCard({
               variant={response === "no" ? "destructive" : "outline"}
               size="sm"
               onClick={() => handleYesNoClick("no")}
+              disabled={!canEdit}
             >
               <ThumbsDown className="h-4 w-4 mr-2" /> No
             </Button>
@@ -208,7 +211,7 @@ export default function ObservationCard({
             placeholder="Enter your observation..."
             value={response ?? ""}
             onChange={(e) => handleResponseChange(e.target.value)}
-            disabled={isPending}
+            disabled={isPending || !canEdit}
             className="w-full"
           />
         );
@@ -221,7 +224,7 @@ export default function ObservationCard({
             placeholder="Enter a number..."
             value={response ?? ""}
             onChange={(e) => handleResponseChange(e.target.value)}
-            disabled={isPending}
+            disabled={isPending || !canEdit}
             className="w-full md:w-1/2"
           />
         );
@@ -276,7 +279,7 @@ export default function ObservationCard({
               <Select
                 value={severity}
                 onValueChange={setSeverity}
-                disabled={isPending}
+                disabled={isPending || !canEdit}
               >
                 <SelectTrigger className="w-full md:w-1/2">
                   <SelectValue placeholder="Select severity" />
@@ -300,7 +303,7 @@ export default function ObservationCard({
                 placeholder="Add your comments or notes..."
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
-                disabled={isPending}
+                disabled={isPending || !canEdit}
               />
             </div>
           )}
@@ -320,7 +323,7 @@ export default function ObservationCard({
                         variant="destructive"
                         size="sm"
                         onClick={() => setIsProblemModalOpen(true)}
-                        disabled={!savedObservation}
+                        disabled={!savedObservation || !canEdit}
                       >
                         <PlusCircle className="h-4 w-4 mr-2" />
                         Create Problem
@@ -332,7 +335,9 @@ export default function ObservationCard({
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={isPending || (savedObservation && !isDirty)}
+                disabled={
+                  isPending || (savedObservation && !isDirty) || !canEdit
+                }
               >
                 {isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
