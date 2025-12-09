@@ -260,7 +260,7 @@ export const navItems = {
     },
   ],
 
-  compliance_officer: [
+  complianceOfficer: [
     {
       id: "dashboard",
       label: "Dashboard",
@@ -405,11 +405,18 @@ export const navItems = {
   ],
 
   auditor: [
+    
     {
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
       href: "/dashboard/auditor",
+    },
+    {
+      id: "schedules",
+      label: "Schedules",
+      icon: Calendar,
+      href: "/dashboard/auditor/schedules",
     },
     {
       id: "auditSessions",
