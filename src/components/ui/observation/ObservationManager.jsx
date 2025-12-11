@@ -74,20 +74,9 @@ export default function ObservationManager({ session, onProblemCreated }) {
     }));
 
     // --- FILTERING LOGIC ---
-    // Lead Auditor: See ALL questions
-    // Regular Auditor: See ONLY assigned questions
-    if (isLeadAuditor) {
-      return merged;
-    }
-
-    return merged.filter((item) => {
-      const assignedToId =
-        item.currentAssignment?.assignedTo?._id ||
-        item.currentAssignment?.assignedTo;
-      const myId = user?._id || user?.id;
-      return assignedToId === myId;
-    });
-  }, [questionsData, observationsData, assignmentsData, isLeadAuditor, user]);
+    // Removed assignment filtering - Any auditor can see all questions
+    return merged;
+  }, [questionsData, observationsData, assignmentsData]);
 
   // --- Loading / Error States ---
   if (isLoadingQuestions || isLoadingObservations || isLoadingAssignments) {
@@ -129,23 +118,21 @@ export default function ObservationManager({ session, onProblemCreated }) {
   // --- Render ---
   return (
     <div className="space-y-4">
-      {questionsWithAnswers.map(
-        ({ question, savedObservation, currentAssignment }) => (
-          <ObservationCard
-            key={question._id}
-            session={session}
-            question={question}
-            savedObservation={savedObservation}
-            currentAssignment={currentAssignment}
-            isLeadAuditor={isLeadAuditor}
-            teamMembers={teamData?.data || []}
-            onSave={() => {
-              refetchObservations();
-            }}
-            onProblemCreated={onProblemCreated}
-          />
-        )
-      )}
+      {questionsWithAnswers.map(({ question, savedObservation }) => (
+        <ObservationCard
+          key={question._id}
+          session={session}
+          question={question}
+          savedObservation={savedObservation}
+          /* Assignment Dropdown removed as per request */
+          isLeadAuditor={isLeadAuditor}
+          teamMembers={teamData?.data || []}
+          onSave={() => {
+            refetchObservations();
+          }}
+          onProblemCreated={onProblemCreated}
+        />
+      ))}
     </div>
   );
 }

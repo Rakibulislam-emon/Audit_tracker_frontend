@@ -272,17 +272,7 @@ export default function ObservationCard({
             <p className="font-medium text-foreground flex-1">
               {question.questionText}
             </p>
-
-            {/* Assignment Dropdown */}
-            <div className="flex-shrink-0">
-              <AssignmentDropdown
-                session={session}
-                question={question}
-                teamMembers={teamMembers}
-                currentAssignment={currentAssignment}
-                isLeadAuditor={isLeadAuditor}
-              />
-            </div>
+            {/* Assignment Dropdown removed */}\n
           </div>
 
           {renderResponseInput()}

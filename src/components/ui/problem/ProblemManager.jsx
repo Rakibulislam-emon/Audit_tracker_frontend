@@ -4,12 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Modal from "@/components/ui/modal";
-import { useDeleteModule } from "@/hooks/useUniversal";
+import {
+  useDeleteModule,
+  useModuleData,
+  useUpdateModule,
+} from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { AlertCircle, Loader2, Trash2, Wrench } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import FixActionManager from "../fixAction/FixActionManager";
+import AssignProblemDropdown from "./AssignProblemDropdown";
 
 // =============================================================================
 // CONSTANTS
@@ -96,6 +101,10 @@ const ProblemRow = ({
   onOpenFixActions,
   onDelete,
   isDeleting,
+  siteUsers,
+  isLeadAuditor,
+  onAssign,
+  isUpdating,
 }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     {/* Problem Details */}
@@ -138,6 +147,15 @@ const ProblemRow = ({
       {/* Status Badge */}
       <StatusBadge status={problem.problemStatus} />
 
+      {/* Assignment Dropdown (Lead Auditor) or Display Name */}
+      <AssignProblemDropdown
+        problem={problem}
+        users={siteUsers}
+        onAssign={onAssign}
+        isLeadAuditor={isLeadAuditor}
+        isUpdating={isUpdating}
+      />
+
       {/* Fix Actions Button (Role-Based) */}
       {canManageFixActions && (
         <Button
@@ -179,6 +197,10 @@ const ProblemsList = ({
   onOpenFixActions,
   onDeleteProblem,
   isDeleting,
+  siteUsers,
+  isLeadAuditor,
+  onAssign,
+  isUpdating,
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -201,6 +223,10 @@ const ProblemsList = ({
               onOpenFixActions={onOpenFixActions}
               onDelete={onDeleteProblem}
               isDeleting={isDeleting}
+              siteUsers={siteUsers}
+              isLeadAuditor={isLeadAuditor}
+              onAssign={onAssign}
+              isUpdating={isUpdating}
             />
           ))}
         </div>
@@ -236,6 +262,23 @@ export default function ProblemManager({
     token
   );
 
+  const { mutate: updateProblem, isPending: isUpdating } = useUpdateModule(
+    MODULE_NAME,
+    token
+  );
+
+  // Fetch users for assignment (filtered by site)
+  const siteId = session?.site?._id || session?.site;
+  const { data: siteUsers } = useModuleData(
+    "users",
+    token, // Pass token as second arg
+    {
+      status: "active",
+      site: siteId,
+      // specific roles? maybe only auditor/problemOwner? For now all site users.
+    }
+  );
+
   // ===========================================================================
   // PERMISSION CHECKS
   // ===========================================================================
@@ -244,6 +287,13 @@ export default function ProblemManager({
    * Checks if current user can manage fix actions
    */
   const canManageFixActions = FIX_ACTION_PERMITTED_ROLES.includes(user?.role);
+
+  const isLeadAuditor =
+    user?.role === "admin" ||
+    user?.role === "sysadmin" ||
+    user?.role === "auditor" ||
+    session?.leadAuditor === user?._id ||
+    session?.leadAuditor?._id === user?._id;
 
   // ===========================================================================
   // EVENT HANDLERS
@@ -268,6 +318,22 @@ export default function ProblemManager({
       },
       cancel: { label: "Cancel" },
     });
+  };
+
+  /**
+   * Handles problem assignment
+   */
+  const handleAssign = (problemId, assignedTo) => {
+    updateProblem(
+      { id: problemId, data: { assignedTo } },
+      {
+        onSuccess: () => {
+          toast.success("Problem assigned successfully");
+          refetch(); // Refetch problems to show updated data
+        },
+        onError: (err) => toast.error(err.message),
+      }
+    );
   };
 
   /**
@@ -301,6 +367,10 @@ export default function ProblemManager({
         onOpenFixActions={handleOpenFixActionManager}
         onDeleteProblem={handleDeleteProblem}
         isDeleting={isDeleting}
+        siteUsers={siteUsers?.data || []}
+        isLeadAuditor={isLeadAuditor}
+        onAssign={handleAssign}
+        isUpdating={isUpdating}
       />
 
       {/* 🎯 Fix Action Management Modal */}

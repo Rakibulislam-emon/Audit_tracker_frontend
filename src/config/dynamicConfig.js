@@ -39,14 +39,70 @@ export const universalConfig = {
         label: "Role",
         required: true,
         options: [
+          // Old roles
           "admin",
-          "auditor",
-          "compliance_officer",
           "manager",
+          "complianceOfficer",
           "sysadmin",
+
+          // New roles
+          "auditor",
+          "superAdmin",
+          "groupAdmin",
+          "companyAdmin",
+          "siteManager",
+          "problemOwner",
+          "approver",
         ],
         tableColumn: true,
         filterable: true,
+      },
+
+      // ===== User Assignment (Simplified UX) =====
+      assignTo: {
+        type: "select",
+        label: "Assign User To",
+        required: true,
+        options: ["group", "company", "site"],
+        default: "group",
+        tableColumn: false,
+        filterable: false,
+        formField: true,
+      },
+      assignedGroup: {
+        type: "select",
+        label: "Group",
+        required: false,
+        relation: "groups",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedGroup.name", // Show group name in table
+      },
+      assignedCompany: {
+        type: "select",
+        label: "Company",
+        required: false,
+        relation: "companies",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedCompany.name", // Show company name in table
+        dependsOn: {
+          field: "assignTo",
+          value: ["company", "site"],
+        },
+      },
+      assignedSite: {
+        type: "select",
+        label: "Site",
+        required: false,
+        relation: "sites",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedSite.name", // Show site name in table
+        dependsOn: {
+          field: "assignTo",
+          value: ["site"],
+        },
       },
       isActive: {
         type: "select",
