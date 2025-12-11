@@ -21,6 +21,7 @@ const FIX_ACTION_PERMITTED_ROLES = [
   "sysadmin",
   "manager",
   "compliance_officer",
+  "auditor",
 ];
 
 // =============================================================================
