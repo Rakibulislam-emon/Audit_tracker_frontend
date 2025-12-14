@@ -26,7 +26,7 @@ const FIX_ACTION_PERMITTED_ROLES = [
   "sysadmin",
   "manager",
   "compliance_officer",
-  "auditor",
+  // "auditor",
 ];
 
 // =============================================================================
@@ -271,12 +271,14 @@ export default function ProblemManager({
   const siteId = session?.site?._id || session?.site;
   const { data: siteUsers } = useModuleData(
     "users",
-    token, // Pass token as second arg
+    token,
     {
       status: "active",
       site: siteId,
-      // specific roles? maybe only auditor/problemOwner? For now all site users.
-    }
+      // Filter for relevant roles (who can own a problem)
+      role: ["problemOwner", "siteManager", "manager", "auditor"],
+    },
+    { enabled: !!siteId } // Only fetch if siteId exists
   );
 
   // ===========================================================================
