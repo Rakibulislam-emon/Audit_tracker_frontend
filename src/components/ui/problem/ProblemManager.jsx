@@ -4,12 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Modal from "@/components/ui/modal";
-import { useDeleteModule } from "@/hooks/useUniversal";
+import {
+  useDeleteModule,
+  useModuleData,
+  useUpdateModule,
+} from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { AlertCircle, Loader2, Trash2, Wrench } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import FixActionManager from "../fixAction/FixActionManager";
+import AssignProblemDropdown from "./AssignProblemDropdown";
 
 // =============================================================================
 // CONSTANTS
@@ -19,9 +24,9 @@ const MODULE_NAME = "problems";
 const FIX_ACTION_PERMITTED_ROLES = [
   "admin",
   "sysadmin",
-  // "manager",
-  "complianceOfficer",
-  "auditor",
+  "manager",
+  "compliance_officer",
+  // "auditor",
 ];
 
 // =============================================================================
@@ -96,7 +101,11 @@ const ProblemRow = ({
   onOpenFixActions,
   onDelete,
   isDeleting,
+  siteUsers,
   isLeadAuditor,
+  onAssign,
+  isUpdating,
+  onRefreshUsers,
 }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     {/* Problem Details */}
@@ -139,6 +148,16 @@ const ProblemRow = ({
       {/* Status Badge */}
       <StatusBadge status={problem.problemStatus} />
 
+      {/* Assignment Dropdown (Lead Auditor) or Display Name */}
+      <AssignProblemDropdown
+        problem={problem}
+        users={siteUsers}
+        onAssign={onAssign}
+        isLeadAuditor={isLeadAuditor}
+        isUpdating={isUpdating}
+        onRefreshUsers={onRefreshUsers}
+      />
+
       {/* Fix Actions Button (Role-Based) */}
       {canManageFixActions && (
         <Button
@@ -152,43 +171,20 @@ const ProblemRow = ({
         </Button>
       )}
 
-      {/* Delete Button - Granular Permissions */}
-      {(() => {
-        const user = useAuthStore.getState().user;
-        const userRole = user?.role;
-        const userId = user?._id || user?.id;
-
-        // 1. Admin/SysAdmin can delete anything
-        if (["admin", "sysadmin"].includes(userRole)) return true;
-
-        // 2. Compliance Officer / Manager CANNOT delete
-        if (["compliance_officer", "manager"].includes(userRole)) return false;
-
-        // 3. Lead Auditor can delete anything in their session
-        if (isLeadAuditor) return true;
-
-        // 4. General Auditor can ONLY delete their own
-        const isCreator =
-          problem.createdBy?._id === userId || problem.createdBy === userId;
-
-        if (userRole === "auditor" && isCreator) return true;
-
-        return false;
-      })() && (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onDelete(problem._id)}
-          disabled={isDeleting}
-          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-        >
-          {isDeleting ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Trash2 className="h-3 w-3" />
-          )}
-        </Button>
-      )}
+      {/* Delete Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onDelete(problem._id)}
+        disabled={isDeleting}
+        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+      >
+        {isDeleting ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Trash2 className="h-3 w-3" />
+        )}
+      </Button>
     </div>
   </div>
 );
@@ -203,7 +199,11 @@ const ProblemsList = ({
   onOpenFixActions,
   onDeleteProblem,
   isDeleting,
+  siteUsers,
   isLeadAuditor,
+  onAssign,
+  isUpdating,
+  onRefreshUsers,
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -226,7 +226,11 @@ const ProblemsList = ({
               onOpenFixActions={onOpenFixActions}
               onDelete={onDeleteProblem}
               isDeleting={isDeleting}
+              siteUsers={siteUsers}
               isLeadAuditor={isLeadAuditor}
+              onAssign={onAssign}
+              isUpdating={isUpdating}
+              onRefreshUsers={onRefreshUsers}
             />
           ))}
         </div>
@@ -262,6 +266,25 @@ export default function ProblemManager({
     token
   );
 
+  const { mutate: updateProblem, isPending: isUpdating } = useUpdateModule(
+    MODULE_NAME,
+    token
+  );
+
+  // Fetch users for assignment (filtered by site)
+  const siteId = session?.site?._id || session?.site;
+  const { data: siteUsers, refetch: refetchUsers } = useModuleData(
+    "users",
+    token,
+    {
+      status: "active",
+      site: siteId,
+      // Filter for relevant roles (who can own a problem)
+      role: ["problemOwner", "siteManager", "manager", "auditor"],
+    },
+    { enabled: !!siteId } // Only fetch if siteId exists
+  );
+
   // ===========================================================================
   // PERMISSION CHECKS
   // ===========================================================================
@@ -272,8 +295,11 @@ export default function ProblemManager({
   const canManageFixActions = FIX_ACTION_PERMITTED_ROLES.includes(user?.role);
 
   const isLeadAuditor =
-    session?.leadAuditor?._id === user?._id ||
-    session?.leadAuditor === user?._id;
+    user?.role === "admin" ||
+    user?.role === "sysadmin" ||
+    user?.role === "auditor" ||
+    session?.leadAuditor === user?._id ||
+    session?.leadAuditor?._id === user?._id;
 
   // ===========================================================================
   // EVENT HANDLERS
@@ -298,6 +324,22 @@ export default function ProblemManager({
       },
       cancel: { label: "Cancel" },
     });
+  };
+
+  /**
+   * Handles problem assignment
+   */
+  const handleAssign = (problemId, assignedTo) => {
+    updateProblem(
+      { id: problemId, data: { assignedTo } },
+      {
+        onSuccess: () => {
+          toast.success("Problem assigned successfully");
+          refetch(); // Refetch problems to show updated data
+        },
+        onError: (err) => toast.error(err.message),
+      }
+    );
   };
 
   /**
@@ -331,7 +373,11 @@ export default function ProblemManager({
         onOpenFixActions={handleOpenFixActionManager}
         onDeleteProblem={handleDeleteProblem}
         isDeleting={isDeleting}
+        siteUsers={siteUsers?.data || []}
         isLeadAuditor={isLeadAuditor}
+        onAssign={handleAssign}
+        isUpdating={isUpdating}
+        onRefreshUsers={refetchUsers}
       />
 
       {/* 🎯 Fix Action Management Modal */}
