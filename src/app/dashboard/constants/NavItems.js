@@ -348,6 +348,12 @@ export const navItems = {
       href: "/dashboard/manager",
     },
     {
+      id: "my-problems",
+      label: "My Problems",
+      icon: ClipboardList,
+      href: "/dashboard/manager/my-problems",
+    },
+    {
       id: "users",
       label: "Users",
       icon: Users,
@@ -421,6 +427,18 @@ export const navItems = {
       label: "Dashboard",
       icon: LayoutDashboard,
       href: "/dashboard/auditor",
+    },
+    {
+      id: "my-problems",
+      label: "My Problems",
+      icon: ClipboardList,
+      href: "/dashboard/auditor/my-problems",
+    },
+    {
+      id: "schedules",
+      label: "Schedules",
+      icon: Calendar,
+      href: "/dashboard/auditor/schedules",
     },
     {
       id: "auditSessions",

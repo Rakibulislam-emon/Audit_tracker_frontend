@@ -296,12 +296,21 @@ const shouldShowAction = (action, item) => {
   return fieldValue === value;
 };
 
-const getFilteredCustomActions = (moduleConfig, userRole, item) => {
+const shouldShowToUser = (action, item, user) => {
+  // If action has a checkUser function, use it for custom visibility logic
+  if (action.checkUser && typeof action.checkUser === "function") {
+    return action.checkUser(item, user);
+  }
+  return true;
+};
+
+const getFilteredCustomActions = (moduleConfig, userRole, item, user) => {
   if (!moduleConfig.customActions) return [];
   return moduleConfig.customActions.filter(
     (action) =>
       hasPermission(action, moduleConfig, userRole) &&
-      shouldShowAction(action, item)
+      shouldShowAction(action, item) &&
+      shouldShowToUser(action, item, user)
   );
 };
 
@@ -528,7 +537,12 @@ export default function UniversalActions({
   const canEdit = moduleConfig.permissions.edit?.includes(userRole) ?? false;
   const canDelete =
     moduleConfig.permissions.delete?.includes(userRole) ?? false;
-  const customActions = getFilteredCustomActions(moduleConfig, userRole, item);
+  const customActions = getFilteredCustomActions(
+    moduleConfig,
+    userRole,
+    item,
+    user
+  );
 
   return (
     <>

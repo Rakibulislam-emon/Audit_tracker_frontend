@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { useModuleData } from "@/hooks/useUniversal";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useQuestionAssignments } from "@/hooks/useQuestionAssignments";
 import { Loader2, AlertCircle } from "lucide-react";
 import ObservationCard from "./ObservationCard";
 
@@ -13,53 +14,72 @@ import ObservationCard from "./ObservationCard";
  * 3. Dui-ta-ke merge kore ekta list dekhay.
  */
 export default function ObservationManager({ session, onProblemCreated }) {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
+  const { useSessionAssignments } = useQuestionAssignments();
 
-  // --- 1. Shob Proshno (Questions) Load Kori ---
-  // Shudhu oi proshno-gulo ani ja ei session-er template-e ache
+  // --- 0. Identify Role ---
+  const isLeadAuditor =
+    (session.leadAuditor?._id || session.leadAuditor) ===
+    (user?._id || user?.id);
+
+  // --- 1. Load Questions (Template Based) ---
   const {
     data: questionsData,
     isLoading: isLoadingQuestions,
     error: questionsError,
   } = useModuleData("questions", token, {
-    template: session.template?._id, 
-    site: session.site?._id, // Add site filter based on session's site
-    limit: 1000, // Shob proshno ani
+    template: session.template?._id,
+    site: session.site?._id,
+    limit: 1000,
   });
 
-  // --- 2. Shob Save Kora Uttor (Observations) Load Kori ---
-  // Shudhu ei session-er jonno
+  // --- 2. Load Saved Observations ---
   const {
     data: observationsData,
     isLoading: isLoadingObservations,
     error: observationsError,
-    refetch: refetchObservations, // ✅ Save/Update korle list refresh korar jonno
+    refetch: refetchObservations,
   } = useModuleData("observations", token, {
-    auditSession: session._id, // Session ID diye filter kori
+    auditSession: session._id,
   });
 
-  // --- 3. Data Merge Kori (Shobcheye Guruttopurno Step) ---
-  // Amra 'questions' ebong 'observations'-ke eksathe "join" korchi
+  // --- 3. Load Assignments ---
+  const { data: assignmentsData, isLoading: isLoadingAssignments } =
+    useSessionAssignments(session._id);
+
+  // --- 4. Load Team Members (For Dropdown) ---
+  const { data: teamData } = useModuleData("teams", token, {
+    auditSession: session._id,
+  });
+
+  // --- 5. Merge Data & Filter ---
   const questionsWithAnswers = useMemo(() => {
     if (!questionsData || !observationsData) return [];
 
     const questions = questionsData.data || [];
     const observations = observationsData.data || [];
+    const assignments = assignmentsData?.data || [];
 
-    // Ekta "Map" to-ri kori jate khub druto (fast) uttor khuje paowa jaay
     const observationMap = new Map(
-      observations.map((obs) => [obs.question?._id, obs])
+      observations.map((obs) => [obs.question?._id || obs.question, obs])
+    );
+    const assignmentMap = new Map(
+      assignments.map((asg) => [asg.question?._id || asg.question, asg])
     );
 
-    // Proshno-r list-er upor map kori
-    return questions.map((question) => ({
+    const merged = questions.map((question) => ({
       question: question,
-      savedObservation: observationMap.get(question._id) || null, // Ei proshno-r uttor-ta Map theke ber kori
+      savedObservation: observationMap.get(question._id) || null,
+      currentAssignment: assignmentMap.get(question._id) || null,
     }));
-  }, [questionsData, observationsData]);
+
+    // --- FILTERING LOGIC ---
+    // Removed assignment filtering - Any auditor can see all questions
+    return merged;
+  }, [questionsData, observationsData, assignmentsData]);
 
   // --- Loading / Error States ---
-  if (isLoadingQuestions || isLoadingObservations) {
+  if (isLoadingQuestions || isLoadingObservations || isLoadingAssignments) {
     return (
       <div className="flex justify-center items-center h-48">
         <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
@@ -67,6 +87,7 @@ export default function ObservationManager({ session, onProblemCreated }) {
       </div>
     );
   }
+
   if (questionsError || observationsError) {
     return (
       <div className="p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg flex items-center gap-3">
@@ -75,42 +96,43 @@ export default function ObservationManager({ session, onProblemCreated }) {
       </div>
     );
   }
+
   if (questionsWithAnswers.length === 0) {
-     return (
-       <div className="p-4 text-center text-gray-500">
-         <AlertCircle className="h-4 w-4 inline-block mr-2" />
-         No questions found for this template.
-       </div>
-     );
+    return (
+      <div className="p-8 text-center text-gray-500 border-2 border-dashed rounded-lg">
+        {isLeadAuditor ? (
+          <>
+            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p>No questions found for this template.</p>
+          </>
+        ) : (
+          <>
+            <Loader2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p>You have no assigned observations for this session.</p>
+          </>
+        )}
+      </div>
+    );
   }
 
-  // --- 4. Render the List ---
+  // --- Render ---
   return (
     <div className="space-y-4">
       {questionsWithAnswers.map(({ question, savedObservation }) => (
         <ObservationCard
           key={question._id}
-          session={session} // Pura session object-ta pass kori
-          question={question} // Ekta question object pass kori
-          savedObservation={savedObservation} // Save kora uttor-ta pass kori
+          session={session}
+          question={question}
+          savedObservation={savedObservation}
+          /* Assignment Dropdown removed as per request */
+          isLeadAuditor={isLeadAuditor}
+          teamMembers={teamData?.data || []}
           onSave={() => {
-            // Jokhon-i kono card save hobe, amra shob observation abar load korbo
             refetchObservations();
           }}
-          onProblemCreated={onProblemCreated} // Parent theke function pass kori
+          onProblemCreated={onProblemCreated}
         />
       ))}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
