@@ -105,6 +105,7 @@ const ProblemRow = ({
   isLeadAuditor,
   onAssign,
   isUpdating,
+  onRefreshUsers,
 }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     {/* Problem Details */}
@@ -154,6 +155,7 @@ const ProblemRow = ({
         onAssign={onAssign}
         isLeadAuditor={isLeadAuditor}
         isUpdating={isUpdating}
+        onRefreshUsers={onRefreshUsers}
       />
 
       {/* Fix Actions Button (Role-Based) */}
@@ -201,6 +203,7 @@ const ProblemsList = ({
   isLeadAuditor,
   onAssign,
   isUpdating,
+  onRefreshUsers,
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -227,6 +230,7 @@ const ProblemsList = ({
               isLeadAuditor={isLeadAuditor}
               onAssign={onAssign}
               isUpdating={isUpdating}
+              onRefreshUsers={onRefreshUsers}
             />
           ))}
         </div>
@@ -269,7 +273,7 @@ export default function ProblemManager({
 
   // Fetch users for assignment (filtered by site)
   const siteId = session?.site?._id || session?.site;
-  const { data: siteUsers } = useModuleData(
+  const { data: siteUsers, refetch: refetchUsers } = useModuleData(
     "users",
     token,
     {
@@ -373,6 +377,7 @@ export default function ProblemManager({
         isLeadAuditor={isLeadAuditor}
         onAssign={handleAssign}
         isUpdating={isUpdating}
+        onRefreshUsers={refetchUsers}
       />
 
       {/* 🎯 Fix Action Management Modal */}

@@ -14,6 +14,7 @@ export default function AssignProblemDropdown({
   onAssign,
   isLeadAuditor,
   isUpdating,
+  onRefreshUsers,
 }) {
   const assignedUserId = problem.assignedTo?._id || problem.assignedTo;
   const assignedUserName = problem.assignedTo?.name;
@@ -37,6 +38,11 @@ export default function AssignProblemDropdown({
         onAssign(problem._id, value === "unassigned" ? null : value)
       }
       disabled={isUpdating}
+      onOpenChange={(isOpen) => {
+        if (isOpen && onRefreshUsers) {
+          onRefreshUsers();
+        }
+      }}
     >
       <SelectTrigger className="w-[160px] h-8 text-xs bg-background">
         <div className="flex items-center gap-2 truncate">
