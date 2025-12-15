@@ -143,27 +143,50 @@ export default function UniversalStaticSelect({
       name={fieldKey}
       control={control}
       rules={validationRules}
-      render={({ field }) => (
-        <Select
-          onValueChange={field.onChange}
-          defaultValue={field.value}
-          value={field.value || ""}
-          disabled={isSubmitting}
-        >
-          <SelectTriggerWithError
-            hasError={hasError}
-            value={field.value}
-            placeholder={placeholderText}
-            isSubmitting={isSubmitting}
-          />
+      render={({ field }) => {
+        // ✅ VALUE TRANSFORMATION
+        // Handle boolean values for isActive field
+        let displayValue = field.value;
+        if (fieldKey === "isActive") {
+          // Convert boolean to string for Select component
+          if (field.value === true) displayValue = "active";
+          else if (field.value === false) displayValue = "inactive";
+          // If already string (e.g. from default), keep it
+        }
 
-          <SelectContentWithOptions
-            options={options}
-            fieldConfig={fieldConfig}
-            hasRequiredOption={hasRequiredOption}
-          />
-        </Select>
-      )}
+        const handleValueChange = (newValue) => {
+          // ✅ CHANGE TRANSFORMATION
+          if (fieldKey === "isActive") {
+            // Convert string back to boolean for Form/API
+            const boolValue = newValue === "active";
+            field.onChange(boolValue);
+          } else {
+            field.onChange(newValue);
+          }
+        };
+
+        return (
+          <Select
+            onValueChange={handleValueChange}
+            defaultValue={displayValue}
+            value={displayValue || ""}
+            disabled={isSubmitting}
+          >
+            <SelectTriggerWithError
+              hasError={hasError}
+              value={displayValue}
+              placeholder={placeholderText}
+              isSubmitting={isSubmitting}
+            />
+
+            <SelectContentWithOptions
+              options={options}
+              fieldConfig={fieldConfig}
+              hasRequiredOption={hasRequiredOption}
+            />
+          </Select>
+        );
+      }}
     />
   );
 }

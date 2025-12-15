@@ -39,14 +39,70 @@ export const universalConfig = {
         label: "Role",
         required: true,
         options: [
+          // Old roles
           "admin",
-          "auditor",
-          "compliance_officer",
           "manager",
+          "complianceOfficer",
           "sysadmin",
+
+          // New roles
+          "auditor",
+          "superAdmin",
+          "groupAdmin",
+          "companyAdmin",
+          "siteManager",
+          "problemOwner",
+          "approver",
         ],
         tableColumn: true,
         filterable: true,
+      },
+
+      // ===== User Assignment (Simplified UX) =====
+      assignTo: {
+        type: "select",
+        label: "Assign User To",
+        required: true,
+        options: ["group", "company", "site"],
+        default: "group",
+        tableColumn: false,
+        filterable: false,
+        formField: true,
+      },
+      assignedGroup: {
+        type: "select",
+        label: "Group",
+        required: false,
+        relation: "groups",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedGroup.name", // Show group name in table
+      },
+      assignedCompany: {
+        type: "select",
+        label: "Company",
+        required: false,
+        relation: "companies",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedCompany.name", // Show company name in table
+        dependsOn: {
+          field: "assignTo",
+          value: ["company", "site"],
+        },
+      },
+      assignedSite: {
+        type: "select",
+        label: "Site",
+        required: false,
+        relation: "sites",
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedSite.name", // Show site name in table
+        dependsOn: {
+          field: "assignTo",
+          value: ["site"],
+        },
       },
       isActive: {
         type: "select",
@@ -1725,7 +1781,7 @@ export const universalConfig = {
       edit: ["admin", "sysadmin", "manager"],
       delete: ["admin", "sysadmin"],
       view: ["admin", "sysadmin", "manager", "auditor"],
-      start: ["admin", "sysadmin", "manager"],
+      start: ["admin", "sysadmin", "manager", "auditor"], // Allow auditors, checkUser filters to assigned lead only
       viewDetails: ["admin", "sysadmin", "manager", "auditor"],
     },
 
@@ -1740,13 +1796,43 @@ export const universalConfig = {
       {
         label: "Start Audit",
         action: "start",
-
         endpoint: "/:id/start",
-
         method: "POST",
         showWhen: {
           field: "scheduleStatus",
           value: "scheduled",
+        },
+        // Custom visibility check: only show to assigned lead auditor or admin/sysadmin
+        checkUser: (item, user) => {
+          console.log("🔍 Start Audit - checkUser called:", {
+            scheduleTitle: item.title,
+            scheduleStatus: item.scheduleStatus,
+            assignedUser_full: item.assignedUser,
+            assignedUser_id: item.assignedUser?._id,
+            assignedUser_plain: item.assignedUser,
+            currentUser_full: user,
+            currentUser_id: user?._id,
+            currentUser_id_alt: user?.id,
+            userRole: user?.role,
+          });
+
+          // Always show to admin/sysadmin
+          if (user?.role === "admin" || user?.role === "sysadmin") {
+            console.log("✅ Admin/SysAdmin - showing button");
+            return true;
+          }
+
+          // Show if user is the assigned lead auditor
+          const assignedUserId = item.assignedUser?._id || item.assignedUser;
+          const currentUserId = user?._id || user?.id;
+
+          console.log("🔍 Comparing IDs:", {
+            assignedUserId,
+            currentUserId,
+            match: assignedUserId?.toString() === currentUserId?.toString(),
+          });
+
+          return assignedUserId?.toString() === currentUserId?.toString();
         },
       },
     ],

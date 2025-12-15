@@ -29,6 +29,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import ProblemForm from "../problem/ProblemForm";
+import AssignmentDropdown from "./AssignmentDropdown";
 
 const capitalizeSeverity = (s) => {
   if (typeof s !== "string" || !s) return "Medium";
@@ -39,6 +40,9 @@ export default function ObservationCard({
   session,
   question,
   savedObservation,
+  currentAssignment,
+  isLeadAuditor,
+  teamMembers,
   onSave,
   onProblemCreated,
 }) {
@@ -262,12 +266,18 @@ export default function ObservationCard({
     <>
       <div
         className={cn(
-          "p-4 bg-card border-l-4 rounded-lg shadow-sm",
+          "p-4 bg-card border-l-4 rounded-lg shadow-sm relative",
           responseColor
         )}
       >
         <div className="space-y-4">
-          <p className="font-medium text-foreground">{question.questionText}</p>
+          <div className="flex justify-between items-start gap-4">
+            <p className="font-medium text-foreground flex-1">
+              {question.questionText}
+            </p>
+            {/* Assignment Dropdown removed */}\n
+          </div>
+
           {renderResponseInput()}
 
           {showSeverity && (
