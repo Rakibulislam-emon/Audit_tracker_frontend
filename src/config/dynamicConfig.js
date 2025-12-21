@@ -77,6 +77,10 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true,
         dataAccessor: "assignedGroup.name", // Show group name in table
+        dependsOn: {
+          field: "assignTo",
+          value: "group",
+        },
       },
       assignedCompany: {
         type: "select",
@@ -158,11 +162,11 @@ export const universalConfig = {
 
     // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin"],
-      edit: ["admin", "sysadmin"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager"],
-      viewDetails: ["admin", "sysadmin", "manager"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      view: ["superAdmin", "groupAdmin", "companyAdmin"],
+      viewDetails: ["superAdmin", "groupAdmin", "companyAdmin"],
     },
     customActions: [
       {
@@ -269,11 +273,11 @@ export const universalConfig = {
 
     // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin"],
-      edit: ["admin", "sysadmin"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager"],
-      viewDetails: ["admin", "sysadmin", "manager"],
+      create: ["admin", "sysadmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "superAdmin", "groupAdmin"],
+      delete: ["admin", "sysadmin", "superAdmin"],
+      view: ["admin", "sysadmin", "manager", "superAdmin"],
+      viewDetails: ["admin", "sysadmin", "manager", "superAdmin"],
     },
     customActions: [
       {
@@ -431,11 +435,25 @@ export const universalConfig = {
 
     // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin"],
-      edit: ["admin", "sysadmin"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager"],
-      viewDetails: ["admin", "sysadmin", "manager"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "groupAdmin",
+        "superAdmin",
+        // "companyAdmin",
+      ],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "groupAdmin",
+        "superAdmin",
+        // "companyAdmin",
+      ],
     },
     customActions: [
       {
@@ -586,11 +604,27 @@ export const universalConfig = {
 
     // PERMISSIONS (আপনার প্রয়োজন অনুযায়ী অ্যাডজাস্ট করুন)
     permissions: {
-      create: ["admin", "sysadmin", "manager"], // কারা তৈরি করতে পারবে
-      edit: ["admin", "sysadmin", "manager"], // কারা এডিট করতে পারবে
-      delete: ["admin", "sysadmin"], // কারা ডিলিট করতে পারবে
-      view: ["admin", "sysadmin", "manager", "auditor"], // কারা দেখতে পারবে
-      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
     },
 
     // Custom Actions
@@ -735,16 +769,26 @@ export const universalConfig = {
 
     // PERMISSIONS (Adjust according to your needs)
     permissions: {
-      create: ["admin", "sysadmin", "complianceOfficer"],
-      edit: ["admin", "sysadmin", "complianceOfficer"],
-      delete: ["admin", "sysadmin", "complianceOfficer"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
       ],
     },
     customActions: [
@@ -896,18 +940,27 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS (Adjust as needed)
     permissions: {
-      create: ["admin", "sysadmin", "complianceOfficer"],
-      edit: ["admin", "sysadmin", "complianceOfficer"],
-      delete: ["admin", "sysadmin", "complianceOfficer"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
       ],
     },
     customActions: [
@@ -1103,18 +1156,27 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin", "manager", "complianceOfficer"],
-      edit: ["admin", "sysadmin", "manager", "complianceOfficer"],
-      delete: ["admin", "sysadmin", "complianceOfficer"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
       ],
     },
 
@@ -1294,18 +1356,27 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS (Adjust as needed)
     permissions: {
-      create: ["admin", "sysadmin", "manager", "complianceOfficer"],
-      edit: ["admin", "sysadmin", "manager", "complianceOfficer"],
-      delete: ["admin", "sysadmin", "complianceOfficer"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
       ],
     },
   },
@@ -1518,13 +1589,28 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor"],
-      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
     },
 
     // Custom Actions
@@ -1775,14 +1861,36 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS
     permissions: {
-      create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"],
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor"],
-      start: ["admin", "sysadmin", "manager", "auditor"], // Allow auditors, checkUser filters to assigned lead only
-      viewDetails: ["admin", "sysadmin", "manager", "auditor"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
+      start: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+      ], // Allow auditors, checkUser filters to assigned lead only
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
     },
 
     // CUSTOM ACTIONS
@@ -2095,16 +2203,35 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      // create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"], // Auditor might update status/dates
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      edit: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "auditor",
+      ], // Auditor might update status/dates
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
       ],
     },
     customActions: [
@@ -2295,16 +2422,40 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin"],
-      edit: ["admin", "sysadmin"], // Might need finer control later
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor", "complianceOfficer"],
+      create: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+      ],
+      edit: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+      ],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
       ],
     },
 
@@ -2483,12 +2634,27 @@ export const universalConfig = {
       // Removed 'search' filter as specific filters are generally more useful here
     },
 
-    // PERMISSIONS (Match roles in authorizeRoles middleware)
     permissions: {
-      create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"],
-      delete: ["admin", "sysadmin", "manager"], // Allow manager to delete assignments too?
-      view: ["admin", "sysadmin", "manager", "auditor"], // Allow auditors to see team assignments
+      create: ["admin", "sysadmin", "manager", "groupAdmin", "superAdmin"],
+      edit: ["admin", "sysadmin", "manager", "groupAdmin", "superAdmin"],
+      delete: ["admin", "sysadmin", "manager", "groupAdmin", "superAdmin"], // Allow manager to delete assignments too?
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+      ], // Allow auditors to see team assignments
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+      ],
     },
   },
 
@@ -2709,16 +2875,34 @@ export const universalConfig = {
     },
     permissions: {
       // Match backend roles
-      create: ["admin", "sysadmin"],
-      edit: ["admin", "sysadmin"], // Who can edit problem details?
-      delete: ["admin", "sysadmin"],
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "auditor"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "auditor"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "auditor"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "siteManager",
+        "approver",
+        "problemOwner",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "siteManager",
+        "approver",
+        "problemOwner",
       ],
     },
 
@@ -3007,19 +3191,54 @@ export const universalConfig = {
     permissions: {
       // Match backend roles
       // Who can view? Probably everyone involved.
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "approver",
+        "problemOwner",
+      ],
       // Who creates actions? Usually Managers/Admins based on Problems.
-      create: ["admin", "sysadmin"],
-      // Who edits? Manager might change details. Owner might update status. Verifier updates verification fields. Needs thought.
-      edit: ["admin", "sysadmin" /*, add owner role? */],
-      // Who deletes? Restricted.
-      delete: ["admin", "sysadmin"],
+      create: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "problemOwner",
+      ],
+      edit: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "problemOwner",
+      ],
+      delete: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "problemOwner",
+      ],
       viewDetails: [
         "admin",
         "sysadmin",
         "manager",
         "auditor",
         "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "approver",
+        "problemOwner",
       ],
     },
 
@@ -3289,16 +3508,47 @@ export const universalConfig = {
       }, // Filter by createdBy
     },
 
-    // Permissions - Need careful consideration for file uploads/deletes
     permissions: {
       // View might be broad
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "problemOwner",
+      ],
       // Create (Upload) - Who can upload evidence?
-      create: ["admin", "sysadmin", "auditor"], // Needs a dedicated upload UI, not UniversalForm create
-      // Edit (Caption/Status only) - Who can edit metadata?
-      edit: ["admin", "sysadmin"], // UniversalForm edit can handle caption/status
-      // Delete - Highly restricted
-      delete: ["admin", "sysadmin"],
+      create: [
+        "admin",
+        "sysadmin",
+        "auditor",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "problemOwner",
+      ],
+      edit: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "auditor",
+        "problemOwner",
+      ],
+      delete: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "siteManager",
+        "auditor",
+        "problemOwner",
+      ],
     },
     // ✅ Indicate that standard CRUD form isn't fully applicable
     hasCustomCreate: true, // Signal to hide default "Add" button
@@ -3499,14 +3749,64 @@ export const universalConfig = {
       },
     },
 
-    // PERMISSIONS (Match backend roles)
     permissions: {
-      create: ["admin", "sysadmin"], // Manual create (hidden by hasCustomCreate)
-      edit: ["admin", "sysadmin", "manager"], // Edit metadata
-      delete: ["admin", "sysadmin"], // Delete report
-      view: ["admin", "sysadmin", "manager", "auditor", "compliance_officer"],
+      create: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
+      edit: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
+      delete: [
+        "admin",
+        "sysadmin",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
       // ✅ Custom permission for generate button
-      generate: ["admin", "sysadmin", "manager"],
+      generate: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
+        "compliance_officer",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
     },
   },
 
@@ -3725,14 +4025,47 @@ export const universalConfig = {
       },
     },
 
-    // In dynamicConfig.js - approvals permissions
     permissions: {
-      view: ["admin", "sysadmin", "manager", "approver", "complianceOfficer"],
-      create: ["admin", "sysadmin", "manager"],
-      edit: ["admin", "sysadmin", "manager"],
-      delete: ["admin", "sysadmin"],
-      approve: ["admin", "sysadmin", "manager", "approver", "complianceOfficer"], // ✅ ADD THIS
-      reject: ["admin", "sysadmin", "manager", "approver", "complianceOfficer"], // ✅ ADD THIS
+      view: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "approver",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+        "auditor",
+      ],
+      viewDetails: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "approver",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ],
+      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "approver"],
+      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "approver"],
+      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin"],
+      approve: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "approver",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ], // ✅ ADD THIS
+      reject: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "approver",
+        "complianceOfficer",
+        "groupAdmin",
+        "superAdmin",
+      ], // ✅ ADD THIS
     },
     // customActions: [
     //   {

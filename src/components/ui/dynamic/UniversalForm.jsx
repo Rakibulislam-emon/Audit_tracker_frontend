@@ -389,6 +389,7 @@ export default function UniversalForm({
   initialData = {},
   mode = "create",
   token,
+  user,
   submissionError,
 }) {
   // ===========================================================================
@@ -402,16 +403,42 @@ export default function UniversalForm({
 
   // Apply default values from config for create mode
   const getInitialFormData = () => {
+    const baseData = { ...normalizedInitialData };
+
     if (mode === "create") {
-      const defaults = {};
+      // 1. Apply static defaults from config
       Object.entries(config.fields).forEach(([fieldKey, fieldConfig]) => {
         if (fieldConfig.default !== undefined) {
-          defaults[fieldKey] = fieldConfig.default;
+          baseData[fieldKey] = fieldConfig.default;
         }
       });
-      return { ...defaults, ...normalizedInitialData };
+
+      // 2. CONTEXTUAL AUTO-FILL: Auto-assign scope if user is jailed (Group/Company Admin)
+      if (user) {
+        // Handle User Model keys
+        if (user.assignedGroup) baseData.assignedGroup = user.assignedGroup;
+        if (user.assignedCompany)
+          baseData.assignedCompany = user.assignedCompany;
+        if (user.assignedSite) baseData.assignedSite = user.assignedSite;
+
+        // Handle Entity Model keys (Group/Company/Site modules)
+        if (user.assignedGroup && !baseData.group)
+          baseData.group = user.assignedGroup;
+        if (user.assignedCompany && !baseData.company)
+          baseData.company = user.assignedCompany;
+
+        // Auto-set assignTo default if current default is unauthorized
+        if (user.role === "companyAdmin" && baseData.assignTo === "group") {
+          baseData.assignTo = "company";
+        } else if (
+          user.role === "groupAdmin" &&
+          ["system"].includes(baseData.assignTo)
+        ) {
+          baseData.assignTo = "group";
+        }
+      }
     }
-    return normalizedInitialData;
+    return baseData;
   };
 
   // Form initialization complete
@@ -430,10 +457,44 @@ export default function UniversalForm({
   // FIELD FILTERING & RENDERING
   // ===========================================================================
 
-  const shouldRenderField = (fieldConfig) => {
+  const shouldRenderField = (fieldKey, fieldConfig) => {
     if (mode === "edit" && fieldConfig.createOnly) return false;
     if (mode === "create" && fieldConfig.editOnly) return false;
     if (fieldConfig.formField === false) return false;
+
+    // CONTEXTUAL JAILING: Hide fields that are already assigned via the requester's scope
+    // If you are a Company Admin, you don't need to see "Select Group" or "Select Company"
+    if (user) {
+      // Hide Group field for anyone below System Level
+      if (
+        (fieldKey === "assignedGroup" || fieldKey === "group") &&
+        (user.assignedGroup ||
+          [
+            "groupAdmin",
+            "companyAdmin",
+            "complianceOfficer",
+            "siteManager",
+          ].includes(user.role))
+      )
+        return false;
+
+      // Hide Company field for anyone below Group Level
+      if (
+        (fieldKey === "assignedCompany" || fieldKey === "company") &&
+        (user.assignedCompany ||
+          ["companyAdmin", "complianceOfficer", "siteManager"].includes(
+            user.role
+          ))
+      )
+        return false;
+
+      // Hide Site field if you are a Site Manager
+      if (
+        fieldKey === "assignedSite" &&
+        (user.assignedSite || user.role === "siteManager")
+      )
+        return false;
+    }
 
     // Handle conditional rendering
     if (fieldConfig.dependsOn) {
@@ -451,7 +512,7 @@ export default function UniversalForm({
   };
 
   const visibleFields = Object.entries(config.fields).filter(
-    ([, fieldConfig]) => shouldRenderField(fieldConfig)
+    ([fieldKey, fieldConfig]) => shouldRenderField(fieldKey, fieldConfig)
   );
 
   const renderField = (fieldKey, fieldConfig) => {
@@ -463,6 +524,7 @@ export default function UniversalForm({
       isSubmitting,
       control,
       token,
+      user,
     };
 
     switch (fieldConfig.type) {
@@ -580,6 +642,16 @@ export default function UniversalForm({
             </div>
           );
         })}
+
+        {/* Hidden Fields (for Auto-Fill/Jailing) */}
+        {Object.entries(config.fields)
+          .filter(
+            ([fieldKey, fieldConfig]) =>
+              !shouldRenderField(fieldKey, fieldConfig)
+          )
+          .map(([fieldKey]) => (
+            <input key={fieldKey} type="hidden" {...register(fieldKey)} />
+          ))}
       </div>
 
       {/* Divider */}

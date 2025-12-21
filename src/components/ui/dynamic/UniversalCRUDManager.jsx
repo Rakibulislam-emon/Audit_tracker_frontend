@@ -11,8 +11,10 @@ import UniversalFilters from "@/components/ui/dynamic/UniversalFilters";
 import UniversalForm from "@/components/ui/dynamic/UniversalForm";
 import UniversalTable from "@/components/ui/dynamic/UniversalTable";
 import Modal from "@/components/ui/modal";
+import AccessDenied from "@/components/ui/AccessDenied";
 
 // Hooks & Config
+import { navItems } from "@/app/dashboard/constants/NavItems";
 import { universalConfig } from "@/config/dynamicConfig";
 import {
   useCreateModule,
@@ -101,10 +103,10 @@ const ActionButtons = ({
     return (
       <button
         onClick={onOpenCreateModal}
-        className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden"
+        className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden"
       >
         {/* Animated background shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
         {/* Icon with animation */}
         <div className="relative z-10 p-1 bg-white/20 rounded-md group-hover:bg-white/30 transition-colors duration-300">
@@ -186,6 +188,29 @@ export default function UniversalCRUDManager({
   const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const config = universalConfig[module];
+
+  // ===========================================================================
+  // NAVIGATION SECURITY GUARD (Jailing)
+  // ===========================================================================
+
+  const isAllowedToBrowse = useMemo(() => {
+    if (!user || !module) return true; // Safety fallback
+
+    const roleNav = navItems[user.role] || [];
+
+    // Check if module ID exists in direct nav items or in submenus
+    return roleNav.some(
+      (item) =>
+        item.id === module ||
+        (item.submenu && item.submenu.some((sub) => sub.id === module))
+    );
+  }, [user, module]);
+
+  // If not in nav, and we are on a standalone page (not a detail view component)
+  // we block the entire render with our AccessDenied component.
+  if (!isAllowedToBrowse) {
+    return <AccessDenied module={module} role={user?.role} />;
+  }
 
   // ===========================================================================
   // DATA FETCHING
@@ -499,6 +524,7 @@ export default function UniversalCRUDManager({
               initialData={modalType === "edit" ? selectedItem : {}}
               mode={modalType}
               token={token}
+              user={user}
               isSubmitting={isCreating || isUpdating}
               submissionError={submissionError}
             />

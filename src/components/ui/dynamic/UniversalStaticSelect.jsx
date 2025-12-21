@@ -122,13 +122,72 @@ export default function UniversalStaticSelect({
   fieldConfig,
   control,
   isSubmitting,
+  user,
   errors,
 }) {
   // ===========================================================================
-  // CONFIGURATION
+  // AUTHORITY-BASED FILTERING (UX)
   // ===========================================================================
 
-  const options = fieldConfig.options || [];
+  const AUTHORITY_TIERS = {
+    superAdmin: 1,
+    sysadmin: 1,
+    admin: 1,
+    groupAdmin: 2,
+    companyAdmin: 3,
+    complianceOfficer: 4,
+    siteManager: 4,
+    auditor: 5,
+  };
+
+  const SCOPE_WEIGHTS = {
+    system: 100,
+    group: 75,
+    company: 50,
+    site: 25,
+  };
+
+  const getFilteredOptions = () => {
+    let rawOptions = fieldConfig.options || [];
+    if (!user || user.role === "superAdmin" || user.role === "sysadmin")
+      return rawOptions;
+
+    const userTier = AUTHORITY_TIERS[user.role] || 5;
+
+    // Infer scope if missing (defensive)
+    let userScopeLevel = user.scopeLevel;
+    if (!userScopeLevel) {
+      if (user.role === "groupAdmin") userScopeLevel = "group";
+      else if (user.role === "companyAdmin") userScopeLevel = "company";
+      else if (user.role === "siteManager") userScopeLevel = "site";
+      else if (["superAdmin", "sysadmin", "admin"].includes(user.role))
+        userScopeLevel = "system";
+    }
+
+    const userScopeWeight = SCOPE_WEIGHTS[userScopeLevel] || 0;
+
+    // 1. Filter User Roles dropdown
+    if (fieldKey === "role") {
+      return rawOptions.filter((option) => {
+        const optionTier = AUTHORITY_TIERS[option] || 5;
+        // Cannot create peer or higher role
+        return optionTier > userTier;
+      });
+    }
+
+    // 2. Filter assignTo (Scope) dropdown
+    if (fieldKey === "assignTo") {
+      return rawOptions.filter((option) => {
+        const optionWeight = SCOPE_WEIGHTS[option] || 0;
+        // Cannot create scope ABOVE your own (equal is fine)
+        return optionWeight <= userScopeWeight;
+      });
+    }
+
+    return rawOptions;
+  };
+
+  const options = getFilteredOptions();
   const hasError = Boolean(errors[fieldKey]);
   const hasRequiredOption = fieldConfig.required;
   const placeholderText = getPlaceholderText(fieldConfig);

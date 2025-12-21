@@ -11,7 +11,7 @@ export default function GroupManagement() {
       token={token}
       title="Group Management"
       addButtonText="Add Group"
-      isAvailable={false}
+      isAvailable={true}
     />
   );
 }
