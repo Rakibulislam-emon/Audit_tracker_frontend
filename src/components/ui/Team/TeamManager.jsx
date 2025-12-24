@@ -215,7 +215,11 @@ const TeamMembersList = ({
 // MAIN COMPONENT
 // =============================================================================
 
-export default function TeamManager({ auditSessionId }) {
+export default function TeamManager({
+  auditSessionId,
+  readOnly = false,
+  lockMessage = null,
+}) {
   // ===========================================================================
   // HOOKS & STATE
   // ===========================================================================
@@ -320,8 +324,19 @@ export default function TeamManager({ auditSessionId }) {
 
   return (
     <div className="space-y-6">
-      {/* Add Member Form - Only for Lead Auditors */}
-      {isLeadAuditor && (
+      {/* Lock Message */}
+      {readOnly && lockMessage && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>🔒 Read-Only Mode:</strong> {lockMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Add Member Form - Only for Lead Auditors and NOT readOnly */}
+      {isLeadAuditor && !readOnly && (
         <AddMemberForm
           control={control}
           errors={errors}
@@ -333,12 +348,13 @@ export default function TeamManager({ auditSessionId }) {
       )}
 
       {/* Team Members List */}
+      {/* Hide delete button if readOnly */}
       <TeamMembersList
         currentTeam={currentTeam}
         isLoadingTeam={isLoadingTeam}
         onRemoveMember={handleRemoveMember}
         isDeleting={isDeleting}
-        canManage={isLeadAuditor}
+        canManage={isLeadAuditor && !readOnly}
       />
     </div>
   );

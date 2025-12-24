@@ -8,6 +8,7 @@ import {
   Factory,
   FileText,
   Loader2,
+  Lock, // ✅ Add Lock icon
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -15,6 +16,7 @@ import { useParams, useRouter } from "next/navigation";
 import ProblemManager from "@/components/ui/problem/ProblemManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TeamManager from "@/components/ui/Team/TeamManager";
+import CloseAuditButton from "@/components/ui/auditSession/CloseAuditButton";
 // Stores & Hooks
 import ObservationManager from "@/components/ui/observation/ObservationManager";
 import { useModuleData, useModuleDataById } from "@/hooks/useUniversal";
@@ -115,31 +117,54 @@ const SessionHeader = ({ session }) => {
 /**
  * Tab content for team management
  */
-const TeamTabContent = ({ sessionId }) => (
+const TeamTabContent = ({ sessionId, readOnly, lockMessage }) => (
   <TabsContent value={TAB_VALUES.TEAM} className="mt-4">
-    <TeamManager auditSessionId={sessionId} />
+    <TeamManager
+      auditSessionId={sessionId}
+      readOnly={readOnly}
+      lockMessage={lockMessage}
+    />
   </TabsContent>
 );
 
 /**
  * Tab content for observations (placeholder)
  */
-const ObservationsTabContent = ({ session, onProblemCreated }) => (
+const ObservationsTabContent = ({
+  session,
+  onProblemCreated,
+  readOnly,
+  lockMessage,
+}) => (
   <TabsContent value={TAB_VALUES.OBSERVATIONS} className="mt-4">
-    <ObservationManager session={session} onProblemCreated={onProblemCreated} />
+    <ObservationManager
+      session={session}
+      onProblemCreated={onProblemCreated}
+      readOnly={readOnly}
+      lockMessage={lockMessage}
+    />
   </TabsContent>
 );
 
 /**
  * Tab content for problems (placeholder)
  */
-const ProblemsTabContent = ({ session, problemList, isLoading, refetch }) => (
+const ProblemsTabContent = ({
+  session,
+  problemList,
+  isLoading,
+  refetch,
+  readOnly,
+  lockMessage,
+}) => (
   <TabsContent value={TAB_VALUES.PROBLEMS} className="mt-4">
     <ProblemManager
       session={session}
       problemList={problemList}
       isLoading={isLoading}
       refetch={refetch}
+      readOnly={readOnly}
+      lockMessage={lockMessage}
     />
   </TabsContent>
 );
@@ -215,7 +240,41 @@ export default function AuditSessionDetailsPage() {
             Forward
           </button>
         </div>
+
+        {/* Close Audit Button (Approver Only) */}
+        <CloseAuditButton
+          auditSession={session}
+          sessionId={id}
+          problemList={problemList}
+          token={token}
+          onClose={() => window.location.reload()}
+        />
       </div>
+
+      {/* Locked Audit Alert */}
+      {(session.isLocked || session.workflowStatus === "completed") && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+          <Lock className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h3 className="font-semibold text-blue-900">
+              Audit Closed - Read Only
+            </h3>
+            <p className="text-sm text-blue-700 mt-1">
+              This audit was closed on{" "}
+              {session.closedAt
+                ? new Date(session.closedAt).toLocaleDateString()
+                : new Date(session.updatedAt).toLocaleDateString()}{" "}
+              {session.closedBy?.name && `by ${session.closedBy.name}`}. All
+              data is now read-only and cannot be modified.
+            </p>
+            {session.closureNotes && (
+              <p className="text-sm text-blue-600 mt-2 italic">
+                &ldquo;{session.closureNotes}&rdquo;
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Session Header */}
       <SessionHeader session={session} />
@@ -230,22 +289,31 @@ export default function AuditSessionDetailsPage() {
           >
             Observations
           </TabsTrigger>
-          <TabsTrigger className={"cursor-pointer"} value={TAB_VALUES.PROBLEMS}>Problems</TabsTrigger>{" "}
-        
+          <TabsTrigger className={"cursor-pointer"} value={TAB_VALUES.PROBLEMS}>
+            Problems
+          </TabsTrigger>{" "}
         </TabsList>
         {/* Tab Contents */}
-        <TeamTabContent sessionId={session._id} />
+        <TeamTabContent
+          sessionId={session._id}
+          readOnly={session.isLocked || session.workflowStatus === "completed"}
+          lockMessage="This audit is closed. Team roster cannot be modified."
+        />
         <ObservationsTabContent
           session={session}
           onProblemCreated={() => {
             refetchProblems();
           }}
+          readOnly={session.isLocked || session.workflowStatus === "completed"}
+          lockMessage="This audit is closed. New observations cannot be created."
         />
         <ProblemsTabContent
           session={session}
           problemList={problemList}
           isLoading={isLoadingProblems}
           refetch={refetchProblems}
+          readOnly={session.isLocked || session.workflowStatus === "completed"}
+          lockMessage="This audit is closed. Problems cannot be modified."
         />
       </Tabs>
     </div>

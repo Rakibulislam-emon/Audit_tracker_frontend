@@ -588,7 +588,7 @@ export default function UniversalForm({
   if (!config) {
     return (
       <div className="p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg flex items-start gap-3">
-        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+        <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
         <div>
           <p className="font-semibold">Configuration Error</p>
           <p className="text-sm mt-1">
@@ -665,7 +665,7 @@ export default function UniversalForm({
           className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-[180px] justify-center"
         >
           {/* Animated background shimmer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
           {/* Content */}
           <div className="relative z-10 flex items-center gap-2">

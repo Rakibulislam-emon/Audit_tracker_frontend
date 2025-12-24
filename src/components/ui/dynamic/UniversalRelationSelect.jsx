@@ -71,14 +71,39 @@ export default function RelationSelect({
   token,
   isSubmitting,
   errors,
+  watch, // Access to form's watch function
 }) {
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
 
+  // Build filters: merge custom filters from fieldConfig with search/status
+  const filters = React.useMemo(() => {
+    const baseFilters = { search: searchTerm, status: "active" };
+
+    // Add custom filters from fieldConfig if they exist
+    if (fieldConfig.queryFilters) {
+      Object.assign(baseFilters, fieldConfig.queryFilters);
+    }
+
+    // Handle dynamic dependency-based filtering (e.g., filter users by site from auditSession)
+    if (fieldConfig.dependsOn && watch) {
+      const dependentFieldValue = watch(fieldConfig.dependsOn.field);
+
+      if (dependentFieldValue && fieldConfig.dependsOn.extractSite) {
+        // The dependent value should be the full audit session object or ID
+        // For now, we'll use the ID to filter (backend should handle this)
+        // Note: This assumes auditSession is populated with site
+        baseFilters.auditSession = dependentFieldValue;
+      }
+    }
+
+    return baseFilters;
+  }, [searchTerm, fieldConfig.queryFilters, fieldConfig.dependsOn, watch]);
+
   const { data: relationData, isLoading } = useModuleData(
     fieldConfig.relation,
     token,
-    { search: searchTerm, status: "active" }
+    filters
   );
 
   const options = relationData?.data || [];
@@ -136,7 +161,7 @@ export default function RelationSelect({
             </PopoverTrigger>
 
             <PopoverContent
-              className="w-[var(--radix-popover-trigger-width)] p-0"
+              className="w-(--radix-popover-trigger-width) p-0"
               align="start"
               onInteractOutside={handleInteractOutside}
             >

@@ -175,6 +175,8 @@ export default function UniversalCRUDManager({
   getRowCondition = null,
   isAvailable = DEFAULT_CONFIG.isAvailable,
   customHeaderActions = null,
+  readOnly = false, // ✅ NEW: Disable all create/edit/delete actions
+  lockMessage = null, // ✅ NEW: Custom message for locked state
 }) {
   // ===========================================================================
   // STATE & HOOKS
@@ -244,7 +246,13 @@ export default function UniversalCRUDManager({
   );
 
   const { mutate: customActionMutate } = useCustomAction(token, {
-    modulesToInvalidate: ["schedules", "auditSessions"],
+    modulesToInvalidate: [
+      "schedules",
+      "auditSessions",
+      "problems", // ← FIX: Invalidate problems when approvals complete
+      "fixActions", // ← FIX: Invalidate fixActions when approvals complete
+      "approvals", // ← FIX: Keep approvals list fresh
+    ],
   });
 
   // ===========================================================================
@@ -454,11 +462,23 @@ export default function UniversalCRUDManager({
         totalCount={totalCount}
       />
 
+      {/* Lock Alert Message */}
+      {readOnly && lockMessage && (
+        <div className="p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>🔒 Read-Only Mode:</strong> {lockMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Filter and Action Section */}
       {isAvailable && (
         <div className="space-y-4 mb-6 ">
           {/* Action Button Row - Right Aligned */}
-          {(canCreate && !config?.hasCustomCreate) || customHeaderActions ? (
+          {!readOnly &&
+          ((canCreate && !config?.hasCustomCreate) || customHeaderActions) ? (
             <div className="flex justify-end w-full">
               {customHeaderActions || (
                 <ActionButtons
@@ -498,6 +518,7 @@ export default function UniversalCRUDManager({
           onCustomAction={handleCustomAction}
           onBulkDelete={handleBulkDelete}
           onBulkExport={handleBulkExport}
+          readOnly={readOnly} // ✅ Pass readOnly to disable row actions
         />
       )}
 

@@ -1168,6 +1168,7 @@ export const universalConfig = {
         "complianceOfficer",
         "groupAdmin",
         "superAdmin",
+        
       ],
       viewDetails: [
         "admin",
@@ -2222,6 +2223,7 @@ export const universalConfig = {
         "groupAdmin",
         "superAdmin",
         "companyAdmin",
+        "approver",
       ],
       viewDetails: [
         "admin",
@@ -2232,6 +2234,7 @@ export const universalConfig = {
         "groupAdmin",
         "superAdmin",
         "companyAdmin",
+        "approver", // Approvers need to view details to close audits
       ],
     },
     customActions: [
@@ -2753,6 +2756,19 @@ export const universalConfig = {
         default: "Open",
         tableColumn: true,
         filterable: true,
+      },
+      assignedTo: {
+        type: "select",
+        label: "Assign To",
+        required: true,
+        relation: "users",
+        // TODO: Implement site-based filtering
+        // Need backend support to filter users by audit session's site
+        // For now, shows all active users
+        tableColumn: true,
+        filterable: true,
+        dataAccessor: "assignedTo.name",
+        placeholder: "Select user to assign problem",
       },
       // methodology: {
       //   type: "textarea",
@@ -3344,6 +3360,15 @@ export const universalConfig = {
       },
 
       // --- File Info (Read-only in table, not on form) ---
+      thumbnail: {
+        type: "image",
+        label: "Preview",
+        tableColumn: true,
+        filterable: false,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "cloudinaryUrl", // Use the Cloudinary URL for image preview
+      },
       originalName: {
         type: "text",
         label: "Filename",
@@ -3367,9 +3392,9 @@ export const universalConfig = {
         type: "number",
         label: "Size (Bytes)",
         required: true,
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         filterable: false,
-        formField: false, // ✅ ফর্মে দেখাবে না (এডিট করা যাবে না)
+        formField: false,
         readOnly: true,
       },
       uploadedAt: {
@@ -3385,11 +3410,11 @@ export const universalConfig = {
         type: "textarea",
         label: "Caption",
         required: false,
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         filterable: true,
-        formField: true, // ✅ ফর্মে দেখাবে
-        editOnly: true, // ✅ শুধু Edit মোডে
-        readOnly: false, // ✅ এডিট করা যাবে
+        formField: true,
+        editOnly: true,
+        readOnly: false,
       },
       status: {
         type: "select",
@@ -3397,11 +3422,11 @@ export const universalConfig = {
         required: true,
         options: ["active", "inactive"],
         default: "active",
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         filterable: true,
-        formField: true, // ✅ ফর্মে দেখাবে
-        editOnly: true, // ✅ শুধু Edit মোডে
-        readOnly: false, // ✅ এডিট করা যাবে
+        formField: true,
+        editOnly: true,
+        readOnly: false,
       },
 
       // --- Common Fields (Hidden from form) ---
@@ -3409,7 +3434,7 @@ export const universalConfig = {
         type: "relation",
         label: "Created By",
         relation: "users",
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         formField: false,
         readOnly: true,
         dataAccessor: "createdBy.name",
@@ -3418,7 +3443,7 @@ export const universalConfig = {
         type: "relation",
         label: "Updated By",
         relation: "users",
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         formField: false,
         readOnly: true,
         dataAccessor: "updatedBy.name",
@@ -3426,14 +3451,14 @@ export const universalConfig = {
       createdAt: {
         type: "date",
         label: "Created At",
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         formField: false,
         readOnly: true,
       },
       updatedAt: {
         type: "date",
         label: "Updated At",
-        tableColumn: true,
+        tableColumn: false, // ✅ Hidden from table - show in detail view
         formField: false,
         readOnly: true,
       },
@@ -3550,6 +3575,48 @@ export const universalConfig = {
         "problemOwner",
       ],
     },
+
+    // Custom actions for proof table
+    customActions: [
+      {
+        action: "viewDetails",
+        label: "View",
+        type: "link",
+        href: "/dashboard/:role/proofs/:id",
+        icon: "Eye",
+      },
+    ],
+
+    // Detail view configuration
+    detailView: {
+      titleField: "originalName",
+      subtitleField: (data) =>
+        `${data.fileType} • ${(data.size / 1024).toFixed(2)} KB`,
+
+      headerCards: [
+        { field: "fileType", label: "File Type", icon: "Calendar" },
+        { field: "uploadedAt", label: "Uploaded", icon: "Clock" },
+        { field: "status", label: "Status", icon: "CheckCircle" },
+      ],
+
+      sections: [
+        {
+          title: "File Information",
+          fields: ["originalName", "fileType", "size", "caption"],
+        },
+        {
+          title: "Related Entities",
+          fields: ["problem", "fixAction"],
+        },
+        {
+          title: "Audit Trail",
+          fields: ["createdBy", "createdAt", "updatedBy", "updatedAt"],
+        },
+      ],
+
+      actions: [{ type: "edit", label: "Edit Details" }],
+    },
+
     // ✅ Indicate that standard CRUD form isn't fully applicable
     hasCustomCreate: true, // Signal to hide default "Add" button
     // hasCustomEdit: false, // Can use UniversalForm for simple edits (caption, status)

@@ -54,7 +54,7 @@ export const navItems = {
       href: "/dashboard/superAdmin/sites",
     },
     {
-      id: "check-types",
+      id: "checkTypes",
       label: "Categories",
       icon: FolderCheck,
       href: "/dashboard/superAdmin/check-types",
@@ -216,6 +216,12 @@ export const navItems = {
       href: "/dashboard/companyAdmin/sites",
     },
     {
+      id: "programs",
+      label: "Programs",
+      icon: Calendar,
+      href: "/dashboard/companyAdmin/programs",
+    },
+    {
       id: "schedules",
       label: "Schedules",
       icon: Calendar,
@@ -315,7 +321,7 @@ export const navItems = {
       href: "/dashboard/auditor",
     },
     {
-      id: "assignments",
+      id: "schedules",
       label: "My Assignments",
       icon: Calendar,
       href: "/dashboard/auditor/schedules",
@@ -352,6 +358,12 @@ export const navItems = {
       label: "Dashboard",
       icon: LayoutDashboard,
       href: "/dashboard/siteManager",
+    },
+    {
+      id: "my-tasks",
+      label: "My Tasks",
+      icon: ClipboardList,
+      href: "/dashboard/siteManager/my-problems",
     },
     {
       id: "problems",
@@ -419,8 +431,15 @@ export const navItems = {
       icon: LayoutDashboard,
       href: "/dashboard/approver",
     },
+    // audit session
     {
-      id: "pending-approvals",
+      id: "auditSessions",
+      label: "Active Audits",
+      icon: ClipboardList,
+      href: "/dashboard/approver/auditsessions",
+    },
+    {
+      id: "approvals",
       label: "Approvals",
       icon: ClipboardCheck,
       href: "/dashboard/approver/approvals",
