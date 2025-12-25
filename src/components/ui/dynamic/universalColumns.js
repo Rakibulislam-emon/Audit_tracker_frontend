@@ -236,6 +236,7 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
   //   fieldKey,
   //   item,
   // });
+
   // ✅ Handle cases where item is an object but we need a string
   if (typeof item === "object" && item !== null) {
     // If it's a user object
@@ -437,7 +438,7 @@ export const generateUniversalColumns = (module) => {
                           (word) => word.charAt(0).toUpperCase() + word.slice(1)
                         )
                         .join(" ")
-                    : "Not set"}
+                    : "N/A"}
                 </span>
               );
 

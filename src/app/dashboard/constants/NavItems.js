@@ -36,106 +36,124 @@ export const navItems = {
       href: "/dashboard/superAdmin/users",
     },
     {
-      id: "groups",
-      label: "Groups",
+      id: "organization",
+      label: "Organization",
       icon: Building2,
-      href: "/dashboard/superAdmin/groups",
+      submenu: [
+        {
+          id: "groups",
+          label: "Groups",
+          href: "/dashboard/superAdmin/groups",
+        },
+        {
+          id: "companies",
+          label: "Companies",
+          href: "/dashboard/superAdmin/companies",
+        },
+        {
+          id: "sites",
+          label: "Sites",
+          href: "/dashboard/superAdmin/sites",
+        },
+        {
+          id: "teams",
+          label: "Teams",
+          href: "/dashboard/superAdmin/teams",
+        },
+      ],
     },
     {
-      id: "companies",
-      label: "Companies",
-      icon: Building2,
-      href: "/dashboard/superAdmin/companies",
+      id: "library",
+      label: "Library",
+      icon: BookOpen,
+      submenu: [
+        {
+          id: "checkTypes",
+          label: "Check Types",
+          href: "/dashboard/superAdmin/check-types",
+        },
+        {
+          id: "rules",
+          label: "Rules",
+          href: "/dashboard/superAdmin/rules",
+        },
+        {
+          id: "questions",
+          label: "Questions",
+          href: "/dashboard/superAdmin/questions",
+        },
+        {
+          id: "templates",
+          label: "Templates",
+          href: "/dashboard/superAdmin/templates",
+        },
+        {
+          id: "programs",
+          label: "Programs",
+          href: "/dashboard/superAdmin/programs",
+        },
+      ],
     },
     {
-      id: "sites",
-      label: "Sites",
-      icon: Factory,
-      href: "/dashboard/superAdmin/sites",
+      id: "auditExecution",
+      label: "Audit Execution",
+      icon: ClipboardCheck,
+      submenu: [
+        {
+          id: "schedules",
+          label: "Schedules",
+          href: "/dashboard/superAdmin/schedules",
+        },
+        {
+          id: "auditSessions",
+          label: "Audit Sessions",
+          href: "/dashboard/superAdmin/auditsessions",
+        },
+        {
+          id: "observations",
+          label: "Observations",
+          href: "/dashboard/superAdmin/observations",
+        },
+      ],
     },
     {
-      id: "checkTypes",
-      label: "Categories",
-      icon: FolderCheck,
-      href: "/dashboard/superAdmin/check-types",
-    },
-    {
-      id: "rules",
-      label: "Rules",
-      icon: ShieldCheck,
-      href: "/dashboard/superAdmin/rules",
-    },
-    {
-      id: "questions",
-      label: "Questions",
-      icon: HelpCircle,
-      href: "/dashboard/superAdmin/questions",
-    },
-    {
-      id: "templates",
-      label: "Templates",
-      icon: FileEdit,
-      href: "/dashboard/superAdmin/templates",
-    },
-    {
-      id: "programs",
-      label: "Programs",
-      icon: CalendarCheck,
-      href: "/dashboard/superAdmin/programs",
-    },
-    {
-      id: "schedules",
-      label: "Schedules",
-      icon: Calendar,
-      href: "/dashboard/superAdmin/schedules",
-    },
-    {
-      id: "auditSessions",
-      label: "Audit Sessions",
-      icon: ClipboardList,
-      href: "/dashboard/superAdmin/auditsessions",
-    },
-    {
-      id: "teams",
-      label: "Teams",
-      icon: Users,
-      href: "/dashboard/superAdmin/teams",
-    },
-    {
-      id: "observations",
-      label: "Observations",
-      icon: SearchCheck,
-      href: "/dashboard/superAdmin/observations",
-    },
-    {
-      id: "problems",
-      label: "Problems",
+      id: "issueManagement",
+      label: "Issue Management",
       icon: AlertTriangle,
-      href: "/dashboard/superAdmin/problems",
+      submenu: [
+        {
+          id: "problems",
+          label: "Problems",
+          href: "/dashboard/superAdmin/problems",
+        },
+        {
+          id: "fixActions",
+          label: "Fix Actions",
+          href: "/dashboard/superAdmin/fix-actions",
+        },
+        {
+          id: "proofs",
+          label: "Proofs",
+          href: "/dashboard/superAdmin/proofs",
+        },
+      ],
     },
     {
-      id: "fix-actions",
-      label: "Fix Actions",
-      icon: Wrench,
-      href: "/dashboard/superAdmin/fix-actions",
-    },
-    {
-      id: "proofs",
-      label: "Proofs",
-      icon: Camera,
-      href: "/dashboard/superAdmin/proofs",
-    },
-    {
-      id: "reports",
-      label: "Reports",
+      id: "reportsCompliance",
+      label: "Reports & Compliance",
       icon: BarChart3,
-      href: "/dashboard/superAdmin/reports",
-    },
-    {
-      id: "approvals",
-      label: "Approvals",
-      icon: ThumbsUp,
-      href: "/dashboard/superAdmin/approvals",
+      submenu: [
+        {
+          id: "reports",
+          label: "Reports",
+          href: "/dashboard/superAdmin/reports",
+        },
+        {
+          id: "approvals",
+          label: "Approvals",
+          href: "/dashboard/superAdmin/approvals",
+        },
+      ],
     },
     {
       id: "settings",
@@ -159,34 +177,82 @@ export const navItems = {
       href: "/dashboard/groupAdmin/users",
     },
     {
-      id: "companies",
-      label: "Companies",
+      id: "organization",
+      label: "Organization",
       icon: Building2,
-      href: "/dashboard/groupAdmin/companies",
+      submenu: [
+        {
+          id: "companies",
+          label: "Companies",
+          href: "/dashboard/groupAdmin/companies",
+        },
+        {
+          id: "sites",
+          label: "Sites",
+          href: "/dashboard/groupAdmin/sites",
+        },
+      ],
     },
     {
-      id: "sites",
-      label: "Sites",
-      icon: Factory,
-      href: "/dashboard/groupAdmin/sites",
+      id: "library",
+      label: "Library",
+      icon: BookOpen,
+      submenu: [
+        {
+          id: "checkTypes",
+          label: "Check Types",
+          href: "/dashboard/groupAdmin/check-types",
+        },
+        {
+          id: "rules",
+          label: "Rules",
+          href: "/dashboard/groupAdmin/rules",
+        },
+        {
+          id: "questions",
+          label: "Questions",
+          href: "/dashboard/groupAdmin/questions",
+        },
+        {
+          id: "templates",
+          label: "Templates",
+          href: "/dashboard/groupAdmin/templates",
+        },
+        {
+          id: "programs",
+          label: "Programs",
+          href: "/dashboard/groupAdmin/programs",
+        },
+      ],
     },
     {
-      id: "problems",
-      label: "Problems",
+      id: "issueManagement",
+      label: "Issue Management",
       icon: AlertTriangle,
-      href: "/dashboard/groupAdmin/problems",
+      submenu: [
+        {
+          id: "problems",
+          label: "Problems",
+          href: "/dashboard/groupAdmin/problems",
+        },
+        {
+          id: "fix-actions",
+          label: "Fix Actions",
+          href: "/dashboard/groupAdmin/fix-actions",
+        },
+      ],
     },
     {
-      id: "fix-actions",
-      label: "Fix Actions",
-      icon: Wrench,
-      href: "/dashboard/groupAdmin/fix-actions",
-    },
-    {
-      id: "reports",
-      label: "Reports",
+      id: "reportsCompliance",
+      label: "Reports & Compliance",
       icon: BarChart3,
-      href: "/dashboard/groupAdmin/reports",
+      submenu: [
+        {
+          id: "reports",
+          label: "Reports",
+          href: "/dashboard/groupAdmin/reports",
+        },
+      ],
     },
     {
       id: "settings",
@@ -210,40 +276,62 @@ export const navItems = {
       href: "/dashboard/companyAdmin/users",
     },
     {
-      id: "sites",
-      label: "Sites",
-      icon: Factory,
-      href: "/dashboard/companyAdmin/sites",
+      id: "organization",
+      label: "Organization",
+      icon: Building2,
+      submenu: [
+        {
+          id: "sites",
+          label: "Sites",
+          href: "/dashboard/companyAdmin/sites",
+        },
+      ],
     },
     {
-      id: "programs",
-      label: "Programs",
-      icon: Calendar,
-      href: "/dashboard/companyAdmin/programs",
+      id: "auditExecution",
+      label: "Audit Execution",
+      icon: ClipboardCheck,
+      submenu: [
+        {
+          id: "programs",
+          label: "Programs",
+          href: "/dashboard/companyAdmin/programs",
+        },
+        {
+          id: "schedules",
+          label: "Schedules",
+          href: "/dashboard/companyAdmin/schedules",
+        },
+        {
+          id: "auditSessions",
+          label: "Audit Sessions",
+          href: "/dashboard/companyAdmin/auditsessions",
+        },
+      ],
     },
     {
-      id: "schedules",
-      label: "Schedules",
-      icon: Calendar,
-      href: "/dashboard/companyAdmin/schedules",
+      id: "issueManagement",
+      label: "Issue Management",
+      icon: AlertTriangle,
+      submenu: [
+        {
+          id: "fix-actions",
+          label: "Fix Actions",
+          href: "/dashboard/companyAdmin/fix-actions",
+        },
+      ],
     },
     {
-      id: "auditSessions",
-      label: "Audit Sessions",
-      icon: ClipboardList,
-      href: "/dashboard/companyAdmin/auditsessions",
-    },
-    {
-      id: "fix-actions",
-      label: "Fix Actions",
-      icon: Wrench,
-      href: "/dashboard/companyAdmin/fix-actions",
-    },
-    {
-      id: "reports",
-      label: "Reports",
+      id: "reportsCompliance",
+      label: "Reports & Compliance",
       icon: BarChart3,
-      href: "/dashboard/companyAdmin/reports",
+      submenu: [
+        {
+          id: "reports",
+          label: "Reports",
+          href: "/dashboard/companyAdmin/reports",
+        },
+      ],
     },
     {
       id: "settings",
@@ -262,7 +350,7 @@ export const navItems = {
     },
     {
       id: "library",
-      label: "Standards Library",
+      label: "Library",
       icon: BookOpen,
       submenu: [
         {
@@ -285,25 +373,29 @@ export const navItems = {
           label: "Templates",
           href: "/dashboard/complianceOfficer/templates",
         },
+        {
+          id: "programs",
+          label: "Programs",
+          href: "/dashboard/complianceOfficer/programs",
+        },
       ],
     },
     {
-      id: "programs",
-      label: "Programs",
-      icon: CalendarCheck,
-      href: "/dashboard/complianceOfficer/programs",
-    },
-    {
-      id: "approvals",
-      label: "Approvals",
-      icon: ThumbsUp,
-      href: "/dashboard/complianceOfficer/approvals",
-    },
-    {
-      id: "reports",
-      label: "Reports",
+      id: "reportsCompliance",
+      label: "Reports & Compliance",
       icon: BarChart3,
-      href: "/dashboard/complianceOfficer/reports",
+      submenu: [
+        {
+          id: "approvals",
+          label: "Approvals",
+          href: "/dashboard/complianceOfficer/approvals",
+        },
+        {
+          id: "reports",
+          label: "Reports",
+          href: "/dashboard/complianceOfficer/reports",
+        },
+      ],
     },
     {
       id: "settings",
@@ -366,22 +458,26 @@ export const navItems = {
       href: "/dashboard/siteManager/my-problems",
     },
     {
-      id: "problems",
-      label: "My Problems",
-      icon: ClipboardList,
-      href: "/dashboard/siteManager/problems",
-    },
-    {
-      id: "fix-actions",
-      label: "Fix Actions",
-      icon: Wrench,
-      href: "/dashboard/siteManager/fix-actions",
-    },
-    {
-      id: "proofs",
-      label: "Proofs",
-      icon: Camera,
-      href: "/dashboard/siteManager/proofs",
+      id: "issueManagement",
+      label: "Issue Management",
+      icon: AlertTriangle,
+      submenu: [
+        {
+          id: "problems",
+          label: "My Problems",
+          href: "/dashboard/siteManager/problems",
+        },
+        {
+          id: "fix-actions",
+          label: "Fix Actions",
+          href: "/dashboard/siteManager/fix-actions",
+        },
+        {
+          id: "proofs",
+          label: "Proofs",
+          href: "/dashboard/siteManager/proofs",
+        },
+      ],
     },
     {
       id: "settings",
@@ -399,22 +495,26 @@ export const navItems = {
       href: "/dashboard/problemOwner",
     },
     {
-      id: "my-tasks",
-      label: "My Tasks",
-      icon: ClipboardList,
-      href: "/dashboard/problemOwner/my-problems",
-    },
-    {
-      id: "fix-actions",
-      label: "Fix Actions",
-      icon: Wrench,
-      href: "/dashboard/problemOwner/fix-actions",
-    },
-    {
-      id: "proofs",
-      label: "Proofs",
-      icon: Camera,
-      href: "/dashboard/problemOwner/proofs",
+      id: "issueManagement",
+      label: "Issue Management",
+      icon: AlertTriangle,
+      submenu: [
+        {
+          id: "my-tasks",
+          label: "My Tasks",
+          href: "/dashboard/problemOwner/my-problems",
+        },
+        {
+          id: "fix-actions",
+          label: "Fix Actions",
+          href: "/dashboard/problemOwner/fix-actions",
+        },
+        {
+          id: "proofs",
+          label: "Proofs",
+          href: "/dashboard/problemOwner/proofs",
+        },
+      ],
     },
     {
       id: "settings",
@@ -431,7 +531,6 @@ export const navItems = {
       icon: LayoutDashboard,
       href: "/dashboard/approver",
     },
-    // audit session
     {
       id: "auditSessions",
       label: "Active Audits",
@@ -439,16 +538,43 @@ export const navItems = {
       href: "/dashboard/approver/auditsessions",
     },
     {
-      id: "approvals",
-      label: "Approvals",
-      icon: ClipboardCheck,
-      href: "/dashboard/approver/approvals",
+      id: "issueManagement",
+      label: "Issue Management",
+      icon: AlertTriangle,
+      submenu: [
+        {
+          id: "problems",
+          label: "Problems",
+          href: "/dashboard/approver/problems",
+        },
+        {
+          id: "fixActions",
+          label: "Fix Actions",
+          href: "/dashboard/approver/fix-actions",
+        },
+        {
+          id: "proofs",
+          label: "Proofs",
+          href: "/dashboard/approver/proofs",
+        },
+      ],
     },
     {
-      id: "reports",
-      label: "Reports",
+      id: "reportsCompliance",
+      label: "Reports & Compliance",
       icon: BarChart3,
-      href: "/dashboard/approver/reports",
+      submenu: [
+        {
+          id: "approvals",
+          label: "Approvals",
+          href: "/dashboard/approver/approvals",
+        },
+        {
+          id: "reports",
+          label: "Reports",
+          href: "/dashboard/approver/reports",
+        },
+      ],
     },
     {
       id: "settings",

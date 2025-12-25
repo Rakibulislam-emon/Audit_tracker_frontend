@@ -1168,7 +1168,6 @@ export const universalConfig = {
         "complianceOfficer",
         "groupAdmin",
         "superAdmin",
-        
       ],
       viewDetails: [
         "admin",
@@ -3038,6 +3037,39 @@ export const universalConfig = {
         tableColumn: true,
         filterable: true,
       },
+
+      // ===== CAPA FIELDS (Root Cause Analysis) =====
+      rootCause: {
+        type: "textarea",
+        label: "Root Cause",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        formField: true,
+        placeholder: "Why did the problem occur?",
+      },
+      correctiveAction: {
+        type: "textarea",
+        label: "Corrective Action",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        formField: true,
+        placeholder: "Fix for this specific instance",
+      },
+      preventiveAction: {
+        type: "textarea",
+        label: "Preventive Action",
+        required: false,
+        tableColumn: true,
+        filterable: true,
+        fullWidth: true,
+        formField: true,
+        placeholder: "Prevent recurrence in the future",
+      },
+
       // Verification fields (mostly read-only in table, maybe editable in form for verifiers)
       verifiedBy: {
         type: "select",
