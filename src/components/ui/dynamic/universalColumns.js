@@ -1,5 +1,6 @@
 // components/dynamic/universalColumns.js - Professional & Minimal
 import { universalConfig } from "@/config/dynamicConfig";
+import Image from "next/image";
 
 // 🎨 PROFESSIONAL COLOR SYSTEM - Minimal & Clean
 const COLOR_SYSTEM = {
@@ -235,6 +236,7 @@ const getRelationDisplayValue = (item, relationModule, fieldKey) => {
   //   fieldKey,
   //   item,
   // });
+
   // ✅ Handle cases where item is an object but we need a string
   if (typeof item === "object" && item !== null) {
     // If it's a user object
@@ -436,7 +438,7 @@ export const generateUniversalColumns = (module) => {
                           (word) => word.charAt(0).toUpperCase() + word.slice(1)
                         )
                         .join(" ")
-                    : "Not set"}
+                    : "N/A"}
                 </span>
               );
 
@@ -468,6 +470,30 @@ export const generateUniversalColumns = (module) => {
                 </a>
               ) : (
                 <span className="text-gray-400 text-sm">No email</span>
+              );
+
+            case "image":
+              // For image fields, use the dataAccessor to get the actual image URL
+              const imageUrl = fieldConfig.dataAccessor
+                ? info.row.original[fieldConfig.dataAccessor]
+                : value;
+
+              return imageUrl ? (
+                <div className="flex items-center justify-center">
+                  <Image
+                    width={64}
+                    height={64}
+                    src={imageUrl}
+                    alt="Preview"
+                    className="h-16 w-16 object-cover rounded border border-gray-200 hover:scale-150 transition-transform duration-200 cursor-pointer"
+                    onError={(e) => {
+                      e.target.src =
+                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%239ca3af">No Image</text></svg>';
+                    }}
+                  />
+                </div>
+              ) : (
+                <span className="text-gray-400 text-sm">No image</span>
               );
 
             default:

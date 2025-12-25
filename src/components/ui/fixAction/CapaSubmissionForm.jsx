@@ -16,7 +16,8 @@ import {
   X,
 } from "lucide-react";
 import { useState, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import UniversalDatePicker from "@/components/ui/dynamic/UniversalDatePicker";
 import { toast } from "sonner";
 
 export default function CapaSubmissionForm({ problem, onClose, onSuccess }) {
@@ -31,6 +32,7 @@ export default function CapaSubmissionForm({ problem, onClose, onSuccess }) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -230,12 +232,17 @@ export default function CapaSubmissionForm({ problem, onClose, onSuccess }) {
           <Calendar className="h-4 w-4" />
           Completion Deadline <span className="text-red-500">*</span>
         </Label>
-        <Input
-          id="deadline"
-          type="date"
-          {...register("deadline", { required: "Deadline is required" })}
-          disabled={isSubmitting}
-          min={new Date().toISOString().split("T")[0]}
+        <Controller
+          name="deadline"
+          control={control}
+          rules={{ required: "Deadline is required" }}
+          render={({ field }) => (
+            <UniversalDatePicker
+              field={field}
+              isSubmitting={isSubmitting}
+              hasError={!!errors.deadline}
+            />
+          )}
         />
         {errors.deadline && (
           <p className="text-xs text-red-500">{errors.deadline.message}</p>

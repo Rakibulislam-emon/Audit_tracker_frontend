@@ -436,17 +436,22 @@ export default function UniversalTable({
   onBulkDelete,
   onBulkExport,
   onBulkStatusChange,
+  readOnly = false, // ✅ NEW: Disable all actions when true
 }) {
   const [sorting, setSorting] = useState([]);
   const [density, setDensity] = useState("comfortable");
   const [rowSelection, setRowSelection] = useState({});
   const { user } = useAuthStore();
 
+  // Override enableActions if readOnly
+  const actualEnableActions = !readOnly && enableActions;
+  const actualEnableBulkActions = !readOnly && enableBulkActions;
+
   // Memoize columns to prevent regeneration on every render
   const columns = useMemo(() => {
     const baseColumns = generateUniversalColumns(module);
 
-    const selectionColumn = enableBulkActions
+    const selectionColumn = actualEnableBulkActions
       ? [
           {
             id: "select",
@@ -472,7 +477,7 @@ export default function UniversalTable({
         ]
       : [];
 
-    const actionsColumn = enableActions
+    const actionsColumn = actualEnableActions
       ? [
           {
             id: "actions",
@@ -495,8 +500,8 @@ export default function UniversalTable({
     return [...selectionColumn, ...baseColumns, ...actionsColumn];
   }, [
     module,
-    enableActions,
-    enableBulkActions,
+    actualEnableActions,
+    actualEnableBulkActions,
     onEdit,
     onDelete,
     moduleConfig,
@@ -513,7 +518,7 @@ export default function UniversalTable({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    enableRowSelection: enableBulkActions,
+    enableRowSelection: actualEnableBulkActions,
     getRowId: (row) => row._id || row.id,
     ...options,
   });
@@ -531,7 +536,7 @@ export default function UniversalTable({
   return (
     <div className="space-y-3">
       {/* Bulk Action Toolbar */}
-      {enableBulkActions && selectedItems.length > 0 && (
+      {actualEnableBulkActions && selectedItems.length > 0 && (
         <BulkActionToolbar
           selectedCount={selectedItems.length}
           selectedItems={selectedItems}
@@ -618,7 +623,7 @@ export default function UniversalTable({
               key={row.id}
               row={row}
               getPriorityLevel={getPriorityLevel}
-              enableActions={enableActions}
+              enableActions={actualEnableActions}
             />
           ))}
         </div>
