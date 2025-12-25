@@ -128,20 +128,27 @@ export default function MyProblemsPage() {
                       </Badge>
                     </div>
                   </div>
-                  {/* Only show Submit CAPA if assigned to current user AND not already submitted */}
+                  {/* Only show Submit CAPA if status is Open */}
                   {problem.assignedTo?._id === user?._id &&
-                    (problem.problemStatus !== "fix_submitted" ? (
-                      <Button onClick={() => handleSubmitCapa(problem)}>
-                        Submit CAPA
-                      </Button>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-blue-50 text-blue-700 border-blue-200"
-                      >
-                        In Review
-                      </Badge>
-                    ))}
+                  problem.problemStatus === "Open" ? (
+                    <Button onClick={() => handleSubmitCapa(problem)}>
+                      Submit CAPA
+                    </Button>
+                  ) : problem.problemStatus === "In Progress" ? (
+                    <Badge
+                      variant="outline"
+                      className="bg-blue-50 text-blue-700 border-blue-200"
+                    >
+                      In Review
+                    </Badge>
+                  ) : problem.problemStatus === "Resolved" ? (
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
+                      Resolved
+                    </Badge>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>
