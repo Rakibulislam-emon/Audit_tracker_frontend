@@ -106,6 +106,7 @@ const ProblemRow = ({
   onAssign,
   isUpdating,
   onRefreshUsers,
+  readOnly = false, // ✅ NEW: Disable actions
 }) => (
   <div className="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
     {/* Problem Details */}
@@ -153,7 +154,7 @@ const ProblemRow = ({
         problem={problem}
         users={siteUsers}
         onAssign={onAssign}
-        isLeadAuditor={isLeadAuditor}
+        isLeadAuditor={isLeadAuditor && !readOnly} // ✅ Disable if read-only
         isUpdating={isUpdating}
         onRefreshUsers={onRefreshUsers}
       />
@@ -171,20 +172,22 @@ const ProblemRow = ({
         </Button>
       )}
 
-      {/* Delete Button */}
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onDelete(problem._id)}
-        disabled={isDeleting}
-        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-      >
-        {isDeleting ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Trash2 className="h-3 w-3" />
-        )}
-      </Button>
+      {/* Delete Button - Hide when read-only */}
+      {!readOnly && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onDelete(problem._id)}
+          disabled={isDeleting}
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          {isDeleting ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Trash2 className="h-3 w-3" />
+          )}
+        </Button>
+      )}
     </div>
   </div>
 );
@@ -204,6 +207,8 @@ const ProblemsList = ({
   onAssign,
   isUpdating,
   onRefreshUsers,
+  readOnly = false, // ✅ NEW
+  lockMessage = null, // ✅ NEW
 }) => (
   <Card>
     <CardHeader className="pb-4">
@@ -212,6 +217,17 @@ const ProblemsList = ({
       </CardTitle>
     </CardHeader>
     <CardContent className="p-0">
+      {/* Lock Message */}
+      {readOnly && lockMessage && (
+        <div className="p-4 bg-amber-50 border-b border-amber-200 flex items-start gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>🔒 Read-Only Mode:</strong> {lockMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
       {isLoading && <ProblemsLoadingState />}
 
       {!isLoading && problems.length === 0 && <ProblemsEmptyState />}
@@ -231,6 +247,7 @@ const ProblemsList = ({
               onAssign={onAssign}
               isUpdating={isUpdating}
               onRefreshUsers={onRefreshUsers}
+              readOnly={readOnly} // ✅ Pass readOnly to row
             />
           ))}
         </div>
@@ -248,6 +265,8 @@ export default function ProblemManager({
   problemList,
   isLoading,
   refetch,
+  readOnly = false, // ✅ NEW: Disable actions when audit is locked
+  lockMessage = null, // ✅ NEW: Display lock message
 }) {
   // ===========================================================================
   // STATE MANAGEMENT
@@ -378,6 +397,8 @@ export default function ProblemManager({
         onAssign={handleAssign}
         isUpdating={isUpdating}
         onRefreshUsers={refetchUsers}
+        readOnly={readOnly} // ✅ Pass readOnly prop
+        lockMessage={lockMessage} // ✅ Pass lockMessage prop
       />
 
       {/* 🎯 Fix Action Management Modal */}

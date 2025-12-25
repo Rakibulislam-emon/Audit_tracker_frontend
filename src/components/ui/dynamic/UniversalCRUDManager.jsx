@@ -11,8 +11,10 @@ import UniversalFilters from "@/components/ui/dynamic/UniversalFilters";
 import UniversalForm from "@/components/ui/dynamic/UniversalForm";
 import UniversalTable from "@/components/ui/dynamic/UniversalTable";
 import Modal from "@/components/ui/modal";
+import AccessDenied from "@/components/ui/AccessDenied";
 
 // Hooks & Config
+import { navItems } from "@/app/dashboard/constants/NavItems";
 import { universalConfig } from "@/config/dynamicConfig";
 import {
   useCreateModule,
@@ -101,10 +103,10 @@ const ActionButtons = ({
     return (
       <button
         onClick={onOpenCreateModal}
-        className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden"
+        className="group cursor-pointer relative inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 overflow-hidden"
       >
         {/* Animated background shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
         {/* Icon with animation */}
         <div className="relative z-10 p-1 bg-white/20 rounded-md group-hover:bg-white/30 transition-colors duration-300">
@@ -173,6 +175,8 @@ export default function UniversalCRUDManager({
   getRowCondition = null,
   isAvailable = DEFAULT_CONFIG.isAvailable,
   customHeaderActions = null,
+  readOnly = false, // ✅ NEW: Disable all create/edit/delete actions
+  lockMessage = null, // ✅ NEW: Custom message for locked state
 }) {
   // ===========================================================================
   // STATE & HOOKS
@@ -186,6 +190,29 @@ export default function UniversalCRUDManager({
   const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const config = universalConfig[module];
+
+  // ===========================================================================
+  // NAVIGATION SECURITY GUARD (Jailing)
+  // ===========================================================================
+
+  const isAllowedToBrowse = useMemo(() => {
+    if (!user || !module) return true; // Safety fallback
+
+    const roleNav = navItems[user.role] || [];
+
+    // Check if module ID exists in direct nav items or in submenus
+    return roleNav.some(
+      (item) =>
+        item.id === module ||
+        (item.submenu && item.submenu.some((sub) => sub.id === module))
+    );
+  }, [user, module]);
+
+  // If not in nav, and we are on a standalone page (not a detail view component)
+  // we block the entire render with our AccessDenied component.
+  if (!isAllowedToBrowse) {
+    return <AccessDenied module={module} role={user?.role} />;
+  }
 
   // ===========================================================================
   // DATA FETCHING
@@ -219,7 +246,13 @@ export default function UniversalCRUDManager({
   );
 
   const { mutate: customActionMutate } = useCustomAction(token, {
-    modulesToInvalidate: ["schedules", "auditSessions"],
+    modulesToInvalidate: [
+      "schedules",
+      "auditSessions",
+      "problems", // ← FIX: Invalidate problems when approvals complete
+      "fixActions", // ← FIX: Invalidate fixActions when approvals complete
+      "approvals", // ← FIX: Keep approvals list fresh
+    ],
   });
 
   // ===========================================================================
@@ -429,11 +462,23 @@ export default function UniversalCRUDManager({
         totalCount={totalCount}
       />
 
+      {/* Lock Alert Message */}
+      {readOnly && lockMessage && (
+        <div className="p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>🔒 Read-Only Mode:</strong> {lockMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Filter and Action Section */}
       {isAvailable && (
         <div className="space-y-4 mb-6 ">
           {/* Action Button Row - Right Aligned */}
-          {(canCreate && !config?.hasCustomCreate) || customHeaderActions ? (
+          {!readOnly &&
+          ((canCreate && !config?.hasCustomCreate) || customHeaderActions) ? (
             <div className="flex justify-end w-full">
               {customHeaderActions || (
                 <ActionButtons
@@ -473,6 +518,7 @@ export default function UniversalCRUDManager({
           onCustomAction={handleCustomAction}
           onBulkDelete={handleBulkDelete}
           onBulkExport={handleBulkExport}
+          readOnly={readOnly} // ✅ Pass readOnly to disable row actions
         />
       )}
 
@@ -499,6 +545,7 @@ export default function UniversalCRUDManager({
               initialData={modalType === "edit" ? selectedItem : {}}
               mode={modalType}
               token={token}
+              user={user}
               isSubmitting={isCreating || isUpdating}
               submissionError={submissionError}
             />

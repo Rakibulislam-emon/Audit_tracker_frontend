@@ -13,7 +13,12 @@ import ObservationCard from "./ObservationCard";
  * 2. Ei Session-er shob saved Observation load kore.
  * 3. Dui-ta-ke merge kore ekta list dekhay.
  */
-export default function ObservationManager({ session, onProblemCreated }) {
+export default function ObservationManager({
+  session,
+  onProblemCreated,
+  readOnly = false,
+  lockMessage = null,
+}) {
   const { token, user } = useAuthStore();
   const { useSessionAssignments } = useQuestionAssignments();
 
@@ -118,19 +123,32 @@ export default function ObservationManager({ session, onProblemCreated }) {
   // --- Render ---
   return (
     <div className="space-y-4">
+      {/* Lock Message */}
+      {readOnly && lockMessage && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>🔒 Read-Only Mode:</strong> {lockMessage}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Pass readOnly to observation cards */}
+      {/* Assignment Dropdown removed as per request */}
       {questionsWithAnswers.map(({ question, savedObservation }) => (
         <ObservationCard
           key={question._id}
           session={session}
           question={question}
           savedObservation={savedObservation}
-          /* Assignment Dropdown removed as per request */
           isLeadAuditor={isLeadAuditor}
           teamMembers={teamData?.data || []}
           onSave={() => {
             refetchObservations();
           }}
           onProblemCreated={onProblemCreated}
+          readOnly={readOnly}
         />
       ))}
     </div>

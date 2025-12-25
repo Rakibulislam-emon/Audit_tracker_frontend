@@ -275,7 +275,7 @@ export default function ObservationCard({
             <p className="font-medium text-foreground flex-1">
               {question.questionText}
             </p>
-            {/* Assignment Dropdown removed */}\n
+            {/* Assignment Dropdown removed */}
           </div>
 
           {renderResponseInput()}
