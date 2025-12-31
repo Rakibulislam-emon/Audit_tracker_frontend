@@ -64,6 +64,51 @@ export default function LoginForm() {
       if (data.rememberMe) localStorage.setItem("auth_token", result.token);
 
       const roleRoutes = {
+        superadmin: "/dashboard/admin",
+        admin: "/dashboard/admin",
+        auditor: "/dashboard/auditor",
+        manager: "/dashboard/manager",
+        user: "/dashboard/user",
+      };
+      router.push(roleRoutes[result.role.toLowerCase()] || "/dashboard");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setServerError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/demo-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Demo login failed. Please try again later.");
+      }
+
+      const result = await response.json();
+
+      useAuthStore.getState().login(
+        {
+          _id: result._id,
+          name: result.name,
+          email: result.email,
+          role: result.role,
+          isReadOnly: true,
+        },
+        result.token
+      );
+
+      const roleRoutes = {
+        superadmin: "/dashboard/admin",
         admin: "/dashboard/admin",
         auditor: "/dashboard/auditor",
         manager: "/dashboard/manager",
@@ -71,7 +116,7 @@ export default function LoginForm() {
       };
       router.push(roleRoutes[result.role.toLowerCase()] || "/dashboard");
     } catch (err) {
-      setServerError(err.message || "An error occurred");
+      setServerError(err.message || "Demo login failed");
     } finally {
       setIsLoading(false);
     }
@@ -179,7 +224,7 @@ export default function LoginForm() {
       {/* Server Error */}
       {serverError && (
         <div className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
           <div className="flex-1">
             <h3 className="text-sm font-medium text-red-800">
               Authentication Failed
@@ -204,6 +249,30 @@ export default function LoginForm() {
             Sign In <ArrowRight className="w-4 h-4" />
           </span>
         )}
+      </Button>
+
+      {/* Demo Multi-Role Trigger */}
+      <div className="relative py-4">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-slate-200"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-slate-500">Recruiter Access</span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isLoading}
+        onClick={handleDemoLogin}
+        className="w-full h-11 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 font-medium flex items-center justify-center gap-2 group shadow-sm bg-blue-50/30"
+      >
+        <span className="relative flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+        </span>
+        Explore Demo as Super Admin
       </Button>
     </form>
   );
