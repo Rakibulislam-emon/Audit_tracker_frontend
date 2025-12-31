@@ -7,6 +7,7 @@ export const useAuthStore = create(
       user: null,
       token: null,
       isLoading: true,
+      isReadOnly: false,
 
       setUser: (user) => set({ user }),
       setToken: (token) => set({ token }),
@@ -16,7 +17,12 @@ export const useAuthStore = create(
       getUserRole: () => get().user && get().user.role,
 
       login: (userData, token) => {
-        set({ user: userData, token, isLoading: false });
+        set({
+          user: userData,
+          token,
+          isLoading: false,
+          isReadOnly: !!userData.isReadOnly,
+        });
         Cookies.set("token", token, {
           expires: 7, // 7 দিন
           path: "/",
@@ -27,7 +33,7 @@ export const useAuthStore = create(
       // new
 
       logout: () => {
-        set({ user: null, token: null, isLoading: false });
+        set({ user: null, token: null, isLoading: false, isReadOnly: false });
         localStorage.removeItem("auth-storage");
         Cookies.remove("token");
       },
@@ -55,6 +61,7 @@ export const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        isReadOnly: state.isReadOnly,
       }),
       onRehydrateStorage: () => (state) => {
         state.setLoading(false);

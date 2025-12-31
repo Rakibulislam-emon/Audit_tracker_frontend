@@ -436,6 +436,7 @@ export default function UniversalTable({
   onBulkDelete,
   onBulkExport,
   onBulkStatusChange,
+  customRowActions = null, // ✅ NEW: Custom actions renderer
   readOnly = false, // ✅ NEW: Disable all actions when true
 }) {
   const [sorting, setSorting] = useState([]);
@@ -483,14 +484,22 @@ export default function UniversalTable({
             id: "actions",
             header: "Actions",
             cell: (info) => (
-              <UniversalActions
-                item={info.row.original}
-                module={module}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                moduleConfig={moduleConfig}
-                onCustomAction={onCustomAction}
-              />
+              <div className="flex items-center justify-center gap-2">
+                {/* Custom row actions if provided */}
+                {customRowActions ? (
+                  customRowActions(info.row.original)
+                ) : (
+                  /* Default actions */
+                  <UniversalActions
+                    item={info.row.original}
+                    module={module}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    moduleConfig={moduleConfig}
+                    onCustomAction={onCustomAction}
+                  />
+                )}
+              </div>
             ),
             enableSorting: false,
           },

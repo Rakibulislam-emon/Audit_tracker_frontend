@@ -175,9 +175,12 @@ export default function UniversalCRUDManager({
   getRowCondition = null,
   isAvailable = DEFAULT_CONFIG.isAvailable,
   customHeaderActions = null,
-  readOnly = false, // ✅ NEW: Disable all create/edit/delete actions
+  customRowActions = null, // ✅ NEW: Custom actions for each row
+  readOnly: propReadOnly = false, // ✅ NEW: Disable all create/edit/delete actions
   lockMessage = null, // ✅ NEW: Custom message for locked state
 }) {
+  const globalReadOnly = useAuthStore((state) => state.isReadOnly);
+  const readOnly = propReadOnly || globalReadOnly;
   // ===========================================================================
   // STATE & HOOKS
   // ===========================================================================
@@ -518,6 +521,7 @@ export default function UniversalCRUDManager({
           onCustomAction={handleCustomAction}
           onBulkDelete={handleBulkDelete}
           onBulkExport={handleBulkExport}
+          customRowActions={customRowActions} // ✅ Pass custom row actions
           readOnly={readOnly} // ✅ Pass readOnly to disable row actions
         />
       )}
