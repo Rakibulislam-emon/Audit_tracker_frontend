@@ -39,12 +39,7 @@ export const universalConfig = {
         label: "Role",
         required: true,
         options: [
-          // Old roles
-          "admin",
-          "manager",
           "complianceOfficer",
-          "sysadmin",
-
           // New roles
           "auditor",
           "superAdmin",
@@ -1862,34 +1857,35 @@ export const universalConfig = {
     },
 
     permissions: {
-      create: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
-      edit: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
-      delete: ["admin", "sysadmin", "groupAdmin", "superAdmin", "companyAdmin"],
+      create: ["superAdmin", "groupAdmin", "companyAdmin", "siteManager"],
+      edit: ["superAdmin", "groupAdmin", "companyAdmin", "siteManager"],
+      delete: ["superAdmin", "groupAdmin", "companyAdmin"],
       view: [
-        "admin",
-        "sysadmin",
-        "manager",
+        "complianceOfficer",
         "auditor",
-        "groupAdmin",
         "superAdmin",
+        "groupAdmin",
         "companyAdmin",
+        "siteManager",
+        "problemOwner",
+        "approver",
       ],
       start: [
-        "admin",
-        "sysadmin",
-        "manager",
         "auditor",
-        "groupAdmin",
         "superAdmin",
-      ], // Allow auditors, checkUser filters to assigned lead only
-      viewDetails: [
-        "admin",
-        "sysadmin",
-        "manager",
-        "auditor",
         "groupAdmin",
-        "superAdmin",
         "companyAdmin",
+        "siteManager",
+      ],
+      viewDetails: [
+        "complianceOfficer",
+        "auditor",
+        "superAdmin",
+        "groupAdmin",
+        "companyAdmin",
+        "siteManager",
+        "problemOwner",
+        "approver",
       ],
     },
 
@@ -3742,6 +3738,24 @@ export const universalConfig = {
         formField: true,
         editOnly: true, // Allow editing system status
       },
+      template: {
+        type: "select",
+        label: "PDF Template",
+        required: false,
+        options: ["standard", "executive", "detailed", "custom"],
+        default: "standard",
+        tableColumn: true,
+        filterable: true,
+        formField: true,
+      },
+      exportCount: {
+        type: "number",
+        label: "Exports",
+        tableColumn: true,
+        formField: false,
+        readOnly: true,
+        dataAccessor: "exportMetadata.exportCount",
+      },
 
       // Generated Info (Read-only, in table only)
       generatedBy: {
@@ -3890,6 +3904,17 @@ export const universalConfig = {
         "admin",
         "sysadmin",
         "manager",
+        "groupAdmin",
+        "superAdmin",
+        "companyAdmin",
+        "approver",
+      ],
+      // ✅ Custom permission for export functionality
+      export: [
+        "admin",
+        "sysadmin",
+        "manager",
+        "auditor",
         "groupAdmin",
         "superAdmin",
         "companyAdmin",

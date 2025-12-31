@@ -12,6 +12,7 @@ import { FilePlus2 } from "lucide-react"; // Icon for generate
 import { useCallback, useState } from "react";
 // ❌ useSearchParams ইম্পোর্ট সরানো হয়েছে
 import ReportGenerateForm from "@/components/ui/reports/ReportGenerateForm"; // কাস্টম ফর্ম ইম্পোর্ট
+import ExportButton from "@/components/ui/reports/ExportButton"; // ✅ Export button with multiple formats
 import { toast } from "sonner";
 
 export default function ReportManagementPage() {
@@ -22,7 +23,6 @@ export default function ReportManagementPage() {
   const config = universalConfig[moduleName]; // config এখানে লোড করুন
 
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
-
 
   // ✅ কাস্টম 'generate' পারমিশন চেক
   const canGenerate =
@@ -81,6 +81,15 @@ export default function ReportManagementPage() {
             </Button>
           )
         }
+        // ✅ Add export button to each row
+        customRowActions={(row) => (
+          <ExportButton
+            reportId={row._id}
+            reportData={row}
+            token={token}
+            compact
+          />
+        )}
         userRole={user?.role} // Pass user role for column permissions
       />
 

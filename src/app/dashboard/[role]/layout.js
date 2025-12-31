@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function RoleLayout({ children }) {
-  const { user, isLoading } = useAuthStore();
+  const { user, isLoading, isReadOnly } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const role = params.role;
@@ -24,8 +24,8 @@ export default function RoleLayout({ children }) {
     if (!isLoading && mounted) {
       if (!user) {
         router.replace("/auth/login");
-      } else if (user.role !== role) {
-        router.replace(`/dashboard/${user.role}`);
+      } else if (user.role.toLowerCase() !== role.toLowerCase()) {
+        router.replace(`/dashboard/${user.role.toLowerCase()}`);
       }
     }
   }, [user, isLoading, role, router, mounted]);
@@ -38,7 +38,7 @@ export default function RoleLayout({ children }) {
     );
   }
 
-  if (user.role !== role) {
+  if (user.role.toLowerCase() !== role.toLowerCase()) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner />
@@ -78,6 +78,17 @@ export default function RoleLayout({ children }) {
         </div>
 
         {/* Page Content */}
+        {isReadOnly && (
+          <div className="bg-blue-600 text-white px-4 py-2 text-center text-sm font-medium animate-in fade-in slide-in-from-top duration-500">
+            <span className="flex items-center justify-center gap-2">
+              <span className="bg-white/20 px-2 py-0.5 rounded text-[10px] uppercase font-bold border border-white/30">
+                Demo Mode
+              </span>
+              You are exploring as Super Admin. Form submissions and deletions
+              are disabled.
+            </span>
+          </div>
+        )}
         <main className="flex-1 overflow-auto p-4">{children}</main>
       </div>
 
