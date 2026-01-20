@@ -582,5 +582,11 @@ export const navItems = {
       icon: Settings,
       href: "/dashboard/approver/settings",
     },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      href: "/dashboard/approver/settings",
+    },
   ],
 };
